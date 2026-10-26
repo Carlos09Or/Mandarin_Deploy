@@ -83,20 +83,46 @@ export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Prop
             </g>
           )}
 
-          {/* Arms */}
+          {/* Arms: one drawing hanging down, one raised with the elbow out; CSS shows one per pose */}
           <g className="wawa-arm-l">
-            <path d="M50 112 C38 122 36 134 42 146" fill="none" stroke={GOLD_DARK} strokeWidth="13" strokeLinecap="round" />
-            <circle cx="43" cy="150" r="8.5" fill={GOLD} />
-            {[35, 43, 51].map((x, i) => (
-              <circle key={x} cx={x} cy={i === 1 ? 158 : 155} r="4.2" fill={GOLD} />
-            ))}
+            <g className="wawa-arm-down">
+              <path d="M50 112 C38 122 36 134 42 146" fill="none" stroke={GOLD_DARK} strokeWidth="13" strokeLinecap="round" />
+              <circle cx="43" cy="150" r="8.5" fill={GOLD} />
+              {[35, 43, 51].map((x, i) => (
+                <circle key={x} cx={x} cy={i === 1 ? 158 : 155} r="4.2" fill={GOLD} />
+              ))}
+            </g>
+            <g className="wawa-arm-up">
+              <path d="M54 114 C38 110 27 98 28 80" fill="none" stroke={GOLD_DARK} strokeWidth="13" strokeLinecap="round" />
+              <circle cx="28" cy="73" r="8.5" fill={GOLD} />
+              {[
+                [20, 67],
+                [28, 63.5],
+                [36, 67],
+              ].map(([x, y]) => (
+                <circle key={x} cx={x} cy={y} r="4.2" fill={GOLD} />
+              ))}
+            </g>
           </g>
           <g className="wawa-arm-r">
-            <path d="M150 112 C162 122 164 134 158 146" fill="none" stroke={GOLD_DARK} strokeWidth="13" strokeLinecap="round" />
-            <circle cx="157" cy="150" r="8.5" fill={GOLD} />
-            {[149, 157, 165].map((x, i) => (
-              <circle key={x} cx={x} cy={i === 1 ? 158 : 155} r="4.2" fill={GOLD} />
-            ))}
+            <g className="wawa-arm-down">
+              <path d="M150 112 C162 122 164 134 158 146" fill="none" stroke={GOLD_DARK} strokeWidth="13" strokeLinecap="round" />
+              <circle cx="157" cy="150" r="8.5" fill={GOLD} />
+              {[149, 157, 165].map((x, i) => (
+                <circle key={x} cx={x} cy={i === 1 ? 158 : 155} r="4.2" fill={GOLD} />
+              ))}
+            </g>
+            <g className="wawa-arm-up">
+              <path d="M146 114 C162 110 173 98 172 80" fill="none" stroke={GOLD_DARK} strokeWidth="13" strokeLinecap="round" />
+              <circle cx="172" cy="73" r="8.5" fill={GOLD} />
+              {[
+                [164, 67],
+                [172, 63.5],
+                [180, 67],
+              ].map(([x, y]) => (
+                <circle key={x} cx={x} cy={y} r="4.2" fill={GOLD} />
+              ))}
+            </g>
           </g>
 
           {/* Eyes */}
