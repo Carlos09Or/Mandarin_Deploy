@@ -19,6 +19,7 @@ export type Outfit =
   | 'panuelo' // red scarf
   | 'banda' // school marching-band shako, as in the November parades
   | 'bandera' // the flag of Panama
+  | 'banderas' // the flags of Panama and China, side by side
   | 'montuno' // camisilla and sombrero pintao
   | 'pollera' // tembleques and motas of the pollera
 
@@ -28,6 +29,7 @@ export const OUTFIT_LABELS: Record<Outfit, string> = {
   panuelo: 'Pañuelo rojo',
   banda: 'Banda de guerra',
   bandera: 'Bandera',
+  banderas: 'Panamá y China',
   montuno: 'Montuno',
   pollera: 'Pollera',
 }
@@ -37,7 +39,7 @@ export const OUTFITS: Record<FriendId, { options: Outfit[]; rotation: Outfit[] }
   wawa: { options: ['sombrero', 'panuelo', 'clasica'], rotation: ['sombrero', 'panuelo', 'sombrero'] },
   harpia: { options: ['banda', 'bandera', 'clasica'], rotation: ['banda', 'bandera'] },
   sloth: { options: ['montuno', 'pollera', 'clasica'], rotation: ['montuno', 'pollera'] },
-  tucan: { options: ['pollera', 'bandera', 'clasica'], rotation: ['pollera', 'bandera'] },
+  tucan: { options: ['pollera', 'banderas', 'clasica'], rotation: ['pollera', 'banderas'] },
 }
 
 export type OutfitSetting = Outfit | 'auto'

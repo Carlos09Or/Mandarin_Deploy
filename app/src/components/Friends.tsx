@@ -244,8 +244,13 @@ export function Tucan({ size = 140, mood = 'idle', outfit }: Props) {
         <ellipse cx="104" cy="90" rx="14" ry="12" fill="#ffd43b" />
         <circle cx="104" cy="72" r="10" fill="#7bd389" />
         <Eye cx={106} cy={73} r={5.5} />
-        {/* Carries a little flag of Panama in its bill, the way toucans carry fruit */}
-        {look === 'bandera' && <WavingFlag x1={146} y1={84} x2={150} y2={18} w={42} />}
+        {/* Carries the flags of Panama and China crossed in its bill, the way toucans carry fruit */}
+        {look === 'banderas' && (
+          <g>
+            <WavingFlag x1={150} y1={84} x2={124} y2={20} w={34} />
+            <WavingFlag x1={146} y1={84} x2={174} y2={26} w={34} country="china" delay={0.4} />
+          </g>
+        )}
         <g clipPath={`url(#bill-${id})`}>
           <rect x="100" y="50" width="36" height="50" fill="#7cc04b" />
           <rect x="136" y="50" width="24" height="50" fill="#f2802a" />
@@ -257,7 +262,7 @@ export function Tucan({ size = 140, mood = 'idle', outfit }: Props) {
         {look === 'pollera' && <Tembleques cx={90} cy={66} r={26} count={6} />}
         {mood === 'sad' && <Drop x={70} y={46} />}
       </g>
-      {mood === 'idle' && look !== 'bandera' && (
+      {mood === 'idle' && look !== 'banderas' && (
         <g className="tucan-berry">
           <circle cx="182" cy="76" r="6" fill="#8a3fbf" />
           <circle cx="184" cy="74" r="1.8" fill="#fff" opacity=".8" />

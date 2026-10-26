@@ -28,14 +28,50 @@ export function PanamaFlag({ x, y, w, h }: { x: number; y: number; w: number; h:
   )
 }
 
+/** The flag of China: red with one large and four small yellow stars. */
+export function ChinaFlag({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
+  const small: [number, number][] = [
+    [1 / 3, 0.1],
+    [0.4, 0.2],
+    [0.4, 0.35],
+    [1 / 3, 0.45],
+  ]
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} fill="#de2910" />
+      <polygon points={star(x + w / 6, y + h / 4, h * 0.15)} fill="#ffde00" />
+      {small.map(([fx, fy]) => (
+        <polygon key={fy} points={star(x + w * fx, y + h * fy, h * 0.05)} fill="#ffde00" />
+      ))}
+    </g>
+  )
+}
+
 /** A flag on a pole that waves. The pole runs from (x1, y1) at the bottom to (x2, y2) at the top. */
-export function WavingFlag({ x1, y1, x2, y2, w = 42 }: { x1: number; y1: number; x2: number; y2: number; w?: number }) {
+export function WavingFlag({
+  x1,
+  y1,
+  x2,
+  y2,
+  w = 42,
+  country = 'panama',
+  delay = 0,
+}: {
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+  w?: number
+  country?: 'panama' | 'china'
+  delay?: number
+}) {
+  const Flag = country === 'china' ? ChinaFlag : PanamaFlag
   return (
     <g>
       <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#8a5a34" strokeWidth="3.5" strokeLinecap="round" />
       <circle cx={x2} cy={y2 - 2} r="3.5" fill="#f2b544" />
-      <g className="flag-wave">
-        <PanamaFlag x={x2} y={y2} w={w} h={w * 0.66} />
+      <g className="flag-wave" style={{ animationDelay: `${delay}s` }}>
+        <Flag x={x2} y={y2} w={w} h={w * 0.66} />
       </g>
     </g>
   )
