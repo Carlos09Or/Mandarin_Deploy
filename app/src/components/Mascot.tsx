@@ -1,4 +1,3 @@
-import { useId } from 'react'
 import { lookFor, useProgress, type Look } from '../lib/progress'
 
 // Wāwa (蛙蛙), a Panamanian golden frog. Gold for luck in Panama and in China (金蟾).
@@ -16,7 +15,6 @@ type Props = { mood?: Mood; look?: Look; size?: number; className?: string }
 export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Props) {
   const saved = useProgress().look
   const style = look ?? lookFor(saved)
-  const uid = useId()
   const openMouth = mood === 'happy' || mood === 'celebrate' || mood === 'fire'
 
   return (
@@ -84,8 +82,6 @@ export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Prop
               <circle cx="139" cy="130" r="7" fill="#c8352b" />
             </g>
           )}
-
-          {style === 'mola' && <MolaPanel id={uid} />}
 
           {/* Arms */}
           <g className="wawa-arm-l">
@@ -163,68 +159,3 @@ export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Prop
   )
 }
 
-const MOLA = { red: '#d7263d', black: '#1a1414', orange: '#f2802a', yellow: '#ffd23f', green: '#2fa36b', blue: '#2a6fd4' }
-
-/** The little frog in the middle of the mola, as separate shapes so outlines follow their union. */
-const MotifShapes = (props: { fill?: string; stroke?: string; strokeWidth?: number }) => (
-  <g {...props} strokeLinejoin="round">
-    <ellipse cx="100" cy="146" rx="13" ry="10" />
-    <circle cx="92" cy="135" r="4.5" />
-    <circle cx="108" cy="135" r="4.5" />
-    <ellipse cx="86" cy="154" rx="6" ry="3.5" />
-    <ellipse cx="114" cy="154" rx="6" ry="3.5" />
-  </g>
-)
-
-/**
- * A mola blouse panel, the way Guna women wear them: a central figure ringed by
- * channels of colour (reverse appliqué), a contrasting border, and small slits ("tas")
- * filling the background. A generic tribute, not a copy of any specific mola.
- */
-function MolaPanel({ id }: { id: string }) {
-  const clip = `mola-${id.replace(/:/g, '')}`
-  // Outermost channel first; each narrower stroke reveals the next layer of fabric.
-  const channels: [number, string][] = [
-    [26, MOLA.black],
-    [22, MOLA.orange],
-    [17, MOLA.black],
-    [13, MOLA.yellow],
-    [8.5, MOLA.black],
-    [5, MOLA.green],
-    [2.2, MOLA.black],
-  ]
-  return (
-    <g>
-      <defs>
-        <clipPath id={clip}>
-          <rect x="62" y="110" width="76" height="64" rx="12" />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${clip})`}>
-        <rect x="62" y="110" width="76" height="64" fill={MOLA.red} />
-        {channels.map(([w, c]) => (
-          <MotifShapes key={w} fill={c} stroke={c} strokeWidth={w} />
-        ))}
-        <MotifShapes fill={MOLA.blue} />
-        <circle cx="92" cy="134.5" r="1.8" fill={MOLA.black} />
-        <circle cx="108" cy="134.5" r="1.8" fill={MOLA.black} />
-        {[
-          [69, 117, MOLA.green],
-          [76, 117, MOLA.yellow],
-          [124, 117, MOLA.blue],
-          [131, 117, MOLA.green],
-          [69, 160, MOLA.blue],
-          [76, 166, MOLA.yellow],
-          [124, 166, MOLA.green],
-          [131, 160, MOLA.yellow],
-        ].map(([x, y, c]) => (
-          <rect key={`${x}-${y}`} x={+x - 1.4} y={+y - 4} width="2.8" height="8" rx="1.4" fill={c as string} />
-        ))}
-      </g>
-      {/* Border: the black-orange-black frame every mola has */}
-      <rect x="62" y="110" width="76" height="64" rx="12" fill="none" stroke={MOLA.black} strokeWidth="3.5" />
-      <rect x="65.5" y="113.5" width="69" height="57" rx="9" fill="none" stroke={MOLA.orange} strokeWidth="1.6" />
-      <rect x="67.5" y="115.5" width="65" height="53" rx="7.5" fill="none" stroke={MOLA.black} strokeWidth="1.2" />
-    </g>
-  )
-}

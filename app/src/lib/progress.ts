@@ -29,14 +29,16 @@ export type Reward = {
 }
 
 /** Wāwa's outfit. 'auto' changes it every day, with the sombrero pintao as her main look. */
-export type Look = 'clasica' | 'panuelo' | 'sombrero' | 'mola'
+export type Look = 'clasica' | 'panuelo' | 'sombrero'
 export type LookSetting = Look | 'auto'
 
-const ROTATION: Look[] = ['sombrero', 'panuelo', 'sombrero', 'mola']
+const ROTATION: Look[] = ['sombrero', 'panuelo', 'sombrero']
+const LOOKS: readonly string[] = ['clasica', 'panuelo', 'sombrero']
 
 /** The outfit to draw for a setting; 'auto' picks today's. */
 export function lookFor(setting: LookSetting, date = new Date()): Look {
-  if (setting !== 'auto') return setting
+  // Outfits that no longer exist (e.g. an old 'mola') fall back to the rotation.
+  if (setting !== 'auto' && LOOKS.includes(setting)) return setting
   const day = Math.floor((date.getTime() - date.getTimezoneOffset() * 60_000) / 86_400_000)
   return ROTATION[day % ROTATION.length]
 }

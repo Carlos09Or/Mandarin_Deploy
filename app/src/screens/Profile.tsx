@@ -20,7 +20,6 @@ const DAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
 const LOOKS: { id: Look; label: string }[] = [
   { id: 'sombrero', label: 'Sombrero pintao' },
   { id: 'panuelo', label: 'Pañuelo rojo' },
-  { id: 'mola', label: 'Blusa de mola' },
   { id: 'clasica', label: 'Sin nada' },
 ]
 const lookLabel = (l: Look) => LOOKS.find((x) => x.id === l)!.label
@@ -100,7 +99,7 @@ export function Profile() {
               <span className="block text-sm text-muted">Cambia de ropa cada día · hoy: {lookLabel(lookFor('auto'))}</span>
             </span>
           </button>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="grid grid-cols-3 gap-2">
             {LOOKS.map((l) => (
               <button
                 key={l.id}
