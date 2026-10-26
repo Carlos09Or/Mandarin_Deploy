@@ -29,7 +29,7 @@ export type Reward = {
 }
 
 /** Wāwa's outfit. */
-export type Look = 'clasica' | 'panuelo' | 'sombrero'
+export type Look = 'clasica' | 'panuelo' | 'sombrero' | 'mola'
 
 export type Progress = {
   v: 1
@@ -60,7 +60,7 @@ function fresh(): Progress {
     createdAt: new Date().toISOString(),
     xp: 0,
     gems: 0,
-    look: 'panuelo',
+    look: 'mola',
     dailyXp: {},
     streak: { count: 0, last: null },
     nodes: {},

@@ -83,6 +83,40 @@ export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Prop
             </g>
           )}
 
+          {style === 'mola' && (
+            // Scout neckerchief made of mola: layered reverse appliqué in the Guna tradition.
+            // A generic geometric tribute, not a copy of any specific mola.
+            <g>
+              <path d="M46 114 Q100 132 154 114 L156 124 Q100 144 44 124Z" fill="#d7263d" />
+              <path d="M47 119 Q100 138 153 119" fill="none" stroke="#1e1a1a" strokeWidth="2.2" />
+              <path d="M47 119 Q100 138 153 119" fill="none" stroke="#f28c28" strokeWidth="0.9" strokeDasharray="3 3" />
+              <polygon points="62,120 138,120 100,176" fill="#1e1a1a" />
+              <polygon points="69,123 131,123 100,168" fill="#d7263d" />
+              <polygon points="76,126 124,126 100,160" fill="#1e1a1a" />
+              <polygon points="81,128.5 119,128.5 100,154" fill="#f28c28" />
+              <polygon points="86,131 114,131 100,148" fill="#1e1a1a" />
+              <polygon points="90,133 110,133 100,144" fill="#ffd23f" />
+              <polygon points="100,134.5 103.5,137.5 100,140.5 96.5,137.5" fill="#1e1a1a" />
+              {[
+                [81, 137, '#2a7fd4'],
+                [119, 137, '#2fa36b'],
+                [91.5, 152, '#2fa36b'],
+                [108.5, 152, '#2a7fd4'],
+                [86, 124.5, '#2fa36b'],
+                [114, 124.5, '#2a7fd4'],
+              ].map(([x, y, c]) => (
+                <polygon
+                  key={`${x}-${y}`}
+                  points={`${x},${+y - 2.4} ${+x + 2},${y} ${x},${+y + 2.4} ${+x - 2},${y}`}
+                  fill={c as string}
+                />
+              ))}
+              {/* Woggle: the ring that holds a scout neckerchief */}
+              <circle cx="100" cy="129" r="6.5" fill="#9a6631" stroke="#5e3b1a" strokeWidth="2" />
+              <circle cx="100" cy="129" r="2.4" fill="#5e3b1a" />
+            </g>
+          )}
+
           {/* Arms */}
           <g className="wawa-arm-l">
             <path d="M50 112 C38 122 36 134 42 146" fill="none" stroke={GOLD_DARK} strokeWidth="13" strokeLinecap="round" />

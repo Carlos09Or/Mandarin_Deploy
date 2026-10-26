@@ -10,6 +10,7 @@ const LOOKS: { id: Look; label: string }[] = [
   { id: 'clasica', label: 'Clásica' },
   { id: 'panuelo', label: 'Pañuelo rojo' },
   { id: 'sombrero', label: 'Sombrero pintao' },
+  { id: 'mola', label: 'Pañoleta de mola' },
 ]
 const MOODS: { id: Mood; label: string }[] = [
   { id: 'idle', label: 'Tranquila' },
@@ -76,7 +77,7 @@ export function Profile() {
           <p className="text-center text-sm text-muted">La rana dorada de Panamá, símbolo de buena suerte aquí y en China.</p>
         </div>
         <div className="flex flex-col gap-4 p-5">
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {LOOKS.map((l) => (
               <button
                 key={l.id}
