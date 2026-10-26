@@ -28,8 +28,18 @@ export type Reward = {
   streakUp: boolean
 }
 
-/** Wāwa's outfit. */
+/** Wāwa's outfit. 'auto' changes it every day, with the sombrero pintao as her main look. */
 export type Look = 'clasica' | 'panuelo' | 'sombrero' | 'mola'
+export type LookSetting = Look | 'auto'
+
+const ROTATION: Look[] = ['sombrero', 'panuelo', 'sombrero', 'mola']
+
+/** The outfit to draw for a setting; 'auto' picks today's. */
+export function lookFor(setting: LookSetting, date = new Date()): Look {
+  if (setting !== 'auto') return setting
+  const day = Math.floor((date.getTime() - date.getTimezoneOffset() * 60_000) / 86_400_000)
+  return ROTATION[day % ROTATION.length]
+}
 
 export type Progress = {
   v: 1
@@ -38,7 +48,7 @@ export type Progress = {
   xp: number
   /** Reward currency. What it buys is up to each teacher (extra quiz points, etc.). */
   gems: number
-  look: Look
+  look: LookSetting
   dailyXp: Record<string, number>
   streak: { count: number; last: string | null }
   nodes: Record<string, NodeResult>
@@ -60,7 +70,7 @@ function fresh(): Progress {
     createdAt: new Date().toISOString(),
     xp: 0,
     gems: 0,
-    look: 'mola',
+    look: 'auto',
     dailyXp: {},
     streak: { count: 0, last: null },
     nodes: {},
@@ -176,7 +186,7 @@ export function completeNode(
   return { xp, gems, parts, streak: streak.count, streakUp }
 }
 
-export function setLook(look: Look) {
+export function setLook(look: LookSetting) {
   commit({ ...state, look })
 }
 

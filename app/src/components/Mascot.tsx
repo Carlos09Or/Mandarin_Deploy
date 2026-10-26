@@ -1,4 +1,5 @@
-import { useProgress, type Look } from '../lib/progress'
+import { useId } from 'react'
+import { lookFor, useProgress, type Look } from '../lib/progress'
 
 // Wāwa (蛙蛙), a Panamanian golden frog. Gold for luck in Panama and in China (金蟾).
 // Poses are CSS animations in index.css (`.wawa-*`), so the drawing stays a plain SVG.
@@ -14,7 +15,8 @@ type Props = { mood?: Mood; look?: Look; size?: number; className?: string }
 
 export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Props) {
   const saved = useProgress().look
-  const style = look ?? saved
+  const style = look ?? lookFor(saved)
+  const uid = useId()
   const openMouth = mood === 'happy' || mood === 'celebrate' || mood === 'fire'
 
   return (
@@ -83,39 +85,7 @@ export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Prop
             </g>
           )}
 
-          {style === 'mola' && (
-            // Scout neckerchief made of mola: layered reverse appliqué in the Guna tradition.
-            // A generic geometric tribute, not a copy of any specific mola.
-            <g>
-              <path d="M46 114 Q100 132 154 114 L156 124 Q100 144 44 124Z" fill="#d7263d" />
-              <path d="M47 119 Q100 138 153 119" fill="none" stroke="#1e1a1a" strokeWidth="2.2" />
-              <path d="M47 119 Q100 138 153 119" fill="none" stroke="#f28c28" strokeWidth="0.9" strokeDasharray="3 3" />
-              <polygon points="62,120 138,120 100,176" fill="#1e1a1a" />
-              <polygon points="69,123 131,123 100,168" fill="#d7263d" />
-              <polygon points="76,126 124,126 100,160" fill="#1e1a1a" />
-              <polygon points="81,128.5 119,128.5 100,154" fill="#f28c28" />
-              <polygon points="86,131 114,131 100,148" fill="#1e1a1a" />
-              <polygon points="90,133 110,133 100,144" fill="#ffd23f" />
-              <polygon points="100,134.5 103.5,137.5 100,140.5 96.5,137.5" fill="#1e1a1a" />
-              {[
-                [81, 137, '#2a7fd4'],
-                [119, 137, '#2fa36b'],
-                [91.5, 152, '#2fa36b'],
-                [108.5, 152, '#2a7fd4'],
-                [86, 124.5, '#2fa36b'],
-                [114, 124.5, '#2a7fd4'],
-              ].map(([x, y, c]) => (
-                <polygon
-                  key={`${x}-${y}`}
-                  points={`${x},${+y - 2.4} ${+x + 2},${y} ${x},${+y + 2.4} ${+x - 2},${y}`}
-                  fill={c as string}
-                />
-              ))}
-              {/* Woggle: the ring that holds a scout neckerchief */}
-              <circle cx="100" cy="129" r="6.5" fill="#9a6631" stroke="#5e3b1a" strokeWidth="2" />
-              <circle cx="100" cy="129" r="2.4" fill="#5e3b1a" />
-            </g>
-          )}
+          {style === 'mola' && <MolaPanel id={uid} />}
 
           {/* Arms */}
           <g className="wawa-arm-l">
@@ -190,5 +160,71 @@ export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Prop
         </g>
       </g>
     </svg>
+  )
+}
+
+const MOLA = { red: '#d7263d', black: '#1a1414', orange: '#f2802a', yellow: '#ffd23f', green: '#2fa36b', blue: '#2a6fd4' }
+
+/** The little frog in the middle of the mola, as separate shapes so outlines follow their union. */
+const MotifShapes = (props: { fill?: string; stroke?: string; strokeWidth?: number }) => (
+  <g {...props} strokeLinejoin="round">
+    <ellipse cx="100" cy="146" rx="13" ry="10" />
+    <circle cx="92" cy="135" r="4.5" />
+    <circle cx="108" cy="135" r="4.5" />
+    <ellipse cx="86" cy="154" rx="6" ry="3.5" />
+    <ellipse cx="114" cy="154" rx="6" ry="3.5" />
+  </g>
+)
+
+/**
+ * A mola blouse panel, the way Guna women wear them: a central figure ringed by
+ * channels of colour (reverse appliqué), a contrasting border, and small slits ("tas")
+ * filling the background. A generic tribute, not a copy of any specific mola.
+ */
+function MolaPanel({ id }: { id: string }) {
+  const clip = `mola-${id.replace(/:/g, '')}`
+  // Outermost channel first; each narrower stroke reveals the next layer of fabric.
+  const channels: [number, string][] = [
+    [26, MOLA.black],
+    [22, MOLA.orange],
+    [17, MOLA.black],
+    [13, MOLA.yellow],
+    [8.5, MOLA.black],
+    [5, MOLA.green],
+    [2.2, MOLA.black],
+  ]
+  return (
+    <g>
+      <defs>
+        <clipPath id={clip}>
+          <rect x="62" y="110" width="76" height="64" rx="12" />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${clip})`}>
+        <rect x="62" y="110" width="76" height="64" fill={MOLA.red} />
+        {channels.map(([w, c]) => (
+          <MotifShapes key={w} fill={c} stroke={c} strokeWidth={w} />
+        ))}
+        <MotifShapes fill={MOLA.blue} />
+        <circle cx="92" cy="134.5" r="1.8" fill={MOLA.black} />
+        <circle cx="108" cy="134.5" r="1.8" fill={MOLA.black} />
+        {[
+          [69, 117, MOLA.green],
+          [76, 117, MOLA.yellow],
+          [124, 117, MOLA.blue],
+          [131, 117, MOLA.green],
+          [69, 160, MOLA.blue],
+          [76, 166, MOLA.yellow],
+          [124, 166, MOLA.green],
+          [131, 160, MOLA.yellow],
+        ].map(([x, y, c]) => (
+          <rect key={`${x}-${y}`} x={+x - 1.4} y={+y - 4} width="2.8" height="8" rx="1.4" fill={c as string} />
+        ))}
+      </g>
+      {/* Border: the black-orange-black frame every mola has */}
+      <rect x="62" y="110" width="76" height="64" rx="12" fill="none" stroke={MOLA.black} strokeWidth="3.5" />
+      <rect x="65.5" y="113.5" width="69" height="57" rx="9" fill="none" stroke={MOLA.orange} strokeWidth="1.6" />
+      <rect x="67.5" y="115.5" width="65" height="53" rx="7.5" fill="none" stroke={MOLA.black} strokeWidth="1.2" />
+    </g>
   )
 }

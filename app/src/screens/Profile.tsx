@@ -1,17 +1,29 @@
 import { useState } from 'react'
 import { PATH, WORDS } from '../data/course'
-import { DAILY_GOAL, GEMS, learnedWords, liveStreak, resetProgress, setLook, today, useProgress, type Look } from '../lib/progress'
+import {
+  DAILY_GOAL,
+  GEMS,
+  learnedWords,
+  liveStreak,
+  lookFor,
+  resetProgress,
+  setLook,
+  today,
+  useProgress,
+  type Look,
+} from '../lib/progress'
 import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
 import { Mascot, type Mood } from '../components/Mascot'
 
 const DAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
 
 const LOOKS: { id: Look; label: string }[] = [
-  { id: 'clasica', label: 'Clásica' },
-  { id: 'panuelo', label: 'Pañuelo rojo' },
   { id: 'sombrero', label: 'Sombrero pintao' },
-  { id: 'mola', label: 'Pañoleta de mola' },
+  { id: 'panuelo', label: 'Pañuelo rojo' },
+  { id: 'mola', label: 'Blusa de mola' },
+  { id: 'clasica', label: 'Sin nada' },
 ]
+const lookLabel = (l: Look) => LOOKS.find((x) => x.id === l)!.label
 const MOODS: { id: Mood; label: string }[] = [
   { id: 'idle', label: 'Tranquila' },
   { id: 'wave', label: 'Saluda' },
@@ -77,6 +89,17 @@ export function Profile() {
           <p className="text-center text-sm text-muted">La rana dorada de Panamá, símbolo de buena suerte aquí y en China.</p>
         </div>
         <div className="flex flex-col gap-4 p-5">
+          <button
+            type="button"
+            onClick={() => setLook('auto')}
+            className={`tile flex items-center gap-3 px-4 py-2 text-left ${p.look === 'auto' ? 'tile-selected' : ''}`}
+          >
+            <Mascot look={lookFor('auto')} size={56} />
+            <span className="flex-1">
+              <span className="block font-extrabold">Automática</span>
+              <span className="block text-sm text-muted">Cambia de ropa cada día · hoy: {lookLabel(lookFor('auto'))}</span>
+            </span>
+          </button>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {LOOKS.map((l) => (
               <button
