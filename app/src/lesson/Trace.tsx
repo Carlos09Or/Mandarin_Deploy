@@ -21,9 +21,14 @@ export function Trace({ char, n, guided, onDone }: Props) {
   const [size] = useState(() => Math.min(300, window.innerWidth - 64))
   const [finished, setFinished] = useState(false)
   const [failed, setFailed] = useState(false)
+  const [animating, setAnimating] = useState(false)
+  // Bumped whenever a demo is skipped, so a finished demo doesn't restart the quiz twice.
+  const demo = useRef(0)
   const w = word(n)
 
   const startQuiz = () => {
+    demo.current++
+    setAnimating(false)
     writer.current?.quiz({
       showHintAfterMisses: guided ? 2 : 3,
       highlightOnComplete: true,
@@ -51,6 +56,11 @@ export function Trace({ char, n, guided, onDone }: Props) {
       drawingWidth: 26,
       highlightColor: '#3b8fd9',
       highlightCompleteColor: '#2f9e7e',
+      // The library defaults (1 s pause between strokes) make a demo of 8 strokes last 10+ s.
+      strokeAnimationSpeed: 2.5,
+      delayBetweenStrokes: 120,
+      strokeFadeDuration: 200,
+      strokeHighlightSpeed: 4,
       charDataLoader: loadChar,
       onLoadCharDataError: () => setFailed(true),
     })
@@ -65,9 +75,22 @@ export function Trace({ char, n, guided, onDone }: Props) {
   const showOrder = async () => {
     const wr = writer.current
     if (!wr) return
+    const run = ++demo.current
     wr.cancelQuiz()
+    setAnimating(true)
     await wr.animateCharacter()
-    if (!guided) await wr.hideCharacter()
+    if (run !== demo.current) return
+    await new Promise((r) => setTimeout(r, 250))
+    if (run !== demo.current) return
+    await wr.hideCharacter({ duration: 150 })
+    if (run === demo.current) startQuiz()
+  }
+
+  const skipDemo = () => {
+    const wr = writer.current
+    if (!wr) return
+    demo.current++
+    wr.hideCharacter({ duration: 0 })
     startQuiz()
   }
 
@@ -120,8 +143,8 @@ export function Trace({ char, n, guided, onDone }: Props) {
 
       {!finished && !failed && (
         <div className="flex justify-center">
-          <button type="button" className="btn btn-ghost py-2.5 text-sm" onClick={showOrder}>
-            Ver orden de trazos
+          <button type="button" className="btn btn-ghost py-2.5 text-sm" onClick={animating ? skipDemo : showOrder}>
+            {animating ? 'Saltar y escribir' : 'Ver orden de trazos'}
           </button>
         </div>
       )}
