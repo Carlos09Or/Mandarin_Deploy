@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { word } from '../data/course'
-import { chime } from '../lib/audio'
+import { chime, setVoiceFor } from '../lib/audio'
 import { retry, type Exercise } from '../lib/lesson'
 import { recordAnswer, recordTrace } from '../lib/progress'
 import { AudioButton } from '../components/AudioButton'
@@ -39,6 +39,12 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
   useEffect(() => {
     stats.current.start = Date.now()
   }, [])
+
+  // The lesson's companion lends it their voice.
+  useEffect(() => {
+    setVoiceFor(buddy)
+    return () => setVoiceFor(null)
+  }, [buddy])
 
   const ex = queue[pos]
   const total = exercises.length

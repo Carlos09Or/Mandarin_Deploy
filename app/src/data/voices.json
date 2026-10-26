@@ -1,0 +1,10 @@
+{
+  "voices": ["zf_xiaoxiao", "zm_yunjian", "zm_yunxi", "zf_xiaoyi"],
+  "byCharacter": {
+    "wawa": "zf_xiaoxiao",
+    "harpia": "zm_yunjian",
+    "sloth": "zm_yunxi",
+    "tucan": "zf_xiaoyi"
+  },
+  "default": "zf_xiaoxiao"
+}

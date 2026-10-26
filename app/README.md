@@ -38,6 +38,21 @@ npm run dev
 node tools/export-v2-data.mjs
 ```
 
+## Voice audio
+
+Words and example sentences play pre-generated clips made with [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M)
+(Apache 2.0), one voice per character. Anything without a clip falls back to the device's Chinese voice.
+
+1. `node tools/export-audio-manifest.mjs` writes `tools/audio-manifest.json`: 600 items
+   (`w001`–`w300` words, `s001`–`s300` sentences) with their text and pinyin.
+2. In Google Colab, upload the manifest and run `tools/kokoro_colab.py`. It writes
+   `audio/<voice>/<id>.mp3` (mono, 48 kbps, trimmed and loudness-normalised) and zips it.
+3. Unzip into `app/public/audio/`, so files land at `app/public/audio/<voice>/<id>.mp3`.
+
+Which voice each character uses is set in `src/data/voices.json`; the folder names must match.
+Clips are cached by the service worker as they are played, so heard lessons work offline.
+The slow button plays the same clip at 0.7× speed with the pitch preserved.
+
 ## Deploy
 
 `.github/workflows/deploy-v2.yml` builds this folder and publishes it to GitHub Pages on every

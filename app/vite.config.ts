@@ -31,6 +31,12 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,json}'],
         runtimeCaching: [
           {
+            // Voice clips are cached as they are played, so lessons already heard work offline.
+            urlPattern: ({ url }) => url.pathname.includes('/audio/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'audio', expiration: { maxEntries: 4000 } },
+          },
+          {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/,
             handler: 'CacheFirst',
             options: { cacheName: 'fonts', expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 365 } },

@@ -1,0 +1,4218 @@
+{
+ "version": 1,
+ "format": {
+  "container": "mp3",
+  "channels": 1,
+  "bitrate": "48k",
+  "sampleRate": 24000
+ },
+ "path": "app/public/audio/{voice}/{id}.mp3",
+ "voices": [
+  "zf_xiaoxiao",
+  "zm_yunjian",
+  "zm_yunxi",
+  "zf_xiaoyi"
+ ],
+ "items": [
+  {
+   "id": "w001",
+   "kind": "word",
+   "text": "我",
+   "pinyin": "wǒ",
+   "es": "yo / me"
+  },
+  {
+   "id": "w002",
+   "kind": "word",
+   "text": "我们",
+   "pinyin": "wǒmen",
+   "es": "nosotros"
+  },
+  {
+   "id": "w003",
+   "kind": "word",
+   "text": "你",
+   "pinyin": "nǐ",
+   "es": "tú / usted"
+  },
+  {
+   "id": "w004",
+   "kind": "word",
+   "text": "他",
+   "pinyin": "tā",
+   "es": "él"
+  },
+  {
+   "id": "w005",
+   "kind": "word",
+   "text": "她",
+   "pinyin": "tā",
+   "es": "ella"
+  },
+  {
+   "id": "w006",
+   "kind": "word",
+   "text": "这",
+   "pinyin": "zhè",
+   "es": "esto / este"
+  },
+  {
+   "id": "w007",
+   "kind": "word",
+   "text": "那",
+   "pinyin": "nà",
+   "es": "eso / aquel"
+  },
+  {
+   "id": "w008",
+   "kind": "word",
+   "text": "哪",
+   "pinyin": "nǎ",
+   "es": "cuál"
+  },
+  {
+   "id": "w009",
+   "kind": "word",
+   "text": "哪儿",
+   "pinyin": "nǎr",
+   "es": "dónde"
+  },
+  {
+   "id": "w010",
+   "kind": "word",
+   "text": "谁",
+   "pinyin": "shéi/shuí",
+   "es": "quién"
+  },
+  {
+   "id": "w011",
+   "kind": "word",
+   "text": "什么",
+   "pinyin": "shénme",
+   "es": "qué"
+  },
+  {
+   "id": "w012",
+   "kind": "word",
+   "text": "多少",
+   "pinyin": "duōshao",
+   "es": "cuánto / cuántos"
+  },
+  {
+   "id": "w013",
+   "kind": "word",
+   "text": "几",
+   "pinyin": "jǐ",
+   "es": "cuántos / algunos"
+  },
+  {
+   "id": "w014",
+   "kind": "word",
+   "text": "怎么",
+   "pinyin": "zěnme",
+   "es": "cómo"
+  },
+  {
+   "id": "w015",
+   "kind": "word",
+   "text": "怎么样",
+   "pinyin": "zěnmeyàng",
+   "es": "qué tal / cómo es"
+  },
+  {
+   "id": "w016",
+   "kind": "word",
+   "text": "一",
+   "pinyin": "yī",
+   "es": "uno"
+  },
+  {
+   "id": "w017",
+   "kind": "word",
+   "text": "二",
+   "pinyin": "èr",
+   "es": "dos"
+  },
+  {
+   "id": "w018",
+   "kind": "word",
+   "text": "三",
+   "pinyin": "sān",
+   "es": "tres"
+  },
+  {
+   "id": "w019",
+   "kind": "word",
+   "text": "四",
+   "pinyin": "sì",
+   "es": "cuatro"
+  },
+  {
+   "id": "w020",
+   "kind": "word",
+   "text": "五",
+   "pinyin": "wǔ",
+   "es": "cinco"
+  },
+  {
+   "id": "w021",
+   "kind": "word",
+   "text": "六",
+   "pinyin": "liù",
+   "es": "seis"
+  },
+  {
+   "id": "w022",
+   "kind": "word",
+   "text": "七",
+   "pinyin": "qī",
+   "es": "siete"
+  },
+  {
+   "id": "w023",
+   "kind": "word",
+   "text": "八",
+   "pinyin": "bā",
+   "es": "ocho"
+  },
+  {
+   "id": "w024",
+   "kind": "word",
+   "text": "九",
+   "pinyin": "jiǔ",
+   "es": "nueve"
+  },
+  {
+   "id": "w025",
+   "kind": "word",
+   "text": "十",
+   "pinyin": "shí",
+   "es": "diez"
+  },
+  {
+   "id": "w026",
+   "kind": "word",
+   "text": "个",
+   "pinyin": "gè",
+   "es": "clasificador general"
+  },
+  {
+   "id": "w027",
+   "kind": "word",
+   "text": "岁",
+   "pinyin": "suì",
+   "es": "años de edad"
+  },
+  {
+   "id": "w028",
+   "kind": "word",
+   "text": "本",
+   "pinyin": "běn",
+   "es": "clasificador para libros"
+  },
+  {
+   "id": "w029",
+   "kind": "word",
+   "text": "些",
+   "pinyin": "xiē",
+   "es": "algunos / unas"
+  },
+  {
+   "id": "w030",
+   "kind": "word",
+   "text": "块",
+   "pinyin": "kuài",
+   "es": "pieza / trozo; yuan coloquial"
+  },
+  {
+   "id": "w031",
+   "kind": "word",
+   "text": "不",
+   "pinyin": "bù",
+   "es": "no"
+  },
+  {
+   "id": "w032",
+   "kind": "word",
+   "text": "没有",
+   "pinyin": "méiyǒu",
+   "es": "no tener; no (en pasado)"
+  },
+  {
+   "id": "w033",
+   "kind": "word",
+   "text": "很",
+   "pinyin": "hěn",
+   "es": "muy"
+  },
+  {
+   "id": "w034",
+   "kind": "word",
+   "text": "太",
+   "pinyin": "tài",
+   "es": "demasiado / muy"
+  },
+  {
+   "id": "w035",
+   "kind": "word",
+   "text": "都",
+   "pinyin": "dōu",
+   "es": "todos"
+  },
+  {
+   "id": "w036",
+   "kind": "word",
+   "text": "一点儿",
+   "pinyin": "yìdiǎnr",
+   "es": "un poco"
+  },
+  {
+   "id": "w037",
+   "kind": "word",
+   "text": "和",
+   "pinyin": "hé",
+   "es": "y"
+  },
+  {
+   "id": "w038",
+   "kind": "word",
+   "text": "在",
+   "pinyin": "zài",
+   "es": "estar en / en"
+  },
+  {
+   "id": "w039",
+   "kind": "word",
+   "text": "的",
+   "pinyin": "de",
+   "es": "partícula posesiva"
+  },
+  {
+   "id": "w040",
+   "kind": "word",
+   "text": "了",
+   "pinyin": "le",
+   "es": "partícula de cambio/completitud"
+  },
+  {
+   "id": "w041",
+   "kind": "word",
+   "text": "吗",
+   "pinyin": "ma",
+   "es": "partícula de pregunta"
+  },
+  {
+   "id": "w042",
+   "kind": "word",
+   "text": "呢",
+   "pinyin": "ne",
+   "es": "partícula interrogativa"
+  },
+  {
+   "id": "w043",
+   "kind": "word",
+   "text": "喂",
+   "pinyin": "wèi",
+   "es": "hola (al teléfono)"
+  },
+  {
+   "id": "w044",
+   "kind": "word",
+   "text": "家",
+   "pinyin": "jiā",
+   "es": "casa / hogar"
+  },
+  {
+   "id": "w045",
+   "kind": "word",
+   "text": "学校",
+   "pinyin": "xuéxiào",
+   "es": "escuela"
+  },
+  {
+   "id": "w046",
+   "kind": "word",
+   "text": "饭店",
+   "pinyin": "fàndiàn",
+   "es": "restaurante"
+  },
+  {
+   "id": "w047",
+   "kind": "word",
+   "text": "商店",
+   "pinyin": "shāngdiàn",
+   "es": "tienda"
+  },
+  {
+   "id": "w048",
+   "kind": "word",
+   "text": "医院",
+   "pinyin": "yīyuàn",
+   "es": "hospital"
+  },
+  {
+   "id": "w049",
+   "kind": "word",
+   "text": "中国",
+   "pinyin": "Zhōngguó",
+   "es": "China"
+  },
+  {
+   "id": "w050",
+   "kind": "word",
+   "text": "超市",
+   "pinyin": "chāoshì",
+   "es": "supermercado"
+  },
+  {
+   "id": "w051",
+   "kind": "word",
+   "text": "上",
+   "pinyin": "shàng",
+   "es": "arriba / sobre"
+  },
+  {
+   "id": "w052",
+   "kind": "word",
+   "text": "下",
+   "pinyin": "xià",
+   "es": "abajo / debajo"
+  },
+  {
+   "id": "w053",
+   "kind": "word",
+   "text": "前",
+   "pinyin": "qián",
+   "es": "delante; antes"
+  },
+  {
+   "id": "w054",
+   "kind": "word",
+   "text": "后",
+   "pinyin": "hòu",
+   "es": "detrás; después"
+  },
+  {
+   "id": "w055",
+   "kind": "word",
+   "text": "里",
+   "pinyin": "lǐ",
+   "es": "dentro"
+  },
+  {
+   "id": "w056",
+   "kind": "word",
+   "text": "今天",
+   "pinyin": "jīntiān",
+   "es": "hoy"
+  },
+  {
+   "id": "w057",
+   "kind": "word",
+   "text": "明天",
+   "pinyin": "míngtiān",
+   "es": "mañana"
+  },
+  {
+   "id": "w058",
+   "kind": "word",
+   "text": "昨天",
+   "pinyin": "zuótiān",
+   "es": "ayer"
+  },
+  {
+   "id": "w059",
+   "kind": "word",
+   "text": "上午",
+   "pinyin": "shàngwǔ",
+   "es": "mañana (antes del mediodía)"
+  },
+  {
+   "id": "w060",
+   "kind": "word",
+   "text": "中午",
+   "pinyin": "zhōngwǔ",
+   "es": "mediodía"
+  },
+  {
+   "id": "w061",
+   "kind": "word",
+   "text": "下午",
+   "pinyin": "xiàwǔ",
+   "es": "tarde"
+  },
+  {
+   "id": "w062",
+   "kind": "word",
+   "text": "年",
+   "pinyin": "nián",
+   "es": "año"
+  },
+  {
+   "id": "w063",
+   "kind": "word",
+   "text": "月",
+   "pinyin": "yuè",
+   "es": "mes / luna"
+  },
+  {
+   "id": "w064",
+   "kind": "word",
+   "text": "号",
+   "pinyin": "hào",
+   "es": "número / día del mes"
+  },
+  {
+   "id": "w065",
+   "kind": "word",
+   "text": "星期",
+   "pinyin": "xīngqī",
+   "es": "semana"
+  },
+  {
+   "id": "w066",
+   "kind": "word",
+   "text": "点",
+   "pinyin": "diǎn",
+   "es": "en punto / hora"
+  },
+  {
+   "id": "w067",
+   "kind": "word",
+   "text": "分钟",
+   "pinyin": "fēnzhōng",
+   "es": "minuto"
+  },
+  {
+   "id": "w068",
+   "kind": "word",
+   "text": "现在",
+   "pinyin": "xiànzài",
+   "es": "ahora"
+  },
+  {
+   "id": "w069",
+   "kind": "word",
+   "text": "时候",
+   "pinyin": "shíhou",
+   "es": "momento / tiempo"
+  },
+  {
+   "id": "w070",
+   "kind": "word",
+   "text": "爸爸",
+   "pinyin": "bàba",
+   "es": "papá"
+  },
+  {
+   "id": "w071",
+   "kind": "word",
+   "text": "妈妈",
+   "pinyin": "māma",
+   "es": "mamá"
+  },
+  {
+   "id": "w072",
+   "kind": "word",
+   "text": "儿子",
+   "pinyin": "érzi",
+   "es": "hijo"
+  },
+  {
+   "id": "w073",
+   "kind": "word",
+   "text": "女儿",
+   "pinyin": "nǚ’ér",
+   "es": "hija"
+  },
+  {
+   "id": "w074",
+   "kind": "word",
+   "text": "老师",
+   "pinyin": "lǎoshī",
+   "es": "profesor/a"
+  },
+  {
+   "id": "w075",
+   "kind": "word",
+   "text": "学生",
+   "pinyin": "xuéshēng",
+   "es": "estudiante"
+  },
+  {
+   "id": "w076",
+   "kind": "word",
+   "text": "同学",
+   "pinyin": "tóngxué",
+   "es": "compañero/a de clase"
+  },
+  {
+   "id": "w077",
+   "kind": "word",
+   "text": "朋友",
+   "pinyin": "péngyou",
+   "es": "amigo/a"
+  },
+  {
+   "id": "w078",
+   "kind": "word",
+   "text": "医生",
+   "pinyin": "yīshēng",
+   "es": "médico/a"
+  },
+  {
+   "id": "w079",
+   "kind": "word",
+   "text": "先生",
+   "pinyin": "xiānsheng",
+   "es": "señor"
+  },
+  {
+   "id": "w080",
+   "kind": "word",
+   "text": "女士",
+   "pinyin": "nǚshì",
+   "es": "señora"
+  },
+  {
+   "id": "w081",
+   "kind": "word",
+   "text": "衣服",
+   "pinyin": "yīfu",
+   "es": "ropa"
+  },
+  {
+   "id": "w082",
+   "kind": "word",
+   "text": "水",
+   "pinyin": "shuǐ",
+   "es": "agua"
+  },
+  {
+   "id": "w083",
+   "kind": "word",
+   "text": "菜",
+   "pinyin": "cài",
+   "es": "plato / verdura"
+  },
+  {
+   "id": "w084",
+   "kind": "word",
+   "text": "米饭",
+   "pinyin": "mǐfàn",
+   "es": "arroz cocido"
+  },
+  {
+   "id": "w085",
+   "kind": "word",
+   "text": "水果",
+   "pinyin": "shuǐguǒ",
+   "es": "fruta"
+  },
+  {
+   "id": "w086",
+   "kind": "word",
+   "text": "苹果",
+   "pinyin": "píngguǒ",
+   "es": "manzana"
+  },
+  {
+   "id": "w087",
+   "kind": "word",
+   "text": "茶",
+   "pinyin": "chá",
+   "es": "té"
+  },
+  {
+   "id": "w088",
+   "kind": "word",
+   "text": "杯子",
+   "pinyin": "bēizi",
+   "es": "taza / vaso"
+  },
+  {
+   "id": "w089",
+   "kind": "word",
+   "text": "钱",
+   "pinyin": "qián",
+   "es": "dinero"
+  },
+  {
+   "id": "w090",
+   "kind": "word",
+   "text": "飞机",
+   "pinyin": "fēijī",
+   "es": "avión"
+  },
+  {
+   "id": "w091",
+   "kind": "word",
+   "text": "出租车",
+   "pinyin": "chūzūchē",
+   "es": "taxi"
+  },
+  {
+   "id": "w092",
+   "kind": "word",
+   "text": "电视",
+   "pinyin": "diànshì",
+   "es": "televisión"
+  },
+  {
+   "id": "w093",
+   "kind": "word",
+   "text": "电脑",
+   "pinyin": "diànnǎo",
+   "es": "computadora"
+  },
+  {
+   "id": "w094",
+   "kind": "word",
+   "text": "电影",
+   "pinyin": "diànyǐng",
+   "es": "película"
+  },
+  {
+   "id": "w095",
+   "kind": "word",
+   "text": "天气",
+   "pinyin": "tiānqì",
+   "es": "clima / tiempo"
+  },
+  {
+   "id": "w096",
+   "kind": "word",
+   "text": "猫",
+   "pinyin": "māo",
+   "es": "gato"
+  },
+  {
+   "id": "w097",
+   "kind": "word",
+   "text": "狗",
+   "pinyin": "gǒu",
+   "es": "perro"
+  },
+  {
+   "id": "w098",
+   "kind": "word",
+   "text": "东西",
+   "pinyin": "dōngxi",
+   "es": "cosa / objeto"
+  },
+  {
+   "id": "w099",
+   "kind": "word",
+   "text": "人",
+   "pinyin": "rén",
+   "es": "persona"
+  },
+  {
+   "id": "w100",
+   "kind": "word",
+   "text": "名字",
+   "pinyin": "míngzi",
+   "es": "nombre"
+  },
+  {
+   "id": "w101",
+   "kind": "word",
+   "text": "书",
+   "pinyin": "shū",
+   "es": "libro"
+  },
+  {
+   "id": "w102",
+   "kind": "word",
+   "text": "汉语",
+   "pinyin": "Hànyǔ",
+   "es": "chino mandarín"
+  },
+  {
+   "id": "w103",
+   "kind": "word",
+   "text": "字",
+   "pinyin": "zì",
+   "es": "carácter / letra"
+  },
+  {
+   "id": "w104",
+   "kind": "word",
+   "text": "桌子",
+   "pinyin": "zhuōzi",
+   "es": "mesa / escritorio"
+  },
+  {
+   "id": "w105",
+   "kind": "word",
+   "text": "椅子",
+   "pinyin": "yǐzi",
+   "es": "silla"
+  },
+  {
+   "id": "w106",
+   "kind": "word",
+   "text": "谢谢",
+   "pinyin": "xièxie",
+   "es": "gracias"
+  },
+  {
+   "id": "w107",
+   "kind": "word",
+   "text": "不客气",
+   "pinyin": "bú kèqi",
+   "es": "de nada"
+  },
+  {
+   "id": "w108",
+   "kind": "word",
+   "text": "再见",
+   "pinyin": "zàijiàn",
+   "es": "adiós / hasta luego"
+  },
+  {
+   "id": "w109",
+   "kind": "word",
+   "text": "请",
+   "pinyin": "qǐng",
+   "es": "por favor"
+  },
+  {
+   "id": "w110",
+   "kind": "word",
+   "text": "对不起",
+   "pinyin": "duìbuqǐ",
+   "es": "lo siento / perdón"
+  },
+  {
+   "id": "w111",
+   "kind": "word",
+   "text": "没关系",
+   "pinyin": "méi guānxi",
+   "es": "no importa / no pasa nada"
+  },
+  {
+   "id": "w112",
+   "kind": "word",
+   "text": "是",
+   "pinyin": "shì",
+   "es": "ser"
+  },
+  {
+   "id": "w113",
+   "kind": "word",
+   "text": "有",
+   "pinyin": "yǒu",
+   "es": "tener / haber"
+  },
+  {
+   "id": "w114",
+   "kind": "word",
+   "text": "看",
+   "pinyin": "kàn",
+   "es": "mirar / ver"
+  },
+  {
+   "id": "w115",
+   "kind": "word",
+   "text": "听",
+   "pinyin": "tīng",
+   "es": "escuchar"
+  },
+  {
+   "id": "w116",
+   "kind": "word",
+   "text": "说",
+   "pinyin": "shuō",
+   "es": "hablar / decir"
+  },
+  {
+   "id": "w117",
+   "kind": "word",
+   "text": "读",
+   "pinyin": "dú",
+   "es": "leer"
+  },
+  {
+   "id": "w118",
+   "kind": "word",
+   "text": "写",
+   "pinyin": "xiě",
+   "es": "escribir"
+  },
+  {
+   "id": "w119",
+   "kind": "word",
+   "text": "看见",
+   "pinyin": "kànjiàn",
+   "es": "ver / alcanzar a ver"
+  },
+  {
+   "id": "w120",
+   "kind": "word",
+   "text": "叫",
+   "pinyin": "jiào",
+   "es": "llamarse / llamar"
+  },
+  {
+   "id": "w121",
+   "kind": "word",
+   "text": "来",
+   "pinyin": "lái",
+   "es": "venir"
+  },
+  {
+   "id": "w122",
+   "kind": "word",
+   "text": "回",
+   "pinyin": "huí",
+   "es": "volver / regresar"
+  },
+  {
+   "id": "w123",
+   "kind": "word",
+   "text": "去",
+   "pinyin": "qù",
+   "es": "ir"
+  },
+  {
+   "id": "w124",
+   "kind": "word",
+   "text": "吃",
+   "pinyin": "chī",
+   "es": "comer"
+  },
+  {
+   "id": "w125",
+   "kind": "word",
+   "text": "喝",
+   "pinyin": "hē",
+   "es": "beber"
+  },
+  {
+   "id": "w126",
+   "kind": "word",
+   "text": "睡觉",
+   "pinyin": "shuìjiào",
+   "es": "dormir"
+  },
+  {
+   "id": "w127",
+   "kind": "word",
+   "text": "打电话",
+   "pinyin": "dǎ diànhuà",
+   "es": "hacer una llamada"
+  },
+  {
+   "id": "w128",
+   "kind": "word",
+   "text": "做",
+   "pinyin": "zuò",
+   "es": "hacer"
+  },
+  {
+   "id": "w129",
+   "kind": "word",
+   "text": "买",
+   "pinyin": "mǎi",
+   "es": "comprar"
+  },
+  {
+   "id": "w130",
+   "kind": "word",
+   "text": "开",
+   "pinyin": "kāi",
+   "es": "abrir / conducir"
+  },
+  {
+   "id": "w131",
+   "kind": "word",
+   "text": "坐",
+   "pinyin": "zuò",
+   "es": "sentarse / ir sentado"
+  },
+  {
+   "id": "w132",
+   "kind": "word",
+   "text": "住",
+   "pinyin": "zhù",
+   "es": "vivir / residir"
+  },
+  {
+   "id": "w133",
+   "kind": "word",
+   "text": "学习",
+   "pinyin": "xuéxí",
+   "es": "estudiar"
+  },
+  {
+   "id": "w134",
+   "kind": "word",
+   "text": "工作",
+   "pinyin": "gōngzuò",
+   "es": "trabajar / trabajo"
+  },
+  {
+   "id": "w135",
+   "kind": "word",
+   "text": "下雨",
+   "pinyin": "xià yǔ",
+   "es": "llover"
+  },
+  {
+   "id": "w136",
+   "kind": "word",
+   "text": "爱",
+   "pinyin": "ài",
+   "es": "amar"
+  },
+  {
+   "id": "w137",
+   "kind": "word",
+   "text": "喜欢",
+   "pinyin": "xǐhuan",
+   "es": "gustar"
+  },
+  {
+   "id": "w138",
+   "kind": "word",
+   "text": "想",
+   "pinyin": "xiǎng",
+   "es": "querer / pensar"
+  },
+  {
+   "id": "w139",
+   "kind": "word",
+   "text": "认识",
+   "pinyin": "rènshi",
+   "es": "conocer"
+  },
+  {
+   "id": "w140",
+   "kind": "word",
+   "text": "会",
+   "pinyin": "huì",
+   "es": "saber hacer / poder"
+  },
+  {
+   "id": "w141",
+   "kind": "word",
+   "text": "能",
+   "pinyin": "néng",
+   "es": "poder / ser capaz"
+  },
+  {
+   "id": "w142",
+   "kind": "word",
+   "text": "好",
+   "pinyin": "hǎo",
+   "es": "bueno / bien"
+  },
+  {
+   "id": "w143",
+   "kind": "word",
+   "text": "大",
+   "pinyin": "dà",
+   "es": "grande"
+  },
+  {
+   "id": "w144",
+   "kind": "word",
+   "text": "小",
+   "pinyin": "xiǎo",
+   "es": "pequeño"
+  },
+  {
+   "id": "w145",
+   "kind": "word",
+   "text": "多",
+   "pinyin": "duō",
+   "es": "mucho / muchos"
+  },
+  {
+   "id": "w146",
+   "kind": "word",
+   "text": "少",
+   "pinyin": "shǎo",
+   "es": "poco / pocos"
+  },
+  {
+   "id": "w147",
+   "kind": "word",
+   "text": "冷",
+   "pinyin": "lěng",
+   "es": "frío"
+  },
+  {
+   "id": "w148",
+   "kind": "word",
+   "text": "热",
+   "pinyin": "rè",
+   "es": "caliente / calor"
+  },
+  {
+   "id": "w149",
+   "kind": "word",
+   "text": "高兴",
+   "pinyin": "gāoxìng",
+   "es": "feliz / contento"
+  },
+  {
+   "id": "w150",
+   "kind": "word",
+   "text": "漂亮",
+   "pinyin": "piàoliang",
+   "es": "bonito/a / hermoso/a"
+  },
+  {
+   "id": "w151",
+   "kind": "word",
+   "text": "你们",
+   "pinyin": "nǐmen",
+   "es": "ustedes"
+  },
+  {
+   "id": "w152",
+   "kind": "word",
+   "text": "您",
+   "pinyin": "nín",
+   "es": "usted"
+  },
+  {
+   "id": "w153",
+   "kind": "word",
+   "text": "他们",
+   "pinyin": "tāmen",
+   "es": "ellos"
+  },
+  {
+   "id": "w154",
+   "kind": "word",
+   "text": "她们",
+   "pinyin": "tāmen",
+   "es": "ellas"
+  },
+  {
+   "id": "w155",
+   "kind": "word",
+   "text": "它",
+   "pinyin": "tā",
+   "es": "ello (animal o cosa)"
+  },
+  {
+   "id": "w156",
+   "kind": "word",
+   "text": "它们",
+   "pinyin": "tāmen",
+   "es": "ellos (animales o cosas)"
+  },
+  {
+   "id": "w157",
+   "kind": "word",
+   "text": "弟弟",
+   "pinyin": "dìdi",
+   "es": "hermano menor"
+  },
+  {
+   "id": "w158",
+   "kind": "word",
+   "text": "哥哥",
+   "pinyin": "gēge",
+   "es": "hermano mayor"
+  },
+  {
+   "id": "w159",
+   "kind": "word",
+   "text": "姐姐",
+   "pinyin": "jiějie",
+   "es": "hermana mayor"
+  },
+  {
+   "id": "w160",
+   "kind": "word",
+   "text": "妹妹",
+   "pinyin": "mèimei",
+   "es": "hermana menor"
+  },
+  {
+   "id": "w161",
+   "kind": "word",
+   "text": "孩子",
+   "pinyin": "háizi",
+   "es": "niño / hijo"
+  },
+  {
+   "id": "w162",
+   "kind": "word",
+   "text": "家人",
+   "pinyin": "jiārén",
+   "es": "familia / familiar"
+  },
+  {
+   "id": "w163",
+   "kind": "word",
+   "text": "大家",
+   "pinyin": "dàjiā",
+   "es": "todos"
+  },
+  {
+   "id": "w164",
+   "kind": "word",
+   "text": "男朋友",
+   "pinyin": "nánpéngyou",
+   "es": "novio"
+  },
+  {
+   "id": "w165",
+   "kind": "word",
+   "text": "女朋友",
+   "pinyin": "nǚpéngyou",
+   "es": "novia"
+  },
+  {
+   "id": "w166",
+   "kind": "word",
+   "text": "哪个",
+   "pinyin": "nǎge",
+   "es": "cuál"
+  },
+  {
+   "id": "w167",
+   "kind": "word",
+   "text": "哪里",
+   "pinyin": "nǎlǐ",
+   "es": "dónde"
+  },
+  {
+   "id": "w168",
+   "kind": "word",
+   "text": "哪些",
+   "pinyin": "nǎxiē",
+   "es": "cuáles"
+  },
+  {
+   "id": "w169",
+   "kind": "word",
+   "text": "那边",
+   "pinyin": "nàbiān",
+   "es": "allá / por allá"
+  },
+  {
+   "id": "w170",
+   "kind": "word",
+   "text": "那个",
+   "pinyin": "nàge",
+   "es": "ese / aquel"
+  },
+  {
+   "id": "w171",
+   "kind": "word",
+   "text": "那里",
+   "pinyin": "nàlǐ",
+   "es": "allí"
+  },
+  {
+   "id": "w172",
+   "kind": "word",
+   "text": "那儿",
+   "pinyin": "nàr",
+   "es": "allí"
+  },
+  {
+   "id": "w173",
+   "kind": "word",
+   "text": "那些",
+   "pinyin": "nàxiē",
+   "es": "esos / aquellos"
+  },
+  {
+   "id": "w174",
+   "kind": "word",
+   "text": "这边",
+   "pinyin": "zhèbiān",
+   "es": "aquí / por aquí"
+  },
+  {
+   "id": "w175",
+   "kind": "word",
+   "text": "这个",
+   "pinyin": "zhège",
+   "es": "este"
+  },
+  {
+   "id": "w176",
+   "kind": "word",
+   "text": "这里",
+   "pinyin": "zhèlǐ",
+   "es": "aquí"
+  },
+  {
+   "id": "w177",
+   "kind": "word",
+   "text": "这儿",
+   "pinyin": "zhèr",
+   "es": "aquí"
+  },
+  {
+   "id": "w178",
+   "kind": "word",
+   "text": "这些",
+   "pinyin": "zhèxiē",
+   "es": "estos"
+  },
+  {
+   "id": "w179",
+   "kind": "word",
+   "text": "请问",
+   "pinyin": "qǐngwèn",
+   "es": "disculpe, ¿…?"
+  },
+  {
+   "id": "w180",
+   "kind": "word",
+   "text": "你好",
+   "pinyin": "nǐ hǎo",
+   "es": "hola"
+  },
+  {
+   "id": "w181",
+   "kind": "word",
+   "text": "百",
+   "pinyin": "bǎi",
+   "es": "cien"
+  },
+  {
+   "id": "w182",
+   "kind": "word",
+   "text": "千",
+   "pinyin": "qiān",
+   "es": "mil"
+  },
+  {
+   "id": "w183",
+   "kind": "word",
+   "text": "零",
+   "pinyin": "líng",
+   "es": "cero"
+  },
+  {
+   "id": "w184",
+   "kind": "word",
+   "text": "两",
+   "pinyin": "liǎng",
+   "es": "dos (cantidad)"
+  },
+  {
+   "id": "w185",
+   "kind": "word",
+   "text": "半",
+   "pinyin": "bàn",
+   "es": "medio / y media"
+  },
+  {
+   "id": "w186",
+   "kind": "word",
+   "text": "一半",
+   "pinyin": "yíbàn",
+   "es": "la mitad"
+  },
+  {
+   "id": "w187",
+   "kind": "word",
+   "text": "第",
+   "pinyin": "dì",
+   "es": "(ordinal)"
+  },
+  {
+   "id": "w188",
+   "kind": "word",
+   "text": "件",
+   "pinyin": "jiàn",
+   "es": "(clasificador de ropa / asuntos)"
+  },
+  {
+   "id": "w189",
+   "kind": "word",
+   "text": "口",
+   "pinyin": "kǒu",
+   "es": "boca / (miembros de familia)"
+  },
+  {
+   "id": "w190",
+   "kind": "word",
+   "text": "只",
+   "pinyin": "zhī",
+   "es": "(clasificador de animales)"
+  },
+  {
+   "id": "w191",
+   "kind": "word",
+   "text": "元",
+   "pinyin": "yuán",
+   "es": "yuan"
+  },
+  {
+   "id": "w192",
+   "kind": "word",
+   "text": "一些",
+   "pinyin": "yìxiē",
+   "es": "algunos / un poco"
+  },
+  {
+   "id": "w193",
+   "kind": "word",
+   "text": "有的",
+   "pinyin": "yǒude",
+   "es": "algunos (de ellos)"
+  },
+  {
+   "id": "w194",
+   "kind": "word",
+   "text": "有些",
+   "pinyin": "yǒuxiē",
+   "es": "algunos; algo"
+  },
+  {
+   "id": "w195",
+   "kind": "word",
+   "text": "分",
+   "pinyin": "fēn",
+   "es": "minuto / céntimo; dividir"
+  },
+  {
+   "id": "w196",
+   "kind": "word",
+   "text": "也",
+   "pinyin": "yě",
+   "es": "también"
+  },
+  {
+   "id": "w197",
+   "kind": "word",
+   "text": "还",
+   "pinyin": "hái",
+   "es": "todavía; también"
+  },
+  {
+   "id": "w198",
+   "kind": "word",
+   "text": "再",
+   "pinyin": "zài",
+   "es": "otra vez"
+  },
+  {
+   "id": "w199",
+   "kind": "word",
+   "text": "真",
+   "pinyin": "zhēn",
+   "es": "realmente; verdadero"
+  },
+  {
+   "id": "w200",
+   "kind": "word",
+   "text": "非常",
+   "pinyin": "fēicháng",
+   "es": "muy, sumamente"
+  },
+  {
+   "id": "w201",
+   "kind": "word",
+   "text": "有点儿",
+   "pinyin": "yǒudiǎnr",
+   "es": "un poco (algo negativo)"
+  },
+  {
+   "id": "w202",
+   "kind": "word",
+   "text": "正在",
+   "pinyin": "zhèngzài",
+   "es": "estar (haciendo)"
+  },
+  {
+   "id": "w203",
+   "kind": "word",
+   "text": "要",
+   "pinyin": "yào",
+   "es": "querer; necesitar; ir a"
+  },
+  {
+   "id": "w204",
+   "kind": "word",
+   "text": "可以",
+   "pinyin": "kěyǐ",
+   "es": "poder (permiso)"
+  },
+  {
+   "id": "w205",
+   "kind": "word",
+   "text": "给",
+   "pinyin": "gěi",
+   "es": "dar; para"
+  },
+  {
+   "id": "w206",
+   "kind": "word",
+   "text": "一下",
+   "pinyin": "yíxià",
+   "es": "un momento / un poco"
+  },
+  {
+   "id": "w207",
+   "kind": "word",
+   "text": "们",
+   "pinyin": "men",
+   "es": "(plural)"
+  },
+  {
+   "id": "w208",
+   "kind": "word",
+   "text": "吧",
+   "pinyin": "ba",
+   "es": "(partícula de sugerencia)"
+  },
+  {
+   "id": "w209",
+   "kind": "word",
+   "text": "对",
+   "pinyin": "duì",
+   "es": "correcto; a / hacia"
+  },
+  {
+   "id": "w210",
+   "kind": "word",
+   "text": "不要",
+   "pinyin": "búyào",
+   "es": "no (hagas); no querer"
+  },
+  {
+   "id": "w211",
+   "kind": "word",
+   "text": "店",
+   "pinyin": "diàn",
+   "es": "tienda"
+  },
+  {
+   "id": "w212",
+   "kind": "word",
+   "text": "书店",
+   "pinyin": "shūdiàn",
+   "es": "librería"
+  },
+  {
+   "id": "w213",
+   "kind": "word",
+   "text": "电影院",
+   "pinyin": "diànyǐngyuàn",
+   "es": "cine"
+  },
+  {
+   "id": "w214",
+   "kind": "word",
+   "text": "房间",
+   "pinyin": "fángjiān",
+   "es": "habitación"
+  },
+  {
+   "id": "w215",
+   "kind": "word",
+   "text": "公司",
+   "pinyin": "gōngsī",
+   "es": "empresa"
+  },
+  {
+   "id": "w216",
+   "kind": "word",
+   "text": "大学",
+   "pinyin": "dàxué",
+   "es": "universidad"
+  },
+  {
+   "id": "w217",
+   "kind": "word",
+   "text": "小学",
+   "pinyin": "xiǎoxué",
+   "es": "escuela primaria"
+  },
+  {
+   "id": "w218",
+   "kind": "word",
+   "text": "中学",
+   "pinyin": "zhōngxué",
+   "es": "escuela secundaria"
+  },
+  {
+   "id": "w219",
+   "kind": "word",
+   "text": "国",
+   "pinyin": "guó",
+   "es": "país"
+  },
+  {
+   "id": "w220",
+   "kind": "word",
+   "text": "外",
+   "pinyin": "wài",
+   "es": "fuera"
+  },
+  {
+   "id": "w221",
+   "kind": "word",
+   "text": "外边",
+   "pinyin": "wàibian",
+   "es": "afuera"
+  },
+  {
+   "id": "w222",
+   "kind": "word",
+   "text": "边",
+   "pinyin": "biān",
+   "es": "lado"
+  },
+  {
+   "id": "w223",
+   "kind": "word",
+   "text": "车",
+   "pinyin": "chē",
+   "es": "coche, vehículo"
+  },
+  {
+   "id": "w224",
+   "kind": "word",
+   "text": "火车",
+   "pinyin": "huǒchē",
+   "es": "tren"
+  },
+  {
+   "id": "w225",
+   "kind": "word",
+   "text": "到",
+   "pinyin": "dào",
+   "es": "llegar"
+  },
+  {
+   "id": "w226",
+   "kind": "word",
+   "text": "白天",
+   "pinyin": "báitiān",
+   "es": "de día"
+  },
+  {
+   "id": "w227",
+   "kind": "word",
+   "text": "早上",
+   "pinyin": "zǎoshang",
+   "es": "mañana (temprano)"
+  },
+  {
+   "id": "w228",
+   "kind": "word",
+   "text": "晚上",
+   "pinyin": "wǎnshang",
+   "es": "noche"
+  },
+  {
+   "id": "w229",
+   "kind": "word",
+   "text": "早",
+   "pinyin": "zǎo",
+   "es": "temprano"
+  },
+  {
+   "id": "w230",
+   "kind": "word",
+   "text": "今年",
+   "pinyin": "jīnnián",
+   "es": "este año"
+  },
+  {
+   "id": "w231",
+   "kind": "word",
+   "text": "明年",
+   "pinyin": "míngnián",
+   "es": "el próximo año"
+  },
+  {
+   "id": "w232",
+   "kind": "word",
+   "text": "去年",
+   "pinyin": "qùnián",
+   "es": "el año pasado"
+  },
+  {
+   "id": "w233",
+   "kind": "word",
+   "text": "日",
+   "pinyin": "rì",
+   "es": "día (fecha); sol"
+  },
+  {
+   "id": "w234",
+   "kind": "word",
+   "text": "天",
+   "pinyin": "tiān",
+   "es": "día; cielo"
+  },
+  {
+   "id": "w235",
+   "kind": "word",
+   "text": "时间",
+   "pinyin": "shíjiān",
+   "es": "tiempo"
+  },
+  {
+   "id": "w236",
+   "kind": "word",
+   "text": "小时",
+   "pinyin": "xiǎoshí",
+   "es": "hora"
+  },
+  {
+   "id": "w237",
+   "kind": "word",
+   "text": "星期日",
+   "pinyin": "xīngqīrì",
+   "es": "domingo"
+  },
+  {
+   "id": "w238",
+   "kind": "word",
+   "text": "星期天",
+   "pinyin": "xīngqītiān",
+   "es": "domingo"
+  },
+  {
+   "id": "w239",
+   "kind": "word",
+   "text": "雪",
+   "pinyin": "xuě",
+   "es": "nieve"
+  },
+  {
+   "id": "w240",
+   "kind": "word",
+   "text": "雨",
+   "pinyin": "yǔ",
+   "es": "lluvia"
+  },
+  {
+   "id": "w241",
+   "kind": "word",
+   "text": "包子",
+   "pinyin": "bāozi",
+   "es": "bollo al vapor relleno"
+  },
+  {
+   "id": "w242",
+   "kind": "word",
+   "text": "饺子",
+   "pinyin": "jiǎozi",
+   "es": "jiaozi (empanadillas)"
+  },
+  {
+   "id": "w243",
+   "kind": "word",
+   "text": "面包",
+   "pinyin": "miànbāo",
+   "es": "pan"
+  },
+  {
+   "id": "w244",
+   "kind": "word",
+   "text": "面条儿",
+   "pinyin": "miàntiáor",
+   "es": "fideos"
+  },
+  {
+   "id": "w245",
+   "kind": "word",
+   "text": "鸡蛋",
+   "pinyin": "jīdàn",
+   "es": "huevo"
+  },
+  {
+   "id": "w246",
+   "kind": "word",
+   "text": "牛奶",
+   "pinyin": "niúnǎi",
+   "es": "leche"
+  },
+  {
+   "id": "w247",
+   "kind": "word",
+   "text": "饭",
+   "pinyin": "fàn",
+   "es": "comida; arroz"
+  },
+  {
+   "id": "w248",
+   "kind": "word",
+   "text": "早饭",
+   "pinyin": "zǎofàn",
+   "es": "desayuno"
+  },
+  {
+   "id": "w249",
+   "kind": "word",
+   "text": "午饭",
+   "pinyin": "wǔfàn",
+   "es": "almuerzo"
+  },
+  {
+   "id": "w250",
+   "kind": "word",
+   "text": "晚饭",
+   "pinyin": "wǎnfàn",
+   "es": "cena"
+  },
+  {
+   "id": "w251",
+   "kind": "word",
+   "text": "做饭",
+   "pinyin": "zuò fàn",
+   "es": "cocinar"
+  },
+  {
+   "id": "w252",
+   "kind": "word",
+   "text": "好吃",
+   "pinyin": "hǎochī",
+   "es": "rico, delicioso"
+  },
+  {
+   "id": "w253",
+   "kind": "word",
+   "text": "卖",
+   "pinyin": "mài",
+   "es": "vender"
+  },
+  {
+   "id": "w254",
+   "kind": "word",
+   "text": "贵",
+   "pinyin": "guì",
+   "es": "caro"
+  },
+  {
+   "id": "w255",
+   "kind": "word",
+   "text": "便宜",
+   "pinyin": "piányi",
+   "es": "barato"
+  },
+  {
+   "id": "w256",
+   "kind": "word",
+   "text": "汉字",
+   "pinyin": "Hànzì",
+   "es": "carácter chino"
+  },
+  {
+   "id": "w257",
+   "kind": "word",
+   "text": "中文",
+   "pinyin": "Zhōngwén",
+   "es": "chino (idioma)"
+  },
+  {
+   "id": "w258",
+   "kind": "word",
+   "text": "读书",
+   "pinyin": "dúshū",
+   "es": "leer; estudiar"
+  },
+  {
+   "id": "w259",
+   "kind": "word",
+   "text": "说话",
+   "pinyin": "shuōhuà",
+   "es": "hablar"
+  },
+  {
+   "id": "w260",
+   "kind": "word",
+   "text": "听见",
+   "pinyin": "tīngjiàn",
+   "es": "oír"
+  },
+  {
+   "id": "w261",
+   "kind": "word",
+   "text": "课",
+   "pinyin": "kè",
+   "es": "clase, lección"
+  },
+  {
+   "id": "w262",
+   "kind": "word",
+   "text": "上课",
+   "pinyin": "shàngkè",
+   "es": "tener clase"
+  },
+  {
+   "id": "w263",
+   "kind": "word",
+   "text": "下课",
+   "pinyin": "xiàkè",
+   "es": "salir de clase"
+  },
+  {
+   "id": "w264",
+   "kind": "word",
+   "text": "歌",
+   "pinyin": "gē",
+   "es": "canción"
+  },
+  {
+   "id": "w265",
+   "kind": "word",
+   "text": "唱",
+   "pinyin": "chàng",
+   "es": "cantar"
+  },
+  {
+   "id": "w266",
+   "kind": "word",
+   "text": "电话",
+   "pinyin": "diànhuà",
+   "es": "teléfono"
+  },
+  {
+   "id": "w267",
+   "kind": "word",
+   "text": "手机",
+   "pinyin": "shǒujī",
+   "es": "celular"
+  },
+  {
+   "id": "w268",
+   "kind": "word",
+   "text": "问",
+   "pinyin": "wèn",
+   "es": "preguntar"
+  },
+  {
+   "id": "w269",
+   "kind": "word",
+   "text": "问题",
+   "pinyin": "wèntí",
+   "es": "pregunta; problema"
+  },
+  {
+   "id": "w270",
+   "kind": "word",
+   "text": "没事",
+   "pinyin": "méishì",
+   "es": "no pasa nada"
+  },
+  {
+   "id": "w271",
+   "kind": "word",
+   "text": "起床",
+   "pinyin": "qǐchuáng",
+   "es": "levantarse"
+  },
+  {
+   "id": "w272",
+   "kind": "word",
+   "text": "上班",
+   "pinyin": "shàngbān",
+   "es": "ir a trabajar"
+  },
+  {
+   "id": "w273",
+   "kind": "word",
+   "text": "下班",
+   "pinyin": "xiàbān",
+   "es": "salir del trabajo"
+  },
+  {
+   "id": "w274",
+   "kind": "word",
+   "text": "上学",
+   "pinyin": "shàngxué",
+   "es": "ir a la escuela"
+  },
+  {
+   "id": "w275",
+   "kind": "word",
+   "text": "睡",
+   "pinyin": "shuì",
+   "es": "dormir"
+  },
+  {
+   "id": "w276",
+   "kind": "word",
+   "text": "学",
+   "pinyin": "xué",
+   "es": "aprender"
+  },
+  {
+   "id": "w277",
+   "kind": "word",
+   "text": "玩",
+   "pinyin": "wán",
+   "es": "jugar; divertirse"
+  },
+  {
+   "id": "w278",
+   "kind": "word",
+   "text": "找",
+   "pinyin": "zhǎo",
+   "es": "buscar"
+  },
+  {
+   "id": "w279",
+   "kind": "word",
+   "text": "见",
+   "pinyin": "jiàn",
+   "es": "ver; encontrarse"
+  },
+  {
+   "id": "w280",
+   "kind": "word",
+   "text": "穿",
+   "pinyin": "chuān",
+   "es": "ponerse, vestir"
+  },
+  {
+   "id": "w281",
+   "kind": "word",
+   "text": "休息",
+   "pinyin": "xiūxi",
+   "es": "descansar"
+  },
+  {
+   "id": "w282",
+   "kind": "word",
+   "text": "觉得",
+   "pinyin": "juéde",
+   "es": "parecer, creer"
+  },
+  {
+   "id": "w283",
+   "kind": "word",
+   "text": "知道",
+   "pinyin": "zhīdào",
+   "es": "saber"
+  },
+  {
+   "id": "w284",
+   "kind": "word",
+   "text": "开车",
+   "pinyin": "kāichē",
+   "es": "conducir"
+  },
+  {
+   "id": "w285",
+   "kind": "word",
+   "text": "事",
+   "pinyin": "shì",
+   "es": "asunto, cosa"
+  },
+  {
+   "id": "w286",
+   "kind": "word",
+   "text": "新",
+   "pinyin": "xīn",
+   "es": "nuevo"
+  },
+  {
+   "id": "w287",
+   "kind": "word",
+   "text": "忙",
+   "pinyin": "máng",
+   "es": "ocupado"
+  },
+  {
+   "id": "w288",
+   "kind": "word",
+   "text": "好看",
+   "pinyin": "hǎokàn",
+   "es": "bonito"
+  },
+  {
+   "id": "w289",
+   "kind": "word",
+   "text": "好听",
+   "pinyin": "hǎotīng",
+   "es": "agradable al oído"
+  },
+  {
+   "id": "w290",
+   "kind": "word",
+   "text": "好玩儿",
+   "pinyin": "hǎowánr",
+   "es": "divertido"
+  },
+  {
+   "id": "w291",
+   "kind": "word",
+   "text": "晚",
+   "pinyin": "wǎn",
+   "es": "tarde"
+  },
+  {
+   "id": "w292",
+   "kind": "word",
+   "text": "病",
+   "pinyin": "bìng",
+   "es": "enfermedad"
+  },
+  {
+   "id": "w293",
+   "kind": "word",
+   "text": "生病",
+   "pinyin": "shēngbìng",
+   "es": "enfermarse"
+  },
+  {
+   "id": "w294",
+   "kind": "word",
+   "text": "看病",
+   "pinyin": "kànbìng",
+   "es": "ir al médico"
+  },
+  {
+   "id": "w295",
+   "kind": "word",
+   "text": "男",
+   "pinyin": "nán",
+   "es": "masculino"
+  },
+  {
+   "id": "w296",
+   "kind": "word",
+   "text": "女",
+   "pinyin": "nǚ",
+   "es": "femenino"
+  },
+  {
+   "id": "w297",
+   "kind": "word",
+   "text": "小朋友",
+   "pinyin": "xiǎopéngyǒu",
+   "es": "niño (amiguito)"
+  },
+  {
+   "id": "w298",
+   "kind": "word",
+   "text": "大学生",
+   "pinyin": "dàxuéshēng",
+   "es": "estudiante universitario"
+  },
+  {
+   "id": "w299",
+   "kind": "word",
+   "text": "中学生",
+   "pinyin": "zhōngxuéshēng",
+   "es": "estudiante de secundaria"
+  },
+  {
+   "id": "w300",
+   "kind": "word",
+   "text": "小学生",
+   "pinyin": "xiǎoxuéshēng",
+   "es": "estudiante de primaria"
+  },
+  {
+   "id": "s001",
+   "kind": "sentence",
+   "text": "我是学生。",
+   "pinyin": "Wǒ shì xuéshēng.",
+   "en": "I am a student."
+  },
+  {
+   "id": "s002",
+   "kind": "sentence",
+   "text": "我们都是学生。",
+   "pinyin": "Wǒmen dōu shì xuéshēng.",
+   "en": "We are all students."
+  },
+  {
+   "id": "s003",
+   "kind": "sentence",
+   "text": "你是中国人吗？",
+   "pinyin": "Nǐ shì Zhōngguó rén ma?",
+   "en": "Are you Chinese?"
+  },
+  {
+   "id": "s004",
+   "kind": "sentence",
+   "text": "他是老师。",
+   "pinyin": "Tā shì lǎoshī.",
+   "en": "He is a teacher."
+  },
+  {
+   "id": "s005",
+   "kind": "sentence",
+   "text": "她是医生。",
+   "pinyin": "Tā shì yīshēng.",
+   "en": "She is a doctor."
+  },
+  {
+   "id": "s006",
+   "kind": "sentence",
+   "text": "这是我的书。",
+   "pinyin": "Zhè shì wǒ de shū.",
+   "en": "This is my book."
+  },
+  {
+   "id": "s007",
+   "kind": "sentence",
+   "text": "那是我的学校。",
+   "pinyin": "Nà shì wǒ de xuéxiào.",
+   "en": "That is my school."
+  },
+  {
+   "id": "s008",
+   "kind": "sentence",
+   "text": "你喜欢哪本书？",
+   "pinyin": "Nǐ xǐhuan nǎ běn shū?",
+   "en": "Which book do you like?"
+  },
+  {
+   "id": "s009",
+   "kind": "sentence",
+   "text": "你去哪儿？",
+   "pinyin": "Nǐ qù nǎr?",
+   "en": "Where are you going?"
+  },
+  {
+   "id": "s010",
+   "kind": "sentence",
+   "text": "他是谁？",
+   "pinyin": "Tā shì shéi?",
+   "en": "Who is he?"
+  },
+  {
+   "id": "s011",
+   "kind": "sentence",
+   "text": "这是什么？",
+   "pinyin": "Zhè shì shénme?",
+   "en": "What is this?"
+  },
+  {
+   "id": "s012",
+   "kind": "sentence",
+   "text": "这个多少钱？",
+   "pinyin": "Zhège duōshao qián?",
+   "en": "How much is this?"
+  },
+  {
+   "id": "s013",
+   "kind": "sentence",
+   "text": "你有几个朋友？",
+   "pinyin": "Nǐ yǒu jǐ ge péngyou?",
+   "en": "How many friends do you have?"
+  },
+  {
+   "id": "s014",
+   "kind": "sentence",
+   "text": "这个字怎么读？",
+   "pinyin": "Zhège zì zěnme dú?",
+   "en": "How do you read this character?"
+  },
+  {
+   "id": "s015",
+   "kind": "sentence",
+   "text": "今天天气怎么样？",
+   "pinyin": "Jīntiān tiānqì zěnmeyàng?",
+   "en": "How is the weather today?"
+  },
+  {
+   "id": "s016",
+   "kind": "sentence",
+   "text": "今天是一号。",
+   "pinyin": "Jīntiān shì yī hào.",
+   "en": "Today is the 1st."
+  },
+  {
+   "id": "s017",
+   "kind": "sentence",
+   "text": "今天是二号。",
+   "pinyin": "Jīntiān shì èr hào.",
+   "en": "Today is the 2nd."
+  },
+  {
+   "id": "s018",
+   "kind": "sentence",
+   "text": "今天是三号。",
+   "pinyin": "Jīntiān shì sān hào.",
+   "en": "Today is the 3rd."
+  },
+  {
+   "id": "s019",
+   "kind": "sentence",
+   "text": "今天是四号。",
+   "pinyin": "Jīntiān shì sì hào.",
+   "en": "Today is the 4th."
+  },
+  {
+   "id": "s020",
+   "kind": "sentence",
+   "text": "今天是五号。",
+   "pinyin": "Jīntiān shì wǔ hào.",
+   "en": "Today is the 5th."
+  },
+  {
+   "id": "s021",
+   "kind": "sentence",
+   "text": "今天是六号。",
+   "pinyin": "Jīntiān shì liù hào.",
+   "en": "Today is the 6th."
+  },
+  {
+   "id": "s022",
+   "kind": "sentence",
+   "text": "今天是七号。",
+   "pinyin": "Jīntiān shì qī hào.",
+   "en": "Today is the 7th."
+  },
+  {
+   "id": "s023",
+   "kind": "sentence",
+   "text": "今天是八号。",
+   "pinyin": "Jīntiān shì bā hào.",
+   "en": "Today is the 8th."
+  },
+  {
+   "id": "s024",
+   "kind": "sentence",
+   "text": "今天是九号。",
+   "pinyin": "Jīntiān shì jiǔ hào.",
+   "en": "Today is the 9th."
+  },
+  {
+   "id": "s025",
+   "kind": "sentence",
+   "text": "今天是十号。",
+   "pinyin": "Jīntiān shì shí hào.",
+   "en": "Today is the 10th."
+  },
+  {
+   "id": "s026",
+   "kind": "sentence",
+   "text": "一个人。",
+   "pinyin": "Yí ge rén.",
+   "en": "One person."
+  },
+  {
+   "id": "s027",
+   "kind": "sentence",
+   "text": "我二十岁。",
+   "pinyin": "Wǒ èrshí suì.",
+   "en": "I am twenty years old."
+  },
+  {
+   "id": "s028",
+   "kind": "sentence",
+   "text": "一本书。",
+   "pinyin": "Yì běn shū.",
+   "en": "One book."
+  },
+  {
+   "id": "s029",
+   "kind": "sentence",
+   "text": "我想买些水果。",
+   "pinyin": "Wǒ xiǎng mǎi xiē shuǐguǒ.",
+   "en": "I want to buy some fruit."
+  },
+  {
+   "id": "s030",
+   "kind": "sentence",
+   "text": "十块钱。",
+   "pinyin": "Shí kuài qián.",
+   "en": "Ten yuan."
+  },
+  {
+   "id": "s031",
+   "kind": "sentence",
+   "text": "我不是老师。",
+   "pinyin": "Wǒ bú shì lǎoshī.",
+   "en": "I am not a teacher."
+  },
+  {
+   "id": "s032",
+   "kind": "sentence",
+   "text": "我没有钱。",
+   "pinyin": "Wǒ méiyǒu qián.",
+   "en": "I don’t have money."
+  },
+  {
+   "id": "s033",
+   "kind": "sentence",
+   "text": "我很好。",
+   "pinyin": "Wǒ hěn hǎo.",
+   "en": "I am very well."
+  },
+  {
+   "id": "s034",
+   "kind": "sentence",
+   "text": "太好了！",
+   "pinyin": "Tài hǎo le!",
+   "en": "Great!"
+  },
+  {
+   "id": "s035",
+   "kind": "sentence",
+   "text": "我们都是学生。",
+   "pinyin": "Wǒmen dōu shì xuéshēng.",
+   "en": "We are all students."
+  },
+  {
+   "id": "s036",
+   "kind": "sentence",
+   "text": "我会说一点儿汉语。",
+   "pinyin": "Wǒ huì shuō yìdiǎnr Hànyǔ.",
+   "en": "I can speak a little Chinese."
+  },
+  {
+   "id": "s037",
+   "kind": "sentence",
+   "text": "我和他是朋友。",
+   "pinyin": "Wǒ hé tā shì péngyou.",
+   "en": "He and I are friends."
+  },
+  {
+   "id": "s038",
+   "kind": "sentence",
+   "text": "我在学校。",
+   "pinyin": "Wǒ zài xuéxiào.",
+   "en": "I am at school."
+  },
+  {
+   "id": "s039",
+   "kind": "sentence",
+   "text": "这是我的书。",
+   "pinyin": "Zhè shì wǒ de shū.",
+   "en": "This is my book."
+  },
+  {
+   "id": "s040",
+   "kind": "sentence",
+   "text": "我吃米饭了。",
+   "pinyin": "Wǒ chī mǐfàn le.",
+   "en": "I ate rice."
+  },
+  {
+   "id": "s041",
+   "kind": "sentence",
+   "text": "你是学生吗？",
+   "pinyin": "Nǐ shì xuéshēng ma?",
+   "en": "Are you a student?"
+  },
+  {
+   "id": "s042",
+   "kind": "sentence",
+   "text": "我很好，你呢？",
+   "pinyin": "Wǒ hěn hǎo, nǐ ne?",
+   "en": "I am well. And you?"
+  },
+  {
+   "id": "s043",
+   "kind": "sentence",
+   "text": "喂，你好！",
+   "pinyin": "Wèi, nǐ hǎo!",
+   "en": "Hello? Hi!"
+  },
+  {
+   "id": "s044",
+   "kind": "sentence",
+   "text": "我在家。",
+   "pinyin": "Wǒ zài jiā.",
+   "en": "I am at home."
+  },
+  {
+   "id": "s045",
+   "kind": "sentence",
+   "text": "我在学校学习。",
+   "pinyin": "Wǒ zài xuéxiào xuéxí.",
+   "en": "I study at school."
+  },
+  {
+   "id": "s046",
+   "kind": "sentence",
+   "text": "我们去饭店吃饭。",
+   "pinyin": "Wǒmen qù fàndiàn chīfàn.",
+   "en": "We go to a restaurant to eat."
+  },
+  {
+   "id": "s047",
+   "kind": "sentence",
+   "text": "我去商店买东西。",
+   "pinyin": "Wǒ qù shāngdiàn mǎi dōngxi.",
+   "en": "I go to the store to buy things."
+  },
+  {
+   "id": "s048",
+   "kind": "sentence",
+   "text": "医生在医院。",
+   "pinyin": "Yīshēng zài yīyuàn.",
+   "en": "The doctor is at the hospital."
+  },
+  {
+   "id": "s049",
+   "kind": "sentence",
+   "text": "我在中国学习汉语。",
+   "pinyin": "Wǒ zài Zhōngguó xuéxí Hànyǔ.",
+   "en": "I study Chinese in China."
+  },
+  {
+   "id": "s050",
+   "kind": "sentence",
+   "text": "我去超市买东西。",
+   "pinyin": "Wǒ qù chāoshì mǎi dōngxi.",
+   "en": "I’m going to the supermarket to buy things."
+  },
+  {
+   "id": "s051",
+   "kind": "sentence",
+   "text": "书在桌子上。",
+   "pinyin": "Shū zài zhuōzi shàng.",
+   "en": "The book is on the table."
+  },
+  {
+   "id": "s052",
+   "kind": "sentence",
+   "text": "猫在桌子下。",
+   "pinyin": "Māo zài zhuōzi xià.",
+   "en": "The cat is under the table."
+  },
+  {
+   "id": "s053",
+   "kind": "sentence",
+   "text": "学校前有一个商店。",
+   "pinyin": "Xuéxiào qián yǒu yí ge shāngdiàn.",
+   "en": "There is a shop in front of the school."
+  },
+  {
+   "id": "s054",
+   "kind": "sentence",
+   "text": "下课后我去饭店。",
+   "pinyin": "Xiàkè hòu wǒ qù fàndiàn.",
+   "en": "After class I go to the restaurant."
+  },
+  {
+   "id": "s055",
+   "kind": "sentence",
+   "text": "杯子里有水。",
+   "pinyin": "Bēizi lǐ yǒu shuǐ.",
+   "en": "There is water in the cup."
+  },
+  {
+   "id": "s056",
+   "kind": "sentence",
+   "text": "今天天气很好。",
+   "pinyin": "Jīntiān tiānqì hěn hǎo.",
+   "en": "The weather is nice today."
+  },
+  {
+   "id": "s057",
+   "kind": "sentence",
+   "text": "明天我去学校。",
+   "pinyin": "Míngtiān wǒ qù xuéxiào.",
+   "en": "Tomorrow I go to school."
+  },
+  {
+   "id": "s058",
+   "kind": "sentence",
+   "text": "昨天我在家。",
+   "pinyin": "Zuótiān wǒ zài jiā.",
+   "en": "Yesterday I was at home."
+  },
+  {
+   "id": "s059",
+   "kind": "sentence",
+   "text": "我上午学习。",
+   "pinyin": "Wǒ shàngwǔ xuéxí.",
+   "en": "I study in the morning."
+  },
+  {
+   "id": "s060",
+   "kind": "sentence",
+   "text": "我们中午吃米饭。",
+   "pinyin": "Wǒmen zhōngwǔ chī mǐfàn.",
+   "en": "We eat rice at noon."
+  },
+  {
+   "id": "s061",
+   "kind": "sentence",
+   "text": "我下午工作。",
+   "pinyin": "Wǒ xiàwǔ gōngzuò.",
+   "en": "I work in the afternoon."
+  },
+  {
+   "id": "s062",
+   "kind": "sentence",
+   "text": "一年有十二个月。",
+   "pinyin": "Yì nián yǒu shí’èr ge yuè.",
+   "en": "A year has twelve months."
+  },
+  {
+   "id": "s063",
+   "kind": "sentence",
+   "text": "今天是五月五号。",
+   "pinyin": "Jīntiān shì wǔ yuè wǔ hào.",
+   "en": "Today is May 5."
+  },
+  {
+   "id": "s064",
+   "kind": "sentence",
+   "text": "今天几号？",
+   "pinyin": "Jīntiān jǐ hào?",
+   "en": "What is today’s date?"
+  },
+  {
+   "id": "s065",
+   "kind": "sentence",
+   "text": "今天星期几？",
+   "pinyin": "Jīntiān xīngqī jǐ?",
+   "en": "What day of the week is it?"
+  },
+  {
+   "id": "s066",
+   "kind": "sentence",
+   "text": "现在三点。",
+   "pinyin": "Xiànzài sān diǎn.",
+   "en": "It is three o’clock now."
+  },
+  {
+   "id": "s067",
+   "kind": "sentence",
+   "text": "十分钟。",
+   "pinyin": "Shí fēnzhōng.",
+   "en": "Ten minutes."
+  },
+  {
+   "id": "s068",
+   "kind": "sentence",
+   "text": "我现在在家。",
+   "pinyin": "Wǒ xiànzài zài jiā.",
+   "en": "I am at home now."
+  },
+  {
+   "id": "s069",
+   "kind": "sentence",
+   "text": "你什么时候来？",
+   "pinyin": "Nǐ shénme shíhou lái?",
+   "en": "When are you coming?"
+  },
+  {
+   "id": "s070",
+   "kind": "sentence",
+   "text": "我爸爸是医生。",
+   "pinyin": "Wǒ bàba shì yīshēng.",
+   "en": "My father is a doctor."
+  },
+  {
+   "id": "s071",
+   "kind": "sentence",
+   "text": "我妈妈是老师。",
+   "pinyin": "Wǒ māma shì lǎoshī.",
+   "en": "My mother is a teacher."
+  },
+  {
+   "id": "s072",
+   "kind": "sentence",
+   "text": "他有一个儿子。",
+   "pinyin": "Tā yǒu yí ge érzi.",
+   "en": "He has a son."
+  },
+  {
+   "id": "s073",
+   "kind": "sentence",
+   "text": "她有一个女儿。",
+   "pinyin": "Tā yǒu yí ge nǚ’ér.",
+   "en": "She has a daughter."
+  },
+  {
+   "id": "s074",
+   "kind": "sentence",
+   "text": "她是我的老师。",
+   "pinyin": "Tā shì wǒ de lǎoshī.",
+   "en": "She is my teacher."
+  },
+  {
+   "id": "s075",
+   "kind": "sentence",
+   "text": "我是学生。",
+   "pinyin": "Wǒ shì xuéshēng.",
+   "en": "I am a student."
+  },
+  {
+   "id": "s076",
+   "kind": "sentence",
+   "text": "他是我的同学。",
+   "pinyin": "Tā shì wǒ de tóngxué.",
+   "en": "He is my classmate."
+  },
+  {
+   "id": "s077",
+   "kind": "sentence",
+   "text": "她是我的朋友。",
+   "pinyin": "Tā shì wǒ de péngyou.",
+   "en": "She is my friend."
+  },
+  {
+   "id": "s078",
+   "kind": "sentence",
+   "text": "他是医生。",
+   "pinyin": "Tā shì yīshēng.",
+   "en": "He is a doctor."
+  },
+  {
+   "id": "s079",
+   "kind": "sentence",
+   "text": "先生，您好！",
+   "pinyin": "Xiānsheng, nín hǎo!",
+   "en": "Hello, sir!"
+  },
+  {
+   "id": "s080",
+   "kind": "sentence",
+   "text": "那个女士是我的老师。",
+   "pinyin": "Nàge nǚshì shì wǒ de lǎoshī.",
+   "en": "That lady is my teacher."
+  },
+  {
+   "id": "s081",
+   "kind": "sentence",
+   "text": "我买衣服。",
+   "pinyin": "Wǒ mǎi yīfu.",
+   "en": "I buy clothes."
+  },
+  {
+   "id": "s082",
+   "kind": "sentence",
+   "text": "我喝水。",
+   "pinyin": "Wǒ hē shuǐ.",
+   "en": "I drink water."
+  },
+  {
+   "id": "s083",
+   "kind": "sentence",
+   "text": "我喜欢吃中国菜。",
+   "pinyin": "Wǒ xǐhuan chī Zhōngguó cài.",
+   "en": "I like eating Chinese food."
+  },
+  {
+   "id": "s084",
+   "kind": "sentence",
+   "text": "我吃米饭。",
+   "pinyin": "Wǒ chī mǐfàn.",
+   "en": "I eat rice."
+  },
+  {
+   "id": "s085",
+   "kind": "sentence",
+   "text": "我喜欢水果。",
+   "pinyin": "Wǒ xǐhuan shuǐguǒ.",
+   "en": "I like fruit."
+  },
+  {
+   "id": "s086",
+   "kind": "sentence",
+   "text": "我吃一个苹果。",
+   "pinyin": "Wǒ chī yí ge píngguǒ.",
+   "en": "I eat an apple."
+  },
+  {
+   "id": "s087",
+   "kind": "sentence",
+   "text": "我喝茶。",
+   "pinyin": "Wǒ hē chá.",
+   "en": "I drink tea."
+  },
+  {
+   "id": "s088",
+   "kind": "sentence",
+   "text": "杯子里有水。",
+   "pinyin": "Bēizi lǐ yǒu shuǐ.",
+   "en": "There is water in the cup."
+  },
+  {
+   "id": "s089",
+   "kind": "sentence",
+   "text": "我没有钱。",
+   "pinyin": "Wǒ méiyǒu qián.",
+   "en": "I do not have money."
+  },
+  {
+   "id": "s090",
+   "kind": "sentence",
+   "text": "我坐飞机去中国。",
+   "pinyin": "Wǒ zuò fēijī qù Zhōngguó.",
+   "en": "I am going to China by plane."
+  },
+  {
+   "id": "s091",
+   "kind": "sentence",
+   "text": "我坐出租车。",
+   "pinyin": "Wǒ zuò chūzūchē.",
+   "en": "I take a taxi."
+  },
+  {
+   "id": "s092",
+   "kind": "sentence",
+   "text": "我看电视。",
+   "pinyin": "Wǒ kàn diànshì.",
+   "en": "I watch TV."
+  },
+  {
+   "id": "s093",
+   "kind": "sentence",
+   "text": "这是我的电脑。",
+   "pinyin": "Zhè shì wǒ de diànnǎo.",
+   "en": "This is my computer."
+  },
+  {
+   "id": "s094",
+   "kind": "sentence",
+   "text": "我喜欢看电影。",
+   "pinyin": "Wǒ xǐhuan kàn diànyǐng.",
+   "en": "I like watching movies."
+  },
+  {
+   "id": "s095",
+   "kind": "sentence",
+   "text": "今天天气很好。",
+   "pinyin": "Jīntiān tiānqì hěn hǎo.",
+   "en": "The weather is nice today."
+  },
+  {
+   "id": "s096",
+   "kind": "sentence",
+   "text": "这是我的猫。",
+   "pinyin": "Zhè shì wǒ de māo.",
+   "en": "This is my cat."
+  },
+  {
+   "id": "s097",
+   "kind": "sentence",
+   "text": "这是我的狗。",
+   "pinyin": "Zhè shì wǒ de gǒu.",
+   "en": "This is my dog."
+  },
+  {
+   "id": "s098",
+   "kind": "sentence",
+   "text": "我去商店买东西。",
+   "pinyin": "Wǒ qù shāngdiàn mǎi dōngxi.",
+   "en": "I go to the store to buy things."
+  },
+  {
+   "id": "s099",
+   "kind": "sentence",
+   "text": "他是中国人。",
+   "pinyin": "Tā shì Zhōngguó rén.",
+   "en": "He is Chinese."
+  },
+  {
+   "id": "s100",
+   "kind": "sentence",
+   "text": "这是我的名字。",
+   "pinyin": "Zhè shì wǒ de míngzi.",
+   "en": "This is my name."
+  },
+  {
+   "id": "s101",
+   "kind": "sentence",
+   "text": "这是一本书。",
+   "pinyin": "Zhè shì yì běn shū.",
+   "en": "This is a book."
+  },
+  {
+   "id": "s102",
+   "kind": "sentence",
+   "text": "我学习汉语。",
+   "pinyin": "Wǒ xuéxí Hànyǔ.",
+   "en": "I study Chinese."
+  },
+  {
+   "id": "s103",
+   "kind": "sentence",
+   "text": "这个字怎么读？",
+   "pinyin": "Zhège zì zěnme dú?",
+   "en": "How do you read this character?"
+  },
+  {
+   "id": "s104",
+   "kind": "sentence",
+   "text": "书在桌子上。",
+   "pinyin": "Shū zài zhuōzi shàng.",
+   "en": "The book is on the table."
+  },
+  {
+   "id": "s105",
+   "kind": "sentence",
+   "text": "我坐在椅子上。",
+   "pinyin": "Wǒ zuò zài yǐzi shang.",
+   "en": "I am sitting on the chair."
+  },
+  {
+   "id": "s106",
+   "kind": "sentence",
+   "text": "谢谢你。",
+   "pinyin": "Xièxie nǐ.",
+   "en": "Thank you."
+  },
+  {
+   "id": "s107",
+   "kind": "sentence",
+   "text": "不客气，我们是朋友。",
+   "pinyin": "Bú kèqi, wǒmen shì péngyou.",
+   "en": "You’re welcome, we are friends."
+  },
+  {
+   "id": "s108",
+   "kind": "sentence",
+   "text": "明天见，再见！",
+   "pinyin": "Míngtiān jiàn, zàijiàn!",
+   "en": "See you tomorrow. Goodbye!"
+  },
+  {
+   "id": "s109",
+   "kind": "sentence",
+   "text": "请坐。",
+   "pinyin": "Qǐng zuò.",
+   "en": "Please sit."
+  },
+  {
+   "id": "s110",
+   "kind": "sentence",
+   "text": "对不起，我来晚了。",
+   "pinyin": "Duìbuqǐ, wǒ lái wǎn le.",
+   "en": "Sorry, I am late."
+  },
+  {
+   "id": "s111",
+   "kind": "sentence",
+   "text": "没关系，明天见！",
+   "pinyin": "Méi guānxi, míngtiān jiàn!",
+   "en": "It’s okay, see you tomorrow!"
+  },
+  {
+   "id": "s112",
+   "kind": "sentence",
+   "text": "我是学生。",
+   "pinyin": "Wǒ shì xuéshēng.",
+   "en": "I am a student."
+  },
+  {
+   "id": "s113",
+   "kind": "sentence",
+   "text": "我有一本书。",
+   "pinyin": "Wǒ yǒu yì běn shū.",
+   "en": "I have a book."
+  },
+  {
+   "id": "s114",
+   "kind": "sentence",
+   "text": "我看电视。",
+   "pinyin": "Wǒ kàn diànshì.",
+   "en": "I watch TV."
+  },
+  {
+   "id": "s115",
+   "kind": "sentence",
+   "text": "我听老师说。",
+   "pinyin": "Wǒ tīng lǎoshī shuō.",
+   "en": "I listen to the teacher speak."
+  },
+  {
+   "id": "s116",
+   "kind": "sentence",
+   "text": "我会说汉语。",
+   "pinyin": "Wǒ huì shuō Hànyǔ.",
+   "en": "I can speak Chinese."
+  },
+  {
+   "id": "s117",
+   "kind": "sentence",
+   "text": "我读这本书。",
+   "pinyin": "Wǒ dú zhè běn shū.",
+   "en": "I read this book."
+  },
+  {
+   "id": "s118",
+   "kind": "sentence",
+   "text": "我写这个字。",
+   "pinyin": "Wǒ xiě zhège zì.",
+   "en": "I write this character."
+  },
+  {
+   "id": "s119",
+   "kind": "sentence",
+   "text": "我看见他了。",
+   "pinyin": "Wǒ kànjiàn tā le.",
+   "en": "I saw him."
+  },
+  {
+   "id": "s120",
+   "kind": "sentence",
+   "text": "你叫什么名字？",
+   "pinyin": "Nǐ jiào shénme míngzi?",
+   "en": "What is your name?"
+  },
+  {
+   "id": "s121",
+   "kind": "sentence",
+   "text": "明天你来吗？",
+   "pinyin": "Míngtiān nǐ lái ma?",
+   "en": "Are you coming tomorrow?"
+  },
+  {
+   "id": "s122",
+   "kind": "sentence",
+   "text": "我回家。",
+   "pinyin": "Wǒ huí jiā.",
+   "en": "I go back home."
+  },
+  {
+   "id": "s123",
+   "kind": "sentence",
+   "text": "我去学校。",
+   "pinyin": "Wǒ qù xuéxiào.",
+   "en": "I go to school."
+  },
+  {
+   "id": "s124",
+   "kind": "sentence",
+   "text": "我吃苹果。",
+   "pinyin": "Wǒ chī píngguǒ.",
+   "en": "I eat apples."
+  },
+  {
+   "id": "s125",
+   "kind": "sentence",
+   "text": "我喝水。",
+   "pinyin": "Wǒ hē shuǐ.",
+   "en": "I drink water."
+  },
+  {
+   "id": "s126",
+   "kind": "sentence",
+   "text": "我十点睡觉。",
+   "pinyin": "Wǒ shí diǎn shuìjiào.",
+   "en": "I go to sleep at ten."
+  },
+  {
+   "id": "s127",
+   "kind": "sentence",
+   "text": "我打电话。",
+   "pinyin": "Wǒ dǎ diànhuà.",
+   "en": "I make a phone call."
+  },
+  {
+   "id": "s128",
+   "kind": "sentence",
+   "text": "我做这个。",
+   "pinyin": "Wǒ zuò zhège.",
+   "en": "I do this."
+  },
+  {
+   "id": "s129",
+   "kind": "sentence",
+   "text": "我买苹果。",
+   "pinyin": "Wǒ mǎi píngguǒ.",
+   "en": "I buy apples."
+  },
+  {
+   "id": "s130",
+   "kind": "sentence",
+   "text": "我开出租车。",
+   "pinyin": "Wǒ kāi chūzūchē.",
+   "en": "I drive a taxi."
+  },
+  {
+   "id": "s131",
+   "kind": "sentence",
+   "text": "请坐。",
+   "pinyin": "Qǐng zuò.",
+   "en": "Please sit."
+  },
+  {
+   "id": "s132",
+   "kind": "sentence",
+   "text": "我住在中国。",
+   "pinyin": "Wǒ zhù zài Zhōngguó.",
+   "en": "I live in China."
+  },
+  {
+   "id": "s133",
+   "kind": "sentence",
+   "text": "我学习汉语。",
+   "pinyin": "Wǒ xuéxí Hànyǔ.",
+   "en": "I study Chinese."
+  },
+  {
+   "id": "s134",
+   "kind": "sentence",
+   "text": "我在商店工作。",
+   "pinyin": "Wǒ zài shāngdiàn gōngzuò.",
+   "en": "I work at a shop."
+  },
+  {
+   "id": "s135",
+   "kind": "sentence",
+   "text": "今天下雨。",
+   "pinyin": "Jīntiān xià yǔ.",
+   "en": "It is raining today."
+  },
+  {
+   "id": "s136",
+   "kind": "sentence",
+   "text": "我爱我的家。",
+   "pinyin": "Wǒ ài wǒ de jiā.",
+   "en": "I love my family."
+  },
+  {
+   "id": "s137",
+   "kind": "sentence",
+   "text": "我喜欢看电影。",
+   "pinyin": "Wǒ xǐhuan kàn diànyǐng.",
+   "en": "I like watching movies."
+  },
+  {
+   "id": "s138",
+   "kind": "sentence",
+   "text": "我想喝茶。",
+   "pinyin": "Wǒ xiǎng hē chá.",
+   "en": "I want to drink tea."
+  },
+  {
+   "id": "s139",
+   "kind": "sentence",
+   "text": "我认识他。",
+   "pinyin": "Wǒ rènshi tā.",
+   "en": "I know him."
+  },
+  {
+   "id": "s140",
+   "kind": "sentence",
+   "text": "我会说汉语。",
+   "pinyin": "Wǒ huì shuō Hànyǔ.",
+   "en": "I can speak Chinese."
+  },
+  {
+   "id": "s141",
+   "kind": "sentence",
+   "text": "我今天不能来。",
+   "pinyin": "Wǒ jīntiān bù néng lái.",
+   "en": "I cannot come today."
+  },
+  {
+   "id": "s142",
+   "kind": "sentence",
+   "text": "今天天气很好。",
+   "pinyin": "Jīntiān tiānqì hěn hǎo.",
+   "en": "The weather is good today."
+  },
+  {
+   "id": "s143",
+   "kind": "sentence",
+   "text": "这个学校很大。",
+   "pinyin": "Zhège xuéxiào hěn dà.",
+   "en": "This school is big."
+  },
+  {
+   "id": "s144",
+   "kind": "sentence",
+   "text": "这个苹果很小。",
+   "pinyin": "Zhège píngguǒ hěn xiǎo.",
+   "en": "This apple is small."
+  },
+  {
+   "id": "s145",
+   "kind": "sentence",
+   "text": "学校的人很多。",
+   "pinyin": "Xuéxiào de rén hěn duō.",
+   "en": "There are many people at the school."
+  },
+  {
+   "id": "s146",
+   "kind": "sentence",
+   "text": "今天人很少。",
+   "pinyin": "Jīntiān rén hěn shǎo.",
+   "en": "There are few people today."
+  },
+  {
+   "id": "s147",
+   "kind": "sentence",
+   "text": "今天很冷。",
+   "pinyin": "Jīntiān hěn lěng.",
+   "en": "It is cold today."
+  },
+  {
+   "id": "s148",
+   "kind": "sentence",
+   "text": "今天很热。",
+   "pinyin": "Jīntiān hěn rè.",
+   "en": "It is hot today."
+  },
+  {
+   "id": "s149",
+   "kind": "sentence",
+   "text": "我很高兴。",
+   "pinyin": "Wǒ hěn gāoxìng.",
+   "en": "I am happy."
+  },
+  {
+   "id": "s150",
+   "kind": "sentence",
+   "text": "她很漂亮。",
+   "pinyin": "Tā hěn piàoliang.",
+   "en": "She is pretty."
+  },
+  {
+   "id": "s151",
+   "kind": "sentence",
+   "text": "你们是学生吗？",
+   "pinyin": "Nǐmen shì xuéshēng ma?",
+   "en": "Are you students?"
+  },
+  {
+   "id": "s152",
+   "kind": "sentence",
+   "text": "老师，您好！",
+   "pinyin": "Lǎoshī, nín hǎo!",
+   "en": "Hello, teacher!"
+  },
+  {
+   "id": "s153",
+   "kind": "sentence",
+   "text": "他们是我的同学。",
+   "pinyin": "Tāmen shì wǒ de tóngxué.",
+   "en": "They are my classmates."
+  },
+  {
+   "id": "s154",
+   "kind": "sentence",
+   "text": "她们都是老师。",
+   "pinyin": "Tāmen dōu shì lǎoshī.",
+   "en": "They are all teachers."
+  },
+  {
+   "id": "s155",
+   "kind": "sentence",
+   "text": "它是我的猫。",
+   "pinyin": "Tā shì wǒ de māo.",
+   "en": "It is my cat."
+  },
+  {
+   "id": "s156",
+   "kind": "sentence",
+   "text": "它们是我家的狗。",
+   "pinyin": "Tāmen shì wǒ jiā de gǒu.",
+   "en": "They are my family’s dogs."
+  },
+  {
+   "id": "s157",
+   "kind": "sentence",
+   "text": "我弟弟八岁。",
+   "pinyin": "Wǒ dìdi bā suì.",
+   "en": "My younger brother is eight."
+  },
+  {
+   "id": "s158",
+   "kind": "sentence",
+   "text": "我哥哥是医生。",
+   "pinyin": "Wǒ gēge shì yīshēng.",
+   "en": "My older brother is a doctor."
+  },
+  {
+   "id": "s159",
+   "kind": "sentence",
+   "text": "我姐姐在医院工作。",
+   "pinyin": "Wǒ jiějie zài yīyuàn gōngzuò.",
+   "en": "My older sister works at a hospital."
+  },
+  {
+   "id": "s160",
+   "kind": "sentence",
+   "text": "我妹妹喜欢猫。",
+   "pinyin": "Wǒ mèimei xǐhuan māo.",
+   "en": "My younger sister likes cats."
+  },
+  {
+   "id": "s161",
+   "kind": "sentence",
+   "text": "你有孩子吗？",
+   "pinyin": "Nǐ yǒu háizi ma?",
+   "en": "Do you have children?"
+  },
+  {
+   "id": "s162",
+   "kind": "sentence",
+   "text": "我的家人都在中国。",
+   "pinyin": "Wǒ de jiārén dōu zài Zhōngguó.",
+   "en": "My family is all in China."
+  },
+  {
+   "id": "s163",
+   "kind": "sentence",
+   "text": "大家都喜欢喝茶。",
+   "pinyin": "Dàjiā dōu xǐhuan hē chá.",
+   "en": "Everyone likes drinking tea."
+  },
+  {
+   "id": "s164",
+   "kind": "sentence",
+   "text": "她有男朋友吗？",
+   "pinyin": "Tā yǒu nánpéngyou ma?",
+   "en": "Does she have a boyfriend?"
+  },
+  {
+   "id": "s165",
+   "kind": "sentence",
+   "text": "我女朋友是老师。",
+   "pinyin": "Wǒ nǚpéngyou shì lǎoshī.",
+   "en": "My girlfriend is a teacher."
+  },
+  {
+   "id": "s166",
+   "kind": "sentence",
+   "text": "你要哪个？",
+   "pinyin": "Nǐ yào nǎge?",
+   "en": "Which one do you want?"
+  },
+  {
+   "id": "s167",
+   "kind": "sentence",
+   "text": "你家在哪里？",
+   "pinyin": "Nǐ jiā zài nǎlǐ?",
+   "en": "Where is your home?"
+  },
+  {
+   "id": "s168",
+   "kind": "sentence",
+   "text": "你喜欢哪些水果？",
+   "pinyin": "Nǐ xǐhuan nǎxiē shuǐguǒ?",
+   "en": "Which fruits do you like?"
+  },
+  {
+   "id": "s169",
+   "kind": "sentence",
+   "text": "我的车在那边。",
+   "pinyin": "Wǒ de chē zài nàbiān.",
+   "en": "My car is over there."
+  },
+  {
+   "id": "s170",
+   "kind": "sentence",
+   "text": "那个人是谁？",
+   "pinyin": "Nàge rén shì shéi?",
+   "en": "Who is that person?"
+  },
+  {
+   "id": "s171",
+   "kind": "sentence",
+   "text": "那里有一个商店。",
+   "pinyin": "Nàlǐ yǒu yí ge shāngdiàn.",
+   "en": "There is a shop there."
+  },
+  {
+   "id": "s172",
+   "kind": "sentence",
+   "text": "你去那儿做什么？",
+   "pinyin": "Nǐ qù nàr zuò shénme?",
+   "en": "What are you going there to do?"
+  },
+  {
+   "id": "s173",
+   "kind": "sentence",
+   "text": "那些书是我的。",
+   "pinyin": "Nàxiē shū shì wǒ de.",
+   "en": "Those books are mine."
+  },
+  {
+   "id": "s174",
+   "kind": "sentence",
+   "text": "请坐这边。",
+   "pinyin": "Qǐng zuò zhèbiān.",
+   "en": "Please sit over here."
+  },
+  {
+   "id": "s175",
+   "kind": "sentence",
+   "text": "这个苹果很大。",
+   "pinyin": "Zhège píngguǒ hěn dà.",
+   "en": "This apple is big."
+  },
+  {
+   "id": "s176",
+   "kind": "sentence",
+   "text": "这里是我的学校。",
+   "pinyin": "Zhèlǐ shì wǒ de xuéxiào.",
+   "en": "Here is my school."
+  },
+  {
+   "id": "s177",
+   "kind": "sentence",
+   "text": "我在这儿！",
+   "pinyin": "Wǒ zài zhèr!",
+   "en": "I’m here!"
+  },
+  {
+   "id": "s178",
+   "kind": "sentence",
+   "text": "这些是我的朋友。",
+   "pinyin": "Zhèxiē shì wǒ de péngyou.",
+   "en": "These are my friends."
+  },
+  {
+   "id": "s179",
+   "kind": "sentence",
+   "text": "请问，医院在哪儿？",
+   "pinyin": "Qǐngwèn, yīyuàn zài nǎr?",
+   "en": "Excuse me, where is the hospital?"
+  },
+  {
+   "id": "s180",
+   "kind": "sentence",
+   "text": "你好，我是你的老师。",
+   "pinyin": "Nǐ hǎo, wǒ shì nǐ de lǎoshī.",
+   "en": "Hello, I am your teacher."
+  },
+  {
+   "id": "s181",
+   "kind": "sentence",
+   "text": "这本书一百块钱。",
+   "pinyin": "Zhè běn shū yìbǎi kuài qián.",
+   "en": "This book costs 100 kuai."
+  },
+  {
+   "id": "s182",
+   "kind": "sentence",
+   "text": "这个电脑三千块。",
+   "pinyin": "Zhège diànnǎo sānqiān kuài.",
+   "en": "This computer costs 3,000 kuai."
+  },
+  {
+   "id": "s183",
+   "kind": "sentence",
+   "text": "他家有一百零五本书。",
+   "pinyin": "Tā jiā yǒu yìbǎi líng wǔ běn shū.",
+   "en": "His family has 105 books."
+  },
+  {
+   "id": "s184",
+   "kind": "sentence",
+   "text": "我有两个哥哥。",
+   "pinyin": "Wǒ yǒu liǎng ge gēge.",
+   "en": "I have two older brothers."
+  },
+  {
+   "id": "s185",
+   "kind": "sentence",
+   "text": "现在三点半。",
+   "pinyin": "Xiànzài sān diǎn bàn.",
+   "en": "It is 3:30 now."
+  },
+  {
+   "id": "s186",
+   "kind": "sentence",
+   "text": "我吃了一半。",
+   "pinyin": "Wǒ chī le yíbàn.",
+   "en": "I ate half."
+  },
+  {
+   "id": "s187",
+   "kind": "sentence",
+   "text": "今天是第一天。",
+   "pinyin": "Jīntiān shì dì yī tiān.",
+   "en": "Today is the first day."
+  },
+  {
+   "id": "s188",
+   "kind": "sentence",
+   "text": "这件衣服很漂亮。",
+   "pinyin": "Zhè jiàn yīfu hěn piàoliang.",
+   "en": "This piece of clothing is pretty."
+  },
+  {
+   "id": "s189",
+   "kind": "sentence",
+   "text": "我家有三口人。",
+   "pinyin": "Wǒ jiā yǒu sān kǒu rén.",
+   "en": "There are three people in my family."
+  },
+  {
+   "id": "s190",
+   "kind": "sentence",
+   "text": "我家有两只猫。",
+   "pinyin": "Wǒ jiā yǒu liǎng zhī māo.",
+   "en": "My family has two cats."
+  },
+  {
+   "id": "s191",
+   "kind": "sentence",
+   "text": "这个杯子十元。",
+   "pinyin": "Zhège bēizi shí yuán.",
+   "en": "This cup is ten yuan."
+  },
+  {
+   "id": "s192",
+   "kind": "sentence",
+   "text": "我想买一些水果。",
+   "pinyin": "Wǒ xiǎng mǎi yìxiē shuǐguǒ.",
+   "en": "I want to buy some fruit."
+  },
+  {
+   "id": "s193",
+   "kind": "sentence",
+   "text": "有的人喜欢猫，有的人喜欢狗。",
+   "pinyin": "Yǒude rén xǐhuan māo, yǒude rén xǐhuan gǒu.",
+   "en": "Some people like cats, some like dogs."
+  },
+  {
+   "id": "s194",
+   "kind": "sentence",
+   "text": "有些学生没有来。",
+   "pinyin": "Yǒuxiē xuéshēng méiyǒu lái.",
+   "en": "Some students didn’t come."
+  },
+  {
+   "id": "s195",
+   "kind": "sentence",
+   "text": "现在八点十分。",
+   "pinyin": "Xiànzài bā diǎn shí fēn.",
+   "en": "It is 8:10 now."
+  },
+  {
+   "id": "s196",
+   "kind": "sentence",
+   "text": "我也是学生。",
+   "pinyin": "Wǒ yě shì xuéshēng.",
+   "en": "I am a student too."
+  },
+  {
+   "id": "s197",
+   "kind": "sentence",
+   "text": "他还在睡觉。",
+   "pinyin": "Tā hái zài shuìjiào.",
+   "en": "He is still sleeping."
+  },
+  {
+   "id": "s198",
+   "kind": "sentence",
+   "text": "明天再来吧。",
+   "pinyin": "Míngtiān zài lái ba.",
+   "en": "Come again tomorrow."
+  },
+  {
+   "id": "s199",
+   "kind": "sentence",
+   "text": "今天天气真好！",
+   "pinyin": "Jīntiān tiānqì zhēn hǎo!",
+   "en": "The weather is really nice today!"
+  },
+  {
+   "id": "s200",
+   "kind": "sentence",
+   "text": "这个菜非常好吃。",
+   "pinyin": "Zhège cài fēicháng hǎochī.",
+   "en": "This dish is extremely tasty."
+  },
+  {
+   "id": "s201",
+   "kind": "sentence",
+   "text": "今天有点儿冷。",
+   "pinyin": "Jīntiān yǒudiǎnr lěng.",
+   "en": "It’s a bit cold today."
+  },
+  {
+   "id": "s202",
+   "kind": "sentence",
+   "text": "妈妈正在做饭。",
+   "pinyin": "Māma zhèngzài zuò fàn.",
+   "en": "Mom is cooking right now."
+  },
+  {
+   "id": "s203",
+   "kind": "sentence",
+   "text": "我要一杯茶。",
+   "pinyin": "Wǒ yào yì bēi chá.",
+   "en": "I want a cup of tea."
+  },
+  {
+   "id": "s204",
+   "kind": "sentence",
+   "text": "我可以坐这儿吗？",
+   "pinyin": "Wǒ kěyǐ zuò zhèr ma?",
+   "en": "May I sit here?"
+  },
+  {
+   "id": "s205",
+   "kind": "sentence",
+   "text": "我给你打电话。",
+   "pinyin": "Wǒ gěi nǐ dǎ diànhuà.",
+   "en": "I’ll call you."
+  },
+  {
+   "id": "s206",
+   "kind": "sentence",
+   "text": "请你看一下。",
+   "pinyin": "Qǐng nǐ kàn yíxià.",
+   "en": "Please take a look."
+  },
+  {
+   "id": "s207",
+   "kind": "sentence",
+   "text": "同学们好！",
+   "pinyin": "Tóngxuémen hǎo!",
+   "en": "Hello, classmates!"
+  },
+  {
+   "id": "s208",
+   "kind": "sentence",
+   "text": "我们去吃饭吧。",
+   "pinyin": "Wǒmen qù chī fàn ba.",
+   "en": "Let’s go eat."
+  },
+  {
+   "id": "s209",
+   "kind": "sentence",
+   "text": "对，他是我哥哥。",
+   "pinyin": "Duì, tā shì wǒ gēge.",
+   "en": "Right, he is my older brother."
+  },
+  {
+   "id": "s210",
+   "kind": "sentence",
+   "text": "不要说话！",
+   "pinyin": "Búyào shuōhuà!",
+   "en": "Don’t talk!"
+  },
+  {
+   "id": "s211",
+   "kind": "sentence",
+   "text": "这个店的菜很好吃。",
+   "pinyin": "Zhège diàn de cài hěn hǎochī.",
+   "en": "The food at this place is tasty."
+  },
+  {
+   "id": "s212",
+   "kind": "sentence",
+   "text": "我在书店买书。",
+   "pinyin": "Wǒ zài shūdiàn mǎi shū.",
+   "en": "I buy books at the bookstore."
+  },
+  {
+   "id": "s213",
+   "kind": "sentence",
+   "text": "我们去电影院看电影吧。",
+   "pinyin": "Wǒmen qù diànyǐngyuàn kàn diànyǐng ba.",
+   "en": "Let’s go to the cinema to watch a movie."
+  },
+  {
+   "id": "s214",
+   "kind": "sentence",
+   "text": "我的房间很小。",
+   "pinyin": "Wǒ de fángjiān hěn xiǎo.",
+   "en": "My room is small."
+  },
+  {
+   "id": "s215",
+   "kind": "sentence",
+   "text": "我爸爸在公司工作。",
+   "pinyin": "Wǒ bàba zài gōngsī gōngzuò.",
+   "en": "My dad works at a company."
+  },
+  {
+   "id": "s216",
+   "kind": "sentence",
+   "text": "我哥哥在大学学习汉语。",
+   "pinyin": "Wǒ gēge zài dàxué xuéxí Hànyǔ.",
+   "en": "My older brother studies Chinese at university."
+  },
+  {
+   "id": "s217",
+   "kind": "sentence",
+   "text": "我妹妹上小学。",
+   "pinyin": "Wǒ mèimei shàng xiǎoxué.",
+   "en": "My younger sister is in primary school."
+  },
+  {
+   "id": "s218",
+   "kind": "sentence",
+   "text": "这个中学很大。",
+   "pinyin": "Zhège zhōngxué hěn dà.",
+   "en": "This middle school is big."
+  },
+  {
+   "id": "s219",
+   "kind": "sentence",
+   "text": "你是哪国人？",
+   "pinyin": "Nǐ shì nǎ guó rén?",
+   "en": "Which country are you from?"
+  },
+  {
+   "id": "s220",
+   "kind": "sentence",
+   "text": "他是外国人。",
+   "pinyin": "Tā shì wàiguó rén.",
+   "en": "He is a foreigner."
+  },
+  {
+   "id": "s221",
+   "kind": "sentence",
+   "text": "外边下雨了。",
+   "pinyin": "Wàibian xià yǔ le.",
+   "en": "It’s raining outside."
+  },
+  {
+   "id": "s222",
+   "kind": "sentence",
+   "text": "桌子边有一个椅子。",
+   "pinyin": "Zhuōzi biān yǒu yí ge yǐzi.",
+   "en": "There is a chair by the table."
+  },
+  {
+   "id": "s223",
+   "kind": "sentence",
+   "text": "你有车吗？",
+   "pinyin": "Nǐ yǒu chē ma?",
+   "en": "Do you have a car?"
+  },
+  {
+   "id": "s224",
+   "kind": "sentence",
+   "text": "我们坐火车去吧。",
+   "pinyin": "Wǒmen zuò huǒchē qù ba.",
+   "en": "Let’s go by train."
+  },
+  {
+   "id": "s225",
+   "kind": "sentence",
+   "text": "我到家了。",
+   "pinyin": "Wǒ dào jiā le.",
+   "en": "I’ve arrived home."
+  },
+  {
+   "id": "s226",
+   "kind": "sentence",
+   "text": "我白天工作，晚上学习。",
+   "pinyin": "Wǒ báitiān gōngzuò, wǎnshang xuéxí.",
+   "en": "I work during the day and study in the evening."
+  },
+  {
+   "id": "s227",
+   "kind": "sentence",
+   "text": "我早上七点起床。",
+   "pinyin": "Wǒ zǎoshang qī diǎn qǐchuáng.",
+   "en": "I get up at seven in the morning."
+  },
+  {
+   "id": "s228",
+   "kind": "sentence",
+   "text": "晚上我看电视。",
+   "pinyin": "Wǎnshang wǒ kàn diànshì.",
+   "en": "In the evening I watch TV."
+  },
+  {
+   "id": "s229",
+   "kind": "sentence",
+   "text": "现在还早。",
+   "pinyin": "Xiànzài hái zǎo.",
+   "en": "It’s still early."
+  },
+  {
+   "id": "s230",
+   "kind": "sentence",
+   "text": "我今年二十岁。",
+   "pinyin": "Wǒ jīnnián èrshí suì.",
+   "en": "I am twenty this year."
+  },
+  {
+   "id": "s231",
+   "kind": "sentence",
+   "text": "明年我想去中国。",
+   "pinyin": "Míngnián wǒ xiǎng qù Zhōngguó.",
+   "en": "Next year I want to go to China."
+  },
+  {
+   "id": "s232",
+   "kind": "sentence",
+   "text": "去年我在中国学习。",
+   "pinyin": "Qùnián wǒ zài Zhōngguó xuéxí.",
+   "en": "Last year I studied in China."
+  },
+  {
+   "id": "s233",
+   "kind": "sentence",
+   "text": "今天是五月一日。",
+   "pinyin": "Jīntiān shì wǔ yuè yī rì.",
+   "en": "Today is May 1st."
+  },
+  {
+   "id": "s234",
+   "kind": "sentence",
+   "text": "我想在这儿住三天。",
+   "pinyin": "Wǒ xiǎng zài zhèr zhù sān tiān.",
+   "en": "I want to stay here for three days."
+  },
+  {
+   "id": "s235",
+   "kind": "sentence",
+   "text": "你明天有时间吗？",
+   "pinyin": "Nǐ míngtiān yǒu shíjiān ma?",
+   "en": "Do you have time tomorrow?"
+  },
+  {
+   "id": "s236",
+   "kind": "sentence",
+   "text": "我学习了两个小时。",
+   "pinyin": "Wǒ xuéxí le liǎng ge xiǎoshí.",
+   "en": "I studied for two hours."
+  },
+  {
+   "id": "s237",
+   "kind": "sentence",
+   "text": "星期日我不工作。",
+   "pinyin": "Xīngqīrì wǒ bù gōngzuò.",
+   "en": "I don’t work on Sunday."
+  },
+  {
+   "id": "s238",
+   "kind": "sentence",
+   "text": "星期天我们去商店吧。",
+   "pinyin": "Xīngqītiān wǒmen qù shāngdiàn ba.",
+   "en": "Let’s go to the shop on Sunday."
+  },
+  {
+   "id": "s239",
+   "kind": "sentence",
+   "text": "明天会下雪吗？",
+   "pinyin": "Míngtiān huì xià xuě ma?",
+   "en": "Will it snow tomorrow?"
+  },
+  {
+   "id": "s240",
+   "kind": "sentence",
+   "text": "今天的雨很大。",
+   "pinyin": "Jīntiān de yǔ hěn dà.",
+   "en": "The rain is heavy today."
+  },
+  {
+   "id": "s241",
+   "kind": "sentence",
+   "text": "我早上吃包子。",
+   "pinyin": "Wǒ zǎoshang chī bāozi.",
+   "en": "I eat steamed buns in the morning."
+  },
+  {
+   "id": "s242",
+   "kind": "sentence",
+   "text": "妈妈做的饺子很好吃。",
+   "pinyin": "Māma zuò de jiǎozi hěn hǎochī.",
+   "en": "The dumplings Mom makes are delicious."
+  },
+  {
+   "id": "s243",
+   "kind": "sentence",
+   "text": "我想买面包。",
+   "pinyin": "Wǒ xiǎng mǎi miànbāo.",
+   "en": "I want to buy bread."
+  },
+  {
+   "id": "s244",
+   "kind": "sentence",
+   "text": "我喜欢吃面条儿。",
+   "pinyin": "Wǒ xǐhuan chī miàntiáor.",
+   "en": "I like eating noodles."
+  },
+  {
+   "id": "s245",
+   "kind": "sentence",
+   "text": "我早饭吃了两个鸡蛋。",
+   "pinyin": "Wǒ zǎofàn chī le liǎng ge jīdàn.",
+   "en": "I ate two eggs for breakfast."
+  },
+  {
+   "id": "s246",
+   "kind": "sentence",
+   "text": "你喝牛奶吗？",
+   "pinyin": "Nǐ hē niúnǎi ma?",
+   "en": "Do you drink milk?"
+  },
+  {
+   "id": "s247",
+   "kind": "sentence",
+   "text": "你吃饭了吗？",
+   "pinyin": "Nǐ chī fàn le ma?",
+   "en": "Have you eaten?"
+  },
+  {
+   "id": "s248",
+   "kind": "sentence",
+   "text": "你吃早饭了吗？",
+   "pinyin": "Nǐ chī zǎofàn le ma?",
+   "en": "Have you had breakfast?"
+  },
+  {
+   "id": "s249",
+   "kind": "sentence",
+   "text": "我们中午十二点吃午饭。",
+   "pinyin": "Wǒmen zhōngwǔ shí’èr diǎn chī wǔfàn.",
+   "en": "We have lunch at twelve noon."
+  },
+  {
+   "id": "s250",
+   "kind": "sentence",
+   "text": "晚饭我想吃饺子。",
+   "pinyin": "Wǎnfàn wǒ xiǎng chī jiǎozi.",
+   "en": "I want dumplings for dinner."
+  },
+  {
+   "id": "s251",
+   "kind": "sentence",
+   "text": "我爸爸很会做饭。",
+   "pinyin": "Wǒ bàba hěn huì zuò fàn.",
+   "en": "My dad is good at cooking."
+  },
+  {
+   "id": "s252",
+   "kind": "sentence",
+   "text": "这个包子很好吃。",
+   "pinyin": "Zhège bāozi hěn hǎochī.",
+   "en": "This bun is delicious."
+  },
+  {
+   "id": "s253",
+   "kind": "sentence",
+   "text": "这个商店卖水果。",
+   "pinyin": "Zhège shāngdiàn mài shuǐguǒ.",
+   "en": "This shop sells fruit."
+  },
+  {
+   "id": "s254",
+   "kind": "sentence",
+   "text": "这件衣服太贵了！",
+   "pinyin": "Zhè jiàn yīfu tài guì le!",
+   "en": "This piece of clothing is too expensive!"
+  },
+  {
+   "id": "s255",
+   "kind": "sentence",
+   "text": "这里的水果很便宜。",
+   "pinyin": "Zhèlǐ de shuǐguǒ hěn piányi.",
+   "en": "The fruit here is cheap."
+  },
+  {
+   "id": "s256",
+   "kind": "sentence",
+   "text": "这个汉字怎么写？",
+   "pinyin": "Zhège Hànzì zěnme xiě?",
+   "en": "How do you write this character?"
+  },
+  {
+   "id": "s257",
+   "kind": "sentence",
+   "text": "你会说中文吗？",
+   "pinyin": "Nǐ huì shuō Zhōngwén ma?",
+   "en": "Can you speak Chinese?"
+  },
+  {
+   "id": "s258",
+   "kind": "sentence",
+   "text": "我喜欢读书。",
+   "pinyin": "Wǒ xǐhuan dúshū.",
+   "en": "I like reading."
+  },
+  {
+   "id": "s259",
+   "kind": "sentence",
+   "text": "我想和你说话。",
+   "pinyin": "Wǒ xiǎng hé nǐ shuōhuà.",
+   "en": "I want to talk with you."
+  },
+  {
+   "id": "s260",
+   "kind": "sentence",
+   "text": "你听见了吗？",
+   "pinyin": "Nǐ tīngjiàn le ma?",
+   "en": "Did you hear it?"
+  },
+  {
+   "id": "s261",
+   "kind": "sentence",
+   "text": "今天我们有汉语课。",
+   "pinyin": "Jīntiān wǒmen yǒu Hànyǔ kè.",
+   "en": "Today we have Chinese class."
+  },
+  {
+   "id": "s262",
+   "kind": "sentence",
+   "text": "我们八点上课。",
+   "pinyin": "Wǒmen bā diǎn shàngkè.",
+   "en": "Our class starts at eight."
+  },
+  {
+   "id": "s263",
+   "kind": "sentence",
+   "text": "下课了，我们去吃饭吧。",
+   "pinyin": "Xiàkè le, wǒmen qù chī fàn ba.",
+   "en": "Class is over, let’s go eat."
+  },
+  {
+   "id": "s264",
+   "kind": "sentence",
+   "text": "这个歌很好听。",
+   "pinyin": "Zhège gē hěn hǎotīng.",
+   "en": "This song sounds nice."
+  },
+  {
+   "id": "s265",
+   "kind": "sentence",
+   "text": "你会唱中文歌吗？",
+   "pinyin": "Nǐ huì chàng Zhōngwén gē ma?",
+   "en": "Can you sing Chinese songs?"
+  },
+  {
+   "id": "s266",
+   "kind": "sentence",
+   "text": "你的电话是多少？",
+   "pinyin": "Nǐ de diànhuà shì duōshao?",
+   "en": "What is your phone number?"
+  },
+  {
+   "id": "s267",
+   "kind": "sentence",
+   "text": "我的手机在哪儿？",
+   "pinyin": "Wǒ de shǒujī zài nǎr?",
+   "en": "Where is my phone?"
+  },
+  {
+   "id": "s268",
+   "kind": "sentence",
+   "text": "我想问老师。",
+   "pinyin": "Wǒ xiǎng wèn lǎoshī.",
+   "en": "I want to ask the teacher."
+  },
+  {
+   "id": "s269",
+   "kind": "sentence",
+   "text": "我有一个问题。",
+   "pinyin": "Wǒ yǒu yí ge wèntí.",
+   "en": "I have a question."
+  },
+  {
+   "id": "s270",
+   "kind": "sentence",
+   "text": "没事，你坐吧。",
+   "pinyin": "Méishì, nǐ zuò ba.",
+   "en": "It’s fine, have a seat."
+  },
+  {
+   "id": "s271",
+   "kind": "sentence",
+   "text": "你几点起床？",
+   "pinyin": "Nǐ jǐ diǎn qǐchuáng?",
+   "en": "What time do you get up?"
+  },
+  {
+   "id": "s272",
+   "kind": "sentence",
+   "text": "我妈妈八点上班。",
+   "pinyin": "Wǒ māma bā diǎn shàngbān.",
+   "en": "My mom starts work at eight."
+  },
+  {
+   "id": "s273",
+   "kind": "sentence",
+   "text": "你几点下班？",
+   "pinyin": "Nǐ jǐ diǎn xiàbān?",
+   "en": "What time do you get off work?"
+  },
+  {
+   "id": "s274",
+   "kind": "sentence",
+   "text": "我弟弟七点去上学。",
+   "pinyin": "Wǒ dìdi qī diǎn qù shàngxué.",
+   "en": "My younger brother goes to school at seven."
+  },
+  {
+   "id": "s275",
+   "kind": "sentence",
+   "text": "你睡了吗？",
+   "pinyin": "Nǐ shuì le ma?",
+   "en": "Are you asleep?"
+  },
+  {
+   "id": "s276",
+   "kind": "sentence",
+   "text": "我在学汉语。",
+   "pinyin": "Wǒ zài xué Hànyǔ.",
+   "en": "I am learning Chinese."
+  },
+  {
+   "id": "s277",
+   "kind": "sentence",
+   "text": "孩子们在外边玩。",
+   "pinyin": "Háizimen zài wàibian wán.",
+   "en": "The children are playing outside."
+  },
+  {
+   "id": "s278",
+   "kind": "sentence",
+   "text": "你找什么？",
+   "pinyin": "Nǐ zhǎo shénme?",
+   "en": "What are you looking for?"
+  },
+  {
+   "id": "s279",
+   "kind": "sentence",
+   "text": "明天见！",
+   "pinyin": "Míngtiān jiàn!",
+   "en": "See you tomorrow!"
+  },
+  {
+   "id": "s280",
+   "kind": "sentence",
+   "text": "今天很冷，你多穿一点儿。",
+   "pinyin": "Jīntiān hěn lěng, nǐ duō chuān yìdiǎnr.",
+   "en": "It’s cold today, wear a bit more."
+  },
+  {
+   "id": "s281",
+   "kind": "sentence",
+   "text": "你休息一下吧。",
+   "pinyin": "Nǐ xiūxi yíxià ba.",
+   "en": "Take a little rest."
+  },
+  {
+   "id": "s282",
+   "kind": "sentence",
+   "text": "我觉得这个很好。",
+   "pinyin": "Wǒ juéde zhège hěn hǎo.",
+   "en": "I think this one is good."
+  },
+  {
+   "id": "s283",
+   "kind": "sentence",
+   "text": "你知道他是谁吗？",
+   "pinyin": "Nǐ zhīdào tā shì shéi ma?",
+   "en": "Do you know who he is?"
+  },
+  {
+   "id": "s284",
+   "kind": "sentence",
+   "text": "我爸爸开车去上班。",
+   "pinyin": "Wǒ bàba kāichē qù shàngbān.",
+   "en": "My dad drives to work."
+  },
+  {
+   "id": "s285",
+   "kind": "sentence",
+   "text": "我明天有事。",
+   "pinyin": "Wǒ míngtiān yǒu shì.",
+   "en": "I have something to do tomorrow."
+  },
+  {
+   "id": "s286",
+   "kind": "sentence",
+   "text": "这是我的新手机。",
+   "pinyin": "Zhè shì wǒ de xīn shǒujī.",
+   "en": "This is my new phone."
+  },
+  {
+   "id": "s287",
+   "kind": "sentence",
+   "text": "我今天很忙。",
+   "pinyin": "Wǒ jīntiān hěn máng.",
+   "en": "I am very busy today."
+  },
+  {
+   "id": "s288",
+   "kind": "sentence",
+   "text": "这个电影很好看。",
+   "pinyin": "Zhège diànyǐng hěn hǎokàn.",
+   "en": "This movie is good."
+  },
+  {
+   "id": "s289",
+   "kind": "sentence",
+   "text": "你的名字很好听。",
+   "pinyin": "Nǐ de míngzi hěn hǎotīng.",
+   "en": "Your name sounds nice."
+  },
+  {
+   "id": "s290",
+   "kind": "sentence",
+   "text": "我的猫很好玩儿。",
+   "pinyin": "Wǒ de māo hěn hǎowánr.",
+   "en": "My cat is fun."
+  },
+  {
+   "id": "s291",
+   "kind": "sentence",
+   "text": "现在太晚了。",
+   "pinyin": "Xiànzài tài wǎn le.",
+   "en": "It’s too late now."
+  },
+  {
+   "id": "s292",
+   "kind": "sentence",
+   "text": "他的病好了。",
+   "pinyin": "Tā de bìng hǎo le.",
+   "en": "He has recovered from his illness."
+  },
+  {
+   "id": "s293",
+   "kind": "sentence",
+   "text": "我妈妈生病了。",
+   "pinyin": "Wǒ māma shēngbìng le.",
+   "en": "My mom is sick."
+  },
+  {
+   "id": "s294",
+   "kind": "sentence",
+   "text": "我明天去医院看病。",
+   "pinyin": "Wǒ míngtiān qù yīyuàn kànbìng.",
+   "en": "Tomorrow I’m going to the hospital to see a doctor."
+  },
+  {
+   "id": "s295",
+   "kind": "sentence",
+   "text": "我们老师是男的。",
+   "pinyin": "Wǒmen lǎoshī shì nán de.",
+   "en": "Our teacher is a man."
+  },
+  {
+   "id": "s296",
+   "kind": "sentence",
+   "text": "那个医生是女的。",
+   "pinyin": "Nàge yīshēng shì nǚ de.",
+   "en": "That doctor is a woman."
+  },
+  {
+   "id": "s297",
+   "kind": "sentence",
+   "text": "小朋友，你几岁了？",
+   "pinyin": "Xiǎopéngyǒu, nǐ jǐ suì le?",
+   "en": "How old are you, kid?"
+  },
+  {
+   "id": "s298",
+   "kind": "sentence",
+   "text": "我姐姐是大学生。",
+   "pinyin": "Wǒ jiějie shì dàxuéshēng.",
+   "en": "My older sister is a university student."
+  },
+  {
+   "id": "s299",
+   "kind": "sentence",
+   "text": "我弟弟是中学生。",
+   "pinyin": "Wǒ dìdi shì zhōngxuéshēng.",
+   "en": "My younger brother is a middle school student."
+  },
+  {
+   "id": "s300",
+   "kind": "sentence",
+   "text": "那些小学生很高兴。",
+   "pinyin": "Nàxiē xiǎoxuéshēng hěn gāoxìng.",
+   "en": "Those schoolchildren are very happy."
+  }
+ ]
+}

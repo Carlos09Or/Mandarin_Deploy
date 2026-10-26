@@ -34,7 +34,8 @@ export function Trace({ char, n, guided, onDone }: Props) {
       highlightOnComplete: true,
       onComplete: ({ totalMistakes }) => {
         setFinished(true)
-        speak(char)
+        // The whole word: a lone character can be read with the wrong tone (们 alone vs 我们).
+        speak(w.hanzi)
         onDone(totalMistakes)
       },
     })
