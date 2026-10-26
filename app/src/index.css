@@ -1,0 +1,105 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Nunito', ui-rounded, system-ui, sans-serif;
+  --font-han: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+
+  --color-paper: #fbf7f0;
+  --color-card: #ffffff;
+  --color-ink: #2b2420;
+  --color-muted: #8b7f75;
+  --color-line: #ece2d4;
+  --color-line-dark: #dccfbd;
+
+  --color-brand: #e0453a;
+  --color-brand-dark: #b3322a;
+  --color-brand-soft: #fde8e4;
+  --color-jade: #2f9e7e;
+  --color-jade-dark: #1f7a5f;
+  --color-jade-soft: #dff3eb;
+  --color-gold: #f2b544;
+  --color-gold-dark: #c98d1c;
+  --color-sky: #3b8fd9;
+  --color-sky-dark: #2a6fae;
+  --color-sky-soft: #e3effb;
+  --color-wrong: #d6453d;
+  --color-wrong-soft: #fde6e3;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  button {
+    cursor: pointer;
+    font: inherit;
+  }
+  button:disabled {
+    cursor: default;
+  }
+
+  .han {
+    font-family: var(--font-han);
+  }
+}
+
+@layer components {
+  /* Tactile button: a solid bottom edge that presses down. */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-[15px] font-extrabold tracking-wide uppercase transition-[transform,box-shadow,background-color] duration-75 select-none active:translate-y-[3px] disabled:translate-y-0;
+  }
+  .btn-primary {
+    @apply bg-brand text-white shadow-[0_4px_0_var(--color-brand-dark)] active:shadow-[0_1px_0_var(--color-brand-dark)];
+  }
+  .btn-jade {
+    @apply bg-jade text-white shadow-[0_4px_0_var(--color-jade-dark)] active:shadow-[0_1px_0_var(--color-jade-dark)];
+  }
+  .btn-wrong {
+    @apply bg-wrong text-white shadow-[0_4px_0_#a8322b] active:shadow-[0_1px_0_#a8322b];
+  }
+  .btn-ghost {
+    @apply border-2 border-line-dark bg-card text-muted shadow-[0_3px_0_var(--color-line-dark)] active:shadow-[0_1px_0_var(--color-line-dark)];
+  }
+  .btn:disabled {
+    @apply bg-line text-muted/70 shadow-none;
+  }
+
+  .tile {
+    @apply rounded-2xl border-2 border-line bg-card shadow-[0_3px_0_var(--color-line)] transition-[transform,box-shadow,border-color,background-color] duration-75 active:translate-y-[2px] active:shadow-[0_1px_0_var(--color-line)];
+  }
+  .tile-selected {
+    @apply border-sky bg-sky-soft shadow-[0_3px_0_#9cc6ee];
+  }
+  .tile-correct {
+    @apply border-jade bg-jade-soft shadow-[0_3px_0_#9fd8c3];
+  }
+  .tile-wrong {
+    @apply border-wrong bg-wrong-soft shadow-[0_3px_0_#f2b1aa];
+  }
+
+  .card {
+    @apply rounded-3xl border-2 border-line bg-card;
+  }
+}
+
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.shake {
+  animation: shake 0.35s ease-in-out;
+}
