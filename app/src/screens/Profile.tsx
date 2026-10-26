@@ -1,38 +1,10 @@
 import { useState } from 'react'
 import { PATH, WORDS } from '../data/course'
-import {
-  DAILY_GOAL,
-  GEMS,
-  learnedWords,
-  liveStreak,
-  lookFor,
-  resetProgress,
-  setLook,
-  today,
-  useProgress,
-  type Look,
-} from '../lib/progress'
+import { DAILY_GOAL, GEMS, learnedWords, liveStreak, resetProgress, today, useProgress } from '../lib/progress'
 import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
-import { Mascot, type Mood } from '../components/Mascot'
-import { FriendScene } from '../components/Friends'
-import { FRIENDS, type FriendId } from '../data/friends'
+import { CharacterStudio } from '../components/CharacterStudio'
 
 const DAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
-
-const LOOKS: { id: Look; label: string }[] = [
-  { id: 'sombrero', label: 'Sombrero pintao' },
-  { id: 'panuelo', label: 'Pañuelo rojo' },
-  { id: 'clasica', label: 'Sin nada' },
-]
-const lookLabel = (l: Look) => LOOKS.find((x) => x.id === l)!.label
-const MOODS: { id: Mood; label: string }[] = [
-  { id: 'idle', label: 'Tranquila' },
-  { id: 'wave', label: 'Saluda' },
-  { id: 'happy', label: 'Acierto' },
-  { id: 'sad', label: 'Fallo' },
-  { id: 'celebrate', label: 'Celebra' },
-  { id: 'fire', label: 'Racha' },
-]
 
 // Ideas only: each teacher will choose which rewards exist in their class.
 const REWARD_IDEAS = [
@@ -44,8 +16,6 @@ const REWARD_IDEAS = [
 export function Profile() {
   const p = useProgress()
   const [confirm, setConfirm] = useState(false)
-  const [mood, setMood] = useState<Mood>('wave')
-  const [moodKey, setMoodKey] = useState(0)
   const answers = Object.values(p.words)
   const right = answers.reduce((a, s) => a + s.correct, 0)
   const total = answers.reduce((a, s) => a + s.correct + s.wrong, 0)
@@ -81,77 +51,7 @@ export function Profile() {
 
   return (
     <div className="flex flex-col gap-8 pb-10">
-      <section className="card overflow-hidden">
-        <div className="flex flex-col items-center gap-2 bg-gold/15 px-5 pt-10 pb-5">
-          <Mascot key={moodKey} mood={mood} size={180} />
-          <p className="han mt-2 text-2xl font-bold">
-            Wāwa <span className="text-gold-dark">蛙蛙</span>
-          </p>
-          <p className="text-center text-sm text-muted">La rana dorada de Panamá, símbolo de buena suerte aquí y en China.</p>
-        </div>
-        <div className="flex flex-col gap-4 p-5">
-          <button
-            type="button"
-            onClick={() => setLook('auto')}
-            className={`tile flex items-center gap-3 px-4 py-2 text-left ${p.look === 'auto' ? 'tile-selected' : ''}`}
-          >
-            <Mascot look={lookFor('auto')} size={56} />
-            <span className="flex-1">
-              <span className="block font-extrabold">Automática</span>
-              <span className="block text-sm text-muted">Cambia de ropa cada día · hoy: {lookLabel(lookFor('auto'))}</span>
-            </span>
-          </button>
-          <div className="grid grid-cols-3 gap-2">
-            {LOOKS.map((l) => (
-              <button
-                key={l.id}
-                type="button"
-                onClick={() => setLook(l.id)}
-                className={`tile flex flex-col items-center gap-1 px-1 pt-3 pb-2 ${p.look === l.id ? 'tile-selected' : ''}`}
-              >
-                <Mascot look={l.id} size={64} />
-                <span className="text-xs font-extrabold">{l.label}</span>
-              </button>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {MOODS.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => {
-                  setMood(m.id)
-                  setMoodKey((k) => k + 1)
-                }}
-                className={`rounded-full border-2 px-3 py-1.5 text-sm font-bold ${
-                  mood === m.id ? 'border-sky bg-sky-soft text-sky-dark' : 'border-line text-muted'
-                }`}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h2 className="mb-1 text-2xl font-black">Amigos de Wāwa</h2>
-        <p className="mb-4 text-sm text-muted">Animales de Panamá que te acompañan en el camino. Su nombre es una palabra en chino.</p>
-        <div className="grid grid-cols-2 gap-3">
-          {(Object.keys(FRIENDS) as FriendId[]).map((id) => (
-            <div key={id} className="card flex flex-col items-center gap-1 px-3 pt-6 pb-4 text-center">
-              <div className="flex h-32 items-end justify-center">
-                <FriendScene id={id} size={120} />
-              </div>
-              <p className="mt-2 font-black">
-                {FRIENDS[id].name} <span className="han text-gold-dark">{FRIENDS[id].hanzi}</span>
-              </p>
-              <p className="text-sm font-bold text-muted">{FRIENDS[id].es}</p>
-              <p className="han text-xs text-sky-dark">{FRIENDS[id].meaning}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <CharacterStudio />
 
       <section>
         <h2 className="mb-4 text-2xl font-black">Estadísticas</h2>

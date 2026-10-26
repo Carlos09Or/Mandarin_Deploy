@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { Shell, type Tab } from './components/Shell'
 import type { PathNode } from './data/course'
+import { FRIEND_IDS, type FriendId } from './data/friends'
 import { LessonComplete } from './lesson/LessonComplete'
 import { LessonPlayer, type LessonSummary } from './lesson/LessonPlayer'
 import { buildNode, buildReview, buildWriting, type Exercise } from './lib/lesson'
@@ -10,8 +11,14 @@ import { Profile } from './screens/Profile'
 import { Review } from './screens/Review'
 import { Write } from './screens/Write'
 
-type Session = { exercises: Exercise[]; nodeId: string | null; newWords: number[]; key: number }
-type Result = { summary: LessonSummary; reward: Reward; newWords: number[] }
+type Session = { exercises: Exercise[]; nodeId: string | null; newWords: number[]; key: number; buddy: FriendId }
+type Result = { summary: LessonSummary; reward: Reward; newWords: number[]; buddy: FriendId }
+
+/** The characters take turns: each finished lesson hands over to the next one. */
+const nextBuddy = (): FriendId => {
+  const done = Object.values(getProgress().nodes).reduce((a, n) => a + n.completions, 0)
+  return FRIEND_IDS[done % FRIEND_IDS.length]
+}
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('learn')
@@ -19,7 +26,7 @@ export default function App() {
   const [result, setResult] = useState<Result | null>(null)
 
   const start = (exercises: Exercise[], nodeId: string | null = null, newWords: number[] = []) =>
-    setSession({ exercises, nodeId, newWords, key: Date.now() })
+    setSession({ exercises, nodeId, newWords, key: Date.now(), buddy: nextBuddy() })
 
   const startNode = (node: PathNode) => {
     const p = getProgress()
@@ -32,7 +39,7 @@ export default function App() {
     (summary: LessonSummary) => {
       if (!session) return
       const reward = completeNode(session.nodeId, summary)
-      setResult({ summary, reward, newWords: session.newWords })
+      setResult({ summary, reward, newWords: session.newWords, buddy: session.buddy })
       setSession(null)
     },
     [session],
@@ -56,12 +63,19 @@ export default function App() {
       </Shell>
 
       {session && (
-        <LessonPlayer key={session.key} exercises={session.exercises} onExit={() => setSession(null)} onFinish={finish} />
+        <LessonPlayer
+          key={session.key}
+          exercises={session.exercises}
+          buddy={session.buddy}
+          onExit={() => setSession(null)}
+          onFinish={finish}
+        />
       )}
       {result && (
         <LessonComplete
           summary={result.summary}
           reward={result.reward}
+          buddy={result.buddy}
           newWords={result.newWords}
           onContinue={() => setResult(null)}
         />

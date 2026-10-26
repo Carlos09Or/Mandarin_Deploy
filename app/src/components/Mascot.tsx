@@ -1,4 +1,6 @@
-import { lookFor, useProgress, type Look } from '../lib/progress'
+import { outfitFor, type Outfit } from '../data/friends'
+import { useProgress } from '../lib/progress'
+import { SombreroPintao } from './Patriotic'
 
 // Wāwa (蛙蛙), a Panamanian golden frog. Gold for luck in Panama and in China (金蟾).
 // Poses are CSS animations in index.css (`.wawa-*`), so the drawing stays a plain SVG.
@@ -10,11 +12,11 @@ const GOLD_DARK = '#eaa31c'
 const BELLY = '#ffe08a'
 const INK = '#3b2a1e'
 
-type Props = { mood?: Mood; look?: Look; size?: number; className?: string }
+type Props = { mood?: Mood; look?: Outfit; size?: number; className?: string }
 
 export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Props) {
-  const saved = useProgress().look
-  const style = look ?? lookFor(saved)
+  const saved = useProgress().outfits.wawa
+  const style = look ?? outfitFor('wawa', saved)
   const openMouth = mood === 'happy' || mood === 'celebrate' || mood === 'fire'
 
   return (
@@ -163,22 +165,7 @@ export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Prop
           )}
           {mood === 'sad' && <path d="M160 46 Q166 56 160 60 Q154 56 160 46Z" fill="#8fd3ff" />}
 
-          {style === 'sombrero' && (
-            // Sombrero pintao: the woven black-and-white hat from Coclé
-            <g transform="rotate(-8 100 30)">
-              <ellipse cx="100" cy="33" rx="47" ry="9.5" fill="#f4e7c6" stroke="#b89c62" strokeWidth="2" />
-              <ellipse cx="100" cy="33" rx="39" ry="7" fill="none" stroke="#2b2420" strokeWidth="1.6" strokeDasharray="5 3" />
-              <ellipse cx="100" cy="33" rx="31" ry="5.2" fill="none" stroke="#2b2420" strokeWidth="1.4" strokeDasharray="3 3" />
-              <path d="M77 33 C77 15 83 8 100 8 C117 8 123 15 123 33Z" fill="#f4e7c6" stroke="#b89c62" strokeWidth="2" />
-              <path
-                d="M85 12 L85 23 M93 9.5 L93 23 M100 8.5 L100 23 M107 9.5 L107 23 M115 12 L115 23"
-                stroke="#2b2420"
-                strokeWidth="1.5"
-                strokeDasharray="2 2"
-              />
-              <rect x="77" y="23" width="46" height="7" rx="2" fill="#2b2420" />
-            </g>
-          )}
+          {style === 'sombrero' && <SombreroPintao cx={100} cy={33} />}
         </g>
       </g>
     </svg>

@@ -75,11 +75,11 @@ export function Learn({ onStart }: Props) {
                   >
                     {node.index === scene.row && (
                       <div
-                        className={`pointer-events-none absolute -top-10 ${scene.row === 2 ? 'left-0 sm:left-6' : 'right-0 sm:right-6'} ${
+                        className={`pointer-events-none absolute -top-6 ${scene.row === 2 ? '-left-2 sm:left-4' : '-right-2 sm:right-4'} ${
                           unitLocked ? 'friend-locked' : ''
                         }`}
                       >
-                        <FriendScene id={scene.id} size={124} />
+                        <FriendScene id={scene.id} size={160} />
                       </div>
                     )}
                     <div className="relative" style={{ transform: `translateX(${x}px)` }}>

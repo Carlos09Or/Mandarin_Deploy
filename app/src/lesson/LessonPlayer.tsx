@@ -6,7 +6,8 @@ import { retry, type Exercise } from '../lib/lesson'
 import { recordAnswer, recordTrace } from '../lib/progress'
 import { AudioButton } from '../components/AudioButton'
 import { IconClose } from '../components/icons'
-import { Mascot } from '../components/Mascot'
+import { Buddy } from '../components/Friends'
+import type { FriendId } from '../data/friends'
 import { Choice } from './Choice'
 import { Intro } from './Intro'
 import { Match } from './Match'
@@ -14,7 +15,7 @@ import { Sentence } from './Sentence'
 import { Trace } from './Trace'
 
 export type LessonSummary = { durationMs: number; answers: number; mistakes: number }
-type Props = { exercises: Exercise[]; onExit: () => void; onFinish: (s: LessonSummary) => void }
+type Props = { exercises: Exercise[]; buddy: FriendId; onExit: () => void; onFinish: (s: LessonSummary) => void }
 
 const PRAISE = [
   ['很好！', 'hěn hǎo', '¡Muy bien!'],
@@ -25,7 +26,7 @@ const PRAISE = [
 
 type Feedback = { correct: boolean; title: string; detail?: string; sub?: string }
 
-export function LessonPlayer({ exercises, onExit, onFinish }: Props) {
+export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
   const [queue, setQueue] = useState(exercises)
   const [pos, setPos] = useState(0)
   const [done, setDone] = useState(0)
@@ -203,7 +204,7 @@ export function LessonPlayer({ exercises, onExit, onFinish }: Props) {
                 className={`flex flex-1 items-center gap-3 ${feedback.correct ? 'text-jade-dark' : 'text-wrong'}`}
               >
                 <div className="-my-4 -ml-2 shrink-0">
-                  <Mascot key={`${pos}-${feedback.correct}`} mood={feedback.correct ? 'happy' : 'sad'} size={72} />
+                  <Buddy key={`${pos}-${feedback.correct}`} id={buddy} mood={feedback.correct ? 'happy' : 'sad'} size={72} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xl font-extrabold">{feedback.title}</p>

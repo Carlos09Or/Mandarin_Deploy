@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { PATH } from '../data/course'
+import type { FriendId, OutfitSetting } from '../data/friends'
 
 // Local-first progress. Everything is saved on the device first; `outbox` holds the
 // events that a future sync (Supabase) will upload, so nothing is lost while offline.
@@ -28,21 +29,6 @@ export type Reward = {
   streakUp: boolean
 }
 
-/** Wāwa's outfit. 'auto' changes it every day, with the sombrero pintao as her main look. */
-export type Look = 'clasica' | 'panuelo' | 'sombrero'
-export type LookSetting = Look | 'auto'
-
-const ROTATION: Look[] = ['sombrero', 'panuelo', 'sombrero']
-const LOOKS: readonly string[] = ['clasica', 'panuelo', 'sombrero']
-
-/** The outfit to draw for a setting; 'auto' picks today's. */
-export function lookFor(setting: LookSetting, date = new Date()): Look {
-  // Outfits that no longer exist (e.g. an old 'mola') fall back to the rotation.
-  if (setting !== 'auto' && LOOKS.includes(setting)) return setting
-  const day = Math.floor((date.getTime() - date.getTimezoneOffset() * 60_000) / 86_400_000)
-  return ROTATION[day % ROTATION.length]
-}
-
 export type Progress = {
   v: 1
   deviceId: string
@@ -50,7 +36,8 @@ export type Progress = {
   xp: number
   /** Reward currency. What it buys is up to each teacher (extra quiz points, etc.). */
   gems: number
-  look: LookSetting
+  /** Outfit setting per character; missing means 'auto'. */
+  outfits: Partial<Record<FriendId, OutfitSetting>>
   dailyXp: Record<string, number>
   streak: { count: number; last: string | null }
   nodes: Record<string, NodeResult>
@@ -72,7 +59,7 @@ function fresh(): Progress {
     createdAt: new Date().toISOString(),
     xp: 0,
     gems: 0,
-    look: 'auto',
+    outfits: {},
     dailyXp: {},
     streak: { count: 0, last: null },
     nodes: {},
@@ -85,7 +72,13 @@ function fresh(): Progress {
 function load(): Progress {
   try {
     const saved = localStorage.getItem(KEY)
-    if (saved) return { ...fresh(), ...JSON.parse(saved) }
+    if (saved) {
+      const data = JSON.parse(saved)
+      // Older saves kept Wāwa's outfit in `look`.
+      if (data.look && !data.outfits) data.outfits = { wawa: data.look }
+      delete data.look
+      return { ...fresh(), ...data }
+    }
   } catch {
     /* private mode or corrupt data: start fresh */
   }
@@ -188,8 +181,8 @@ export function completeNode(
   return { xp, gems, parts, streak: streak.count, streakUp }
 }
 
-export function setLook(look: LookSetting) {
-  commit({ ...state, look })
+export function setOutfit(id: FriendId, outfit: OutfitSetting) {
+  commit({ ...state, outfits: { ...state.outfits, [id]: outfit } })
 }
 
 export function resetProgress() {

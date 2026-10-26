@@ -5,14 +5,16 @@ import { chime } from '../lib/audio'
 import { today, useProgress, type Reward } from '../lib/progress'
 import { IconFlame, IconGem } from '../components/icons'
 import { Mascot } from '../components/Mascot'
+import { Buddy } from '../components/Friends'
+import type { FriendId } from '../data/friends'
 import type { LessonSummary } from './LessonPlayer'
 
-type Props = { summary: LessonSummary; reward: Reward; newWords: number[]; onContinue: () => void }
+type Props = { summary: LessonSummary; reward: Reward; newWords: number[]; buddy: FriendId; onContinue: () => void }
 
 type Step = 'summary' | 'streak' | 'reward'
 
 /** End of a lesson: how it went, the streak (first lesson of the day), then the gems it earned. */
-export function LessonComplete({ summary, reward, newWords, onContinue }: Props) {
+export function LessonComplete({ summary, reward, newWords, buddy, onContinue }: Props) {
   const steps: Step[] = reward.streakUp ? ['summary', 'streak', 'reward'] : ['summary', 'reward']
   const [i, setI] = useState(0)
   const step = steps[i]
@@ -24,7 +26,7 @@ export function LessonComplete({ summary, reward, newWords, onContinue }: Props)
         <AnimatePresence mode="wait">
           {step === 'summary' ? (
             <motion.div key="summary" exit={{ opacity: 0, x: -40 }} className="flex w-full flex-col items-center gap-8">
-              <SummaryStep summary={summary} xp={reward.xp} newWords={newWords} />
+              <SummaryStep summary={summary} xp={reward.xp} newWords={newWords} buddy={buddy} />
             </motion.div>
           ) : step === 'streak' ? (
             <motion.div
@@ -64,7 +66,17 @@ export function LessonComplete({ summary, reward, newWords, onContinue }: Props)
   )
 }
 
-function SummaryStep({ summary, xp, newWords }: { summary: LessonSummary; xp: number; newWords: number[] }) {
+function SummaryStep({
+  summary,
+  xp,
+  newWords,
+  buddy,
+}: {
+  summary: LessonSummary
+  xp: number
+  newWords: number[]
+  buddy: FriendId
+}) {
   const accuracy = summary.answers ? Math.round(((summary.answers - summary.mistakes) / summary.answers) * 100) : 100
   const mins = Math.floor(summary.durationMs / 60000)
   const secs = Math.round((summary.durationMs % 60000) / 1000)
@@ -82,7 +94,7 @@ function SummaryStep({ summary, xp, newWords }: { summary: LessonSummary; xp: nu
         transition={{ type: 'spring', stiffness: 220, damping: 14 }}
         className="relative mt-14"
       >
-        <Mascot mood="celebrate" size={160} />
+        <Buddy id={buddy} mood="celebrate" size={160} />
         <motion.span
           initial={{ scale: 0, rotate: -20 }}
           animate={{ scale: 1, rotate: 0 }}
