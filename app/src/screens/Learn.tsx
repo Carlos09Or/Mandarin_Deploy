@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { PATH, UNITS, accentFor, nodesOfUnit, word, type PathNode } from '../data/course'
 import { currentIndex, useProgress } from '../lib/progress'
 import { IconCheck, IconLock, IconStar, IconTrophy } from '../components/icons'
+import { Mascot } from '../components/Mascot'
 
 // Horizontal offsets (px) that give the path its gentle zig-zag.
 const ZIGZAG = [0, 46, 70, 46, 0, -46, -70, -46]
@@ -68,6 +69,14 @@ export function Learn({ onStart }: Props) {
                           {done ? 'Repasar' : 'Empezar'}
                           <span className="absolute -bottom-[7px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-r-2 border-b-2 border-line bg-card" />
                         </motion.div>
+                      )}
+                      {isCurrent && !isOpen && (
+                        <div
+                          className="pointer-events-none absolute -top-6"
+                          style={x >= 0 ? { right: '100%', marginRight: 18 } : { left: '100%', marginLeft: 18 }}
+                        >
+                          <Mascot mood="wave" size={92} />
+                        </div>
                       )}
                       {isCurrent && (
                         <span

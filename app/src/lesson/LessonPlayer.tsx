@@ -5,7 +5,8 @@ import { chime } from '../lib/audio'
 import { retry, type Exercise } from '../lib/lesson'
 import { recordAnswer, recordTrace } from '../lib/progress'
 import { AudioButton } from '../components/AudioButton'
-import { IconCheck, IconClose } from '../components/icons'
+import { IconClose } from '../components/icons'
+import { Mascot } from '../components/Mascot'
 import { Choice } from './Choice'
 import { Intro } from './Intro'
 import { Match } from './Match'
@@ -201,13 +202,9 @@ export function LessonPlayer({ exercises, onExit, onFinish }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 className={`flex flex-1 items-center gap-3 ${feedback.correct ? 'text-jade-dark' : 'text-wrong'}`}
               >
-                <span
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white ${
-                    feedback.correct ? 'text-jade' : 'text-wrong'
-                  }`}
-                >
-                  {feedback.correct ? <IconCheck className="h-7 w-7" /> : <IconClose className="h-7 w-7" />}
-                </span>
+                <div className="-my-4 -ml-2 shrink-0">
+                  <Mascot key={`${pos}-${feedback.correct}`} mood={feedback.correct ? 'happy' : 'sad'} size={72} />
+                </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xl font-extrabold">{feedback.title}</p>
                   {feedback.detail && <p className="han line-clamp-2 text-base font-semibold">{feedback.detail}</p>}

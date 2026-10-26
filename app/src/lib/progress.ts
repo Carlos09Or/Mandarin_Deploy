@@ -19,7 +19,17 @@ export type LessonEvent = {
 }
 
 /** Why gems were earned, shown on the lesson summary. */
-export type Reward = { xp: number; gems: number; parts: { label: string; gems: number }[] }
+export type Reward = {
+  xp: number
+  gems: number
+  parts: { label: string; gems: number }[]
+  /** Streak after this lesson, and whether this lesson extended it. */
+  streak: number
+  streakUp: boolean
+}
+
+/** Wāwa's outfit. */
+export type Look = 'clasica' | 'panuelo' | 'sombrero'
 
 export type Progress = {
   v: 1
@@ -28,6 +38,7 @@ export type Progress = {
   xp: number
   /** Reward currency. What it buys is up to each teacher (extra quiz points, etc.). */
   gems: number
+  look: Look
   dailyXp: Record<string, number>
   streak: { count: number; last: string | null }
   nodes: Record<string, NodeResult>
@@ -49,6 +60,7 @@ function fresh(): Progress {
     createdAt: new Date().toISOString(),
     xp: 0,
     gems: 0,
+    look: 'panuelo',
     dailyXp: {},
     streak: { count: 0, last: null },
     nodes: {},
@@ -138,6 +150,8 @@ export function completeNode(
   if (perfect) parts.push({ label: 'Sin errores', gems: GEMS.perfect })
   if (before < DAILY_GOAL && before + xp >= DAILY_GOAL) parts.push({ label: 'Meta diaria', gems: GEMS.dailyGoal })
   const gems = parts.reduce((a, p) => a + p.gems, 0)
+  const streak = nextStreak(state.streak)
+  const streakUp = state.streak.last !== t
   const nodes = { ...state.nodes }
   if (nodeId) {
     const prev = nodes[nodeId]
@@ -152,14 +166,18 @@ export function completeNode(
     xp: state.xp + xp,
     gems: state.gems + gems,
     dailyXp: { ...state.dailyXp, [t]: (state.dailyXp[t] ?? 0) + xp },
-    streak: nextStreak(state.streak),
+    streak,
     nodes,
     outbox: [
       ...state.outbox,
       { type: 'lesson_completed', node: nodeId ?? 'practice', at: new Date().toISOString(), ...summary, accuracy, xp, gems },
     ],
   })
-  return { xp, gems, parts }
+  return { xp, gems, parts, streak: streak.count, streakUp }
+}
+
+export function setLook(look: Look) {
+  commit({ ...state, look })
 }
 
 export function resetProgress() {

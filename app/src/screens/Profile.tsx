@@ -1,9 +1,24 @@
 import { useState } from 'react'
 import { PATH, WORDS } from '../data/course'
-import { DAILY_GOAL, GEMS, learnedWords, liveStreak, resetProgress, today, useProgress } from '../lib/progress'
+import { DAILY_GOAL, GEMS, learnedWords, liveStreak, resetProgress, setLook, today, useProgress, type Look } from '../lib/progress'
 import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
+import { Mascot, type Mood } from '../components/Mascot'
 
 const DAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+
+const LOOKS: { id: Look; label: string }[] = [
+  { id: 'clasica', label: 'Clásica' },
+  { id: 'panuelo', label: 'Pañuelo rojo' },
+  { id: 'sombrero', label: 'Sombrero pintao' },
+]
+const MOODS: { id: Mood; label: string }[] = [
+  { id: 'idle', label: 'Tranquila' },
+  { id: 'wave', label: 'Saluda' },
+  { id: 'happy', label: 'Acierto' },
+  { id: 'sad', label: 'Fallo' },
+  { id: 'celebrate', label: 'Celebra' },
+  { id: 'fire', label: 'Racha' },
+]
 
 // Ideas only: each teacher will choose which rewards exist in their class.
 const REWARD_IDEAS = [
@@ -15,6 +30,8 @@ const REWARD_IDEAS = [
 export function Profile() {
   const p = useProgress()
   const [confirm, setConfirm] = useState(false)
+  const [mood, setMood] = useState<Mood>('wave')
+  const [moodKey, setMoodKey] = useState(0)
   const answers = Object.values(p.words)
   const right = answers.reduce((a, s) => a + s.correct, 0)
   const total = answers.reduce((a, s) => a + s.correct + s.wrong, 0)
@@ -50,6 +67,48 @@ export function Profile() {
 
   return (
     <div className="flex flex-col gap-8 pb-10">
+      <section className="card overflow-hidden">
+        <div className="flex flex-col items-center gap-2 bg-gold/15 px-5 pt-10 pb-5">
+          <Mascot key={moodKey} mood={mood} size={180} />
+          <p className="han mt-2 text-2xl font-bold">
+            Wāwa <span className="text-gold-dark">蛙蛙</span>
+          </p>
+          <p className="text-center text-sm text-muted">La rana dorada de Panamá, símbolo de buena suerte aquí y en China.</p>
+        </div>
+        <div className="flex flex-col gap-4 p-5">
+          <div className="grid grid-cols-3 gap-2">
+            {LOOKS.map((l) => (
+              <button
+                key={l.id}
+                type="button"
+                onClick={() => setLook(l.id)}
+                className={`tile flex flex-col items-center gap-1 px-1 pt-3 pb-2 ${p.look === l.id ? 'tile-selected' : ''}`}
+              >
+                <Mascot look={l.id} size={64} />
+                <span className="text-xs font-extrabold">{l.label}</span>
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {MOODS.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => {
+                  setMood(m.id)
+                  setMoodKey((k) => k + 1)
+                }}
+                className={`rounded-full border-2 px-3 py-1.5 text-sm font-bold ${
+                  mood === m.id ? 'border-sky bg-sky-soft text-sky-dark' : 'border-line text-muted'
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section>
         <h2 className="mb-4 text-2xl font-black">Estadísticas</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">

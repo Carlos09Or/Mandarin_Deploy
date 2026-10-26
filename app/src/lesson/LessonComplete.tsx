@@ -2,15 +2,20 @@ import { AnimatePresence, animate, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { word } from '../data/course'
 import { chime } from '../lib/audio'
-import { useProgress, type Reward } from '../lib/progress'
-import { IconGem } from '../components/icons'
+import { today, useProgress, type Reward } from '../lib/progress'
+import { IconFlame, IconGem } from '../components/icons'
+import { Mascot } from '../components/Mascot'
 import type { LessonSummary } from './LessonPlayer'
 
 type Props = { summary: LessonSummary; reward: Reward; newWords: number[]; onContinue: () => void }
 
-/** End of a lesson in two steps: how it went, then the gems it earned. */
+type Step = 'summary' | 'streak' | 'reward'
+
+/** End of a lesson: how it went, the streak (first lesson of the day), then the gems it earned. */
 export function LessonComplete({ summary, reward, newWords, onContinue }: Props) {
-  const [step, setStep] = useState<'summary' | 'reward'>('summary')
+  const steps: Step[] = reward.streakUp ? ['summary', 'streak', 'reward'] : ['summary', 'reward']
+  const [i, setI] = useState(0)
+  const step = steps[i]
   useEffect(() => chime.done(), [])
 
   return (
@@ -20,6 +25,16 @@ export function LessonComplete({ summary, reward, newWords, onContinue }: Props)
           {step === 'summary' ? (
             <motion.div key="summary" exit={{ opacity: 0, x: -40 }} className="flex w-full flex-col items-center gap-8">
               <SummaryStep summary={summary} xp={reward.xp} newWords={newWords} />
+            </motion.div>
+          ) : step === 'streak' ? (
+            <motion.div
+              key="streak"
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              className="flex w-full flex-col items-center gap-6"
+            >
+              <StreakStep streak={reward.streak} />
             </motion.div>
           ) : (
             <motion.div
@@ -38,10 +53,10 @@ export function LessonComplete({ summary, reward, newWords, onContinue }: Props)
           <button
             type="button"
             autoFocus
-            onClick={() => (step === 'summary' ? setStep('reward') : onContinue())}
+            onClick={() => (i + 1 < steps.length ? setI(i + 1) : onContinue())}
             className="btn btn-primary w-full sm:w-44"
           >
-            {step === 'summary' ? 'Ver recompensa' : 'Continuar'}
+            {steps[i + 1] === 'reward' ? 'Ver recompensa' : 'Continuar'}
           </button>
         </div>
       </footer>
@@ -62,12 +77,20 @@ function SummaryStep({ summary, xp, newWords }: { summary: LessonSummary; xp: nu
   return (
     <>
       <motion.div
-        initial={{ scale: 0.4, rotate: -12, opacity: 0 }}
-        animate={{ scale: 1, rotate: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 220, damping: 12 }}
-        className="flex h-36 w-36 items-center justify-center rounded-[2.5rem] bg-brand text-white shadow-[0_8px_0_var(--color-brand-dark)]"
+        initial={{ scale: 0.4, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 220, damping: 14 }}
+        className="relative mt-14"
       >
-        <span className="han text-7xl">{accuracy === 100 ? '棒' : '好'}</span>
+        <Mascot mood="celebrate" size={160} />
+        <motion.span
+          initial={{ scale: 0, rotate: -20 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 12 }}
+          className="han absolute top-2 -right-16 rounded-2xl border-2 border-line bg-card px-3 py-1.5 text-2xl font-bold text-brand"
+        >
+          {accuracy === 100 ? '太棒了！' : '很好！'}
+        </motion.span>
       </motion.div>
       <div>
         <h1 className="text-3xl font-black text-gold-dark">
@@ -96,14 +119,86 @@ function SummaryStep({ summary, xp, newWords }: { summary: LessonSummary; xp: nu
           <p className="mb-3 text-sm font-extrabold tracking-widest text-muted uppercase">Palabras nuevas</p>
           <div className="flex flex-wrap justify-center gap-2">
             {newWords.map((n) => (
-              <span key={n} className="card flex items-baseline gap-2 rounded-2xl px-3 py-2">
+              <span key={n} className="card flex max-w-32 flex-col items-center rounded-2xl px-3 py-1.5">
                 <span className="han text-xl">{word(n).hanzi}</span>
-                <span className="text-sm text-muted">{word(n).es}</span>
+                <span className="text-xs leading-tight text-muted">{word(n).es}</span>
               </span>
             ))}
           </div>
         </div>
       )}
+    </>
+  )
+}
+
+const WEEK = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+
+function StreakStep({ streak }: { streak: number }) {
+  const dailyXp = useProgress().dailyXp
+  const [shown, setShown] = useState(Math.max(0, streak - 1))
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setShown(streak)
+      chime.correct()
+    }, 600)
+    return () => clearTimeout(t)
+  }, [streak])
+
+  const days = [...Array(7)].map((_, k) => {
+    const d = new Date()
+    d.setDate(d.getDate() - (6 - k))
+    return { label: WEEK[d.getDay()], done: (dailyXp[today(d)] ?? 0) > 0, isToday: k === 6 }
+  })
+
+  return (
+    <>
+      <div className="relative flex items-end justify-center">
+        <Mascot mood="fire" size={150} />
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 260, damping: 12 }}
+          className="relative -ml-6 flex items-center justify-center"
+        >
+          <IconFlame className="h-28 w-28 text-brand drop-shadow-[0_5px_0_rgba(179,50,42,0.35)]" />
+          <AnimatePresence mode="popLayout">
+            <motion.span
+              key={shown}
+              initial={{ y: 24, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -24, opacity: 0 }}
+              className="absolute top-12 text-3xl font-black text-white"
+            >
+              {shown}
+            </motion.span>
+          </AnimatePresence>
+        </motion.div>
+      </div>
+      <div>
+        <h1 className="text-3xl font-black text-brand">
+          {streak === 1 ? '¡Empezaste una racha!' : `¡${streak} días de racha!`}
+        </h1>
+        <p className="mt-1 text-muted">
+          {streak === 1 ? 'Vuelve mañana para que crezca.' : 'Wāwa está orgullosa. ¡No la rompas mañana!'}
+        </p>
+      </div>
+      <div className="flex gap-2">
+        {days.map((d, k) => (
+          <div key={k} className="flex flex-col items-center gap-1.5">
+            <span className={`text-xs font-extrabold ${d.isToday ? 'text-brand' : 'text-muted'}`}>{d.label}</span>
+            <motion.span
+              initial={d.isToday ? { scale: 0.4 } : false}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.7, type: 'spring', stiffness: 400, damping: 10 }}
+              className={`flex h-9 w-9 items-center justify-center rounded-full ${
+                d.done ? 'bg-brand text-white' : 'bg-line text-transparent'
+              }`}
+            >
+              <IconFlame className="h-5 w-5" />
+            </motion.span>
+          </div>
+        ))}
+      </div>
     </>
   )
 }

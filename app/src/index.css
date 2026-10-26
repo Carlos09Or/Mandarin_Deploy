@@ -103,3 +103,160 @@
 .shake {
   animation: shake 0.35s ease-in-out;
 }
+
+/* ---- Wāwa, the mascot (src/components/Mascot.tsx) ---- */
+.wawa {
+  overflow: visible;
+}
+.wawa g,
+.wawa ellipse {
+  transform-box: view-box;
+}
+.wawa-frog,
+.wawa-breathe,
+.wawa-shadow {
+  transform-origin: 100px 186px;
+}
+.wawa-eye-l {
+  transform-origin: 68px 64px;
+}
+.wawa-eye-r {
+  transform-origin: 132px 64px;
+}
+.wawa-arm-l {
+  transform-origin: 50px 112px;
+}
+.wawa-arm-r {
+  transform-origin: 150px 112px;
+}
+.wawa-arm-l,
+.wawa-arm-r,
+.wawa-pupil {
+  transition: transform 0.25s ease-out;
+}
+.wawa-breathe {
+  animation: wawa-breathe 2.6s ease-in-out infinite;
+}
+.wawa-eye {
+  animation: wawa-blink 4.4s infinite;
+}
+.wawa-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wawa-twinkle 1.2s ease-in-out infinite;
+}
+
+/* Correct answer: one happy hop, arms up */
+.wawa-happy .wawa-frog {
+  animation: wawa-hop 0.6s ease-out 2;
+}
+.wawa-happy .wawa-arm-l {
+  transform: rotate(140deg);
+}
+.wawa-happy .wawa-arm-r {
+  transform: rotate(-140deg);
+}
+
+/* End of lesson: big squash-and-stretch jumps */
+.wawa-celebrate .wawa-frog {
+  animation: wawa-jump 1.2s cubic-bezier(0.3, 0.7, 0.4, 1) infinite;
+}
+.wawa-celebrate .wawa-shadow {
+  animation: wawa-shadow-jump 1.2s cubic-bezier(0.3, 0.7, 0.4, 1) infinite;
+}
+.wawa-celebrate .wawa-arm-l {
+  animation: wawa-cheer-l 0.3s ease-in-out infinite alternate;
+}
+.wawa-celebrate .wawa-arm-r {
+  animation: wawa-cheer-r 0.3s ease-in-out infinite alternate;
+}
+
+/* Greeting on the path */
+.wawa-wave .wawa-arm-r {
+  animation: wawa-wave 0.45s ease-in-out infinite alternate;
+}
+
+/* Wrong answer: brows up, looks down, droops */
+.wawa-sad .wawa-frog {
+  animation: wawa-droop 1.8s ease-in-out infinite;
+}
+.wawa-sad .wawa-pupil {
+  transform: translate(-2px, 5px);
+}
+
+/* Streak: dances side to side, pumping its arms */
+.wawa-fire .wawa-frog {
+  animation: wawa-dance 0.7s ease-in-out infinite alternate;
+}
+.wawa-fire .wawa-arm-l {
+  animation: wawa-pump-l 0.35s ease-in-out infinite alternate;
+}
+.wawa-fire .wawa-arm-r {
+  animation: wawa-pump-r 0.35s ease-in-out 0.35s infinite alternate;
+}
+
+@keyframes wawa-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.015, 1.03); }
+}
+@keyframes wawa-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.08); }
+}
+@keyframes wawa-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+@keyframes wawa-hop {
+  0% { transform: translateY(0) scale(1, 1); }
+  20% { transform: translateY(3px) scale(1.06, 0.92); }
+  50% { transform: translateY(-24px) scale(0.96, 1.05); }
+  80% { transform: translateY(0) scale(1.05, 0.94); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes wawa-jump {
+  0% { transform: translateY(0) scale(1, 1); }
+  12% { transform: translateY(4px) scale(1.1, 0.88); }
+  40% { transform: translateY(-52px) scale(0.94, 1.08); }
+  55% { transform: translateY(-54px) scale(1, 1); }
+  78% { transform: translateY(0) scale(1.1, 0.9); }
+  88% { transform: translateY(0) scale(0.97, 1.03); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes wawa-shadow-jump {
+  0%, 100% { transform: scale(1); opacity: 0.12; }
+  40%, 55% { transform: scale(0.55); opacity: 0.06; }
+}
+@keyframes wawa-cheer-l {
+  from { transform: rotate(125deg); }
+  to { transform: rotate(165deg); }
+}
+@keyframes wawa-cheer-r {
+  from { transform: rotate(-125deg); }
+  to { transform: rotate(-165deg); }
+}
+@keyframes wawa-wave {
+  from { transform: rotate(-165deg); }
+  to { transform: rotate(-120deg); }
+}
+@keyframes wawa-droop {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50% { transform: rotate(-3deg) translateY(3px); }
+}
+@keyframes wawa-dance {
+  from { transform: rotate(-7deg) translateY(0); }
+  to { transform: rotate(7deg) translateY(-8px); }
+}
+@keyframes wawa-pump-l {
+  from { transform: rotate(95deg); }
+  to { transform: rotate(165deg); }
+}
+@keyframes wawa-pump-r {
+  from { transform: rotate(-95deg); }
+  to { transform: rotate(-165deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wawa * {
+    animation: none !important;
+  }
+}
