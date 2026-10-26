@@ -9,6 +9,7 @@ import { IconCheck, IconClose } from '../components/icons'
 import { Choice } from './Choice'
 import { Intro } from './Intro'
 import { Match } from './Match'
+import { Sentence } from './Sentence'
 import { Trace } from './Trace'
 
 export type LessonSummary = { durationMs: number; answers: number; mistakes: number }
@@ -21,13 +22,14 @@ const PRAISE = [
   ['非常好！', 'fēicháng hǎo', '¡Perfecto!'],
 ]
 
-type Feedback = { correct: boolean; title: string; detail?: string }
+type Feedback = { correct: boolean; title: string; detail?: string; sub?: string }
 
 export function LessonPlayer({ exercises, onExit, onFinish }: Props) {
   const [queue, setQueue] = useState(exercises)
   const [pos, setPos] = useState(0)
   const [done, setDone] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
+  const [order, setOrder] = useState<number[]>([])
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [confirmExit, setConfirmExit] = useState(false)
   const stats = useRef({ answers: 0, mistakes: 0, start: 0 })
@@ -43,6 +45,7 @@ export function LessonPlayer({ exercises, onExit, onFinish }: Props) {
 
   const advance = useCallback(() => {
     setSelected(null)
+    setOrder([])
     setFeedback(null)
     if (pos + 1 >= queue.length) {
       const s = stats.current
@@ -65,6 +68,18 @@ export function LessonPlayer({ exercises, onExit, onFinish }: Props) {
   )
 
   const check = useCallback(() => {
+    if (ex.kind === 'sentence') {
+      if (!order.length) return
+      const correct = order.map((i) => ex.bank[i]).join('') === ex.tokens.join('')
+      const ewx = word(ex.word).example
+      const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
+      grade(
+        correct,
+        { correct, title: correct ? `${p[0]} ${p[2]}` : 'Frase correcta:', detail: ewx.hanzi, sub: `${ewx.pinyin} · ${ewx.en}` },
+        true,
+      )
+      return
+    }
     if (ex.kind !== 'choice' || selected === null) return
     const correct = selected === ex.word
     recordAnswer(ex.word, correct)
@@ -77,7 +92,7 @@ export function LessonPlayer({ exercises, onExit, onFinish }: Props) {
         : { correct, title: 'Respuesta correcta:', detail: `${w.hanzi} · ${w.pinyin} · ${w.es}` },
       true,
     )
-  }, [ex, selected, grade])
+  }, [ex, selected, order, grade])
 
   const onPrimary = () => {
     if (feedback) return advance()
@@ -99,9 +114,15 @@ export function LessonPlayer({ exercises, onExit, onFinish }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [confirmExit])
 
-  const primaryLabel = ex.kind === 'choice' && !feedback ? 'Comprobar' : 'Continuar'
-  const primaryDisabled = !feedback && ((ex.kind === 'choice' && selected === null) || ex.kind === 'match' || ex.kind === 'trace')
-  const fbWord = ex.kind === 'intro' || ex.kind === 'match' ? null : word(ex.word)
+  const primaryLabel = (ex.kind === 'choice' || ex.kind === 'sentence') && !feedback ? 'Comprobar' : 'Continuar'
+  const primaryDisabled =
+    !feedback &&
+    ((ex.kind === 'choice' && selected === null) ||
+      (ex.kind === 'sentence' && order.length === 0) ||
+      ex.kind === 'match' ||
+      ex.kind === 'trace')
+  const fbAudio =
+    ex.kind === 'sentence' ? word(ex.word).example.hanzi : ex.kind === 'intro' || ex.kind === 'match' ? null : word(ex.word).hanzi
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-paper">
@@ -134,6 +155,9 @@ export function LessonPlayer({ exercises, onExit, onFinish }: Props) {
               {ex.kind === 'intro' && <Intro n={ex.word} />}
               {ex.kind === 'choice' && (
                 <Choice ex={ex} selected={selected} onSelect={setSelected} revealed={!!feedback} />
+              )}
+              {ex.kind === 'sentence' && (
+                <Sentence ex={ex} order={order} onOrder={setOrder} revealed={!!feedback} />
               )}
               {ex.kind === 'match' && (
                 <Match
@@ -186,9 +210,10 @@ export function LessonPlayer({ exercises, onExit, onFinish }: Props) {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-xl font-extrabold">{feedback.title}</p>
-                  {feedback.detail && <p className="han truncate text-base font-semibold">{feedback.detail}</p>}
+                  {feedback.detail && <p className="han line-clamp-2 text-base font-semibold">{feedback.detail}</p>}
+                  {feedback.sub && <p className="line-clamp-2 text-sm opacity-80">{feedback.sub}</p>}
                 </div>
-                {fbWord && <AudioButton text={fbWord.hanzi} size="sm" />}
+                {fbAudio && <AudioButton text={fbAudio} size="sm" />}
               </motion.div>
             )}
           </AnimatePresence>

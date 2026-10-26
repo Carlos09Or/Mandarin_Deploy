@@ -4,14 +4,14 @@ import type { PathNode } from './data/course'
 import { LessonComplete } from './lesson/LessonComplete'
 import { LessonPlayer, type LessonSummary } from './lesson/LessonPlayer'
 import { buildNode, buildReview, buildWriting, type Exercise } from './lib/lesson'
-import { completeNode, getProgress } from './lib/progress'
+import { completeNode, getProgress, type Reward } from './lib/progress'
 import { Learn } from './screens/Learn'
 import { Profile } from './screens/Profile'
 import { Review } from './screens/Review'
 import { Write } from './screens/Write'
 
 type Session = { exercises: Exercise[]; nodeId: string | null; newWords: number[]; key: number }
-type Result = { summary: LessonSummary; xp: number; newWords: number[] }
+type Result = { summary: LessonSummary; reward: Reward; newWords: number[] }
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('learn')
@@ -31,8 +31,8 @@ export default function App() {
   const finish = useCallback(
     (summary: LessonSummary) => {
       if (!session) return
-      const xp = completeNode(session.nodeId, summary)
-      setResult({ summary, xp, newWords: session.newWords })
+      const reward = completeNode(session.nodeId, summary)
+      setResult({ summary, reward, newWords: session.newWords })
       setSession(null)
     },
     [session],
@@ -61,7 +61,7 @@ export default function App() {
       {result && (
         <LessonComplete
           summary={result.summary}
-          xp={result.xp}
+          reward={result.reward}
           newWords={result.newWords}
           onContinue={() => setResult(null)}
         />

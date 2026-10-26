@@ -88,3 +88,13 @@ export const IconTrophy = (p: P) => (
     <path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7" />
   </svg>
 )
+/** Faceted gem, drawn in its own colors so it reads the same everywhere. */
+export const IconGem = (p: P) => (
+  <svg {...base({ strokeWidth: 0, ...p })}>
+    <path d="M7 3h10l4 6-9 12L3 9z" fill="#3fb1e8" />
+    <path d="M3 9h18l-9 12z" fill="#2391cc" />
+    <path d="M7 3l2.5 6h5L17 3z" fill="#7fd0f5" />
+    <path d="M9.5 9L12 21l2.5-12z" fill="#1c7fb5" />
+    <path d="M8 5.5l1 2" stroke="#fff" strokeWidth="1.3" strokeLinecap="round" opacity=".9" />
+  </svg>
+)

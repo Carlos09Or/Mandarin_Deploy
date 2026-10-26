@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { DAILY_GOAL, liveStreak, todayXp, useProgress } from '../lib/progress'
-import { IconBrush, IconFlame, IconPath, IconReview, IconStar, IconUser } from './icons'
+import { IconBrush, IconFlame, IconGem, IconPath, IconReview, IconStar, IconUser } from './icons'
 
 export type Tab = 'learn' | 'review' | 'write' | 'profile'
 
@@ -20,7 +20,7 @@ export function Shell({ tab, onTab, children }: Props) {
   const goal = Math.min(1, xpToday / DAILY_GOAL)
 
   const stats = (
-    <div className="flex items-center gap-4 text-[15px] font-black">
+    <div className="flex items-center gap-3 text-[15px] font-black sm:gap-4">
       <span className={`flex items-center gap-1 ${streak ? 'text-brand' : 'text-muted/60'}`} title="Días de racha">
         <IconFlame className="h-6 w-6" />
         {streak}
@@ -28,6 +28,10 @@ export function Shell({ tab, onTab, children }: Props) {
       <span className="flex items-center gap-1 text-gold-dark" title="XP total">
         <IconStar className="h-6 w-6 text-gold" />
         {p.xp}
+      </span>
+      <span className="flex items-center gap-1 text-sky-dark" title="Gemas">
+        <IconGem className="h-6 w-6" />
+        {p.gems}
       </span>
       <span className="flex items-center gap-1.5 text-jade-dark" title={`Meta diaria: ${xpToday}/${DAILY_GOAL} XP`}>
         <svg viewBox="0 0 36 36" className="h-7 w-7 -rotate-90">
@@ -80,7 +84,8 @@ export function Shell({ tab, onTab, children }: Props) {
         <header className="sticky top-0 z-30 border-b-2 border-line bg-paper/90 backdrop-blur pt-[env(safe-area-inset-top)]">
           <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
             <p className="font-black md:hidden">
-              <span className="han text-brand">汉</span> Mandarin Hub
+              <span className="han text-brand">汉</span>
+              <span className="hidden min-[430px]:inline"> Mandarin Hub</span>
             </p>
             <p className="hidden text-xl font-black md:block">{TABS.find((t) => t.id === tab)?.label}</p>
             {stats}

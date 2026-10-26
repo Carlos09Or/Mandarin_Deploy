@@ -15,13 +15,19 @@ export type LessonEvent = {
   mistakes: number
   accuracy: number
   xp: number
+  gems: number
 }
+
+/** Why gems were earned, shown on the lesson summary. */
+export type Reward = { xp: number; gems: number; parts: { label: string; gems: number }[] }
 
 export type Progress = {
   v: 1
   deviceId: string
   createdAt: string
   xp: number
+  /** Reward currency. What it buys is up to each teacher (extra quiz points, etc.). */
+  gems: number
   dailyXp: Record<string, number>
   streak: { count: number; last: string | null }
   nodes: Record<string, NodeResult>
@@ -32,6 +38,7 @@ export type Progress = {
 
 const KEY = 'mlh.progress.v1'
 export const DAILY_GOAL = 30
+export const GEMS = { lesson: 5, perfect: 5, dailyGoal: 10 }
 
 const today = (d = new Date()) => d.toLocaleDateString('en-CA') // YYYY-MM-DD in local time
 
@@ -41,6 +48,7 @@ function fresh(): Progress {
     deviceId: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     xp: 0,
+    gems: 0,
     dailyXp: {},
     streak: { count: 0, last: null },
     nodes: {},
@@ -116,14 +124,20 @@ function nextStreak(s: Progress['streak']): Progress['streak'] {
   return { count: s.last === today(yesterday) ? s.count + 1 : 1, last: t }
 }
 
-/** Saves a finished lesson and returns the XP it earned. */
+/** Saves a finished lesson and returns the XP and gems it earned. */
 export function completeNode(
   nodeId: string | null,
   summary: { durationMs: number; answers: number; mistakes: number },
-): number {
+): Reward {
   const accuracy = summary.answers ? Math.round(((summary.answers - summary.mistakes) / summary.answers) * 100) : 100
-  const xp = 10 + (summary.mistakes === 0 ? 5 : 0)
+  const perfect = summary.mistakes === 0
+  const xp = 10 + (perfect ? 5 : 0)
   const t = today()
+  const before = state.dailyXp[t] ?? 0
+  const parts = [{ label: 'Lección completada', gems: GEMS.lesson }]
+  if (perfect) parts.push({ label: 'Sin errores', gems: GEMS.perfect })
+  if (before < DAILY_GOAL && before + xp >= DAILY_GOAL) parts.push({ label: 'Meta diaria', gems: GEMS.dailyGoal })
+  const gems = parts.reduce((a, p) => a + p.gems, 0)
   const nodes = { ...state.nodes }
   if (nodeId) {
     const prev = nodes[nodeId]
@@ -136,15 +150,16 @@ export function completeNode(
   commit({
     ...state,
     xp: state.xp + xp,
+    gems: state.gems + gems,
     dailyXp: { ...state.dailyXp, [t]: (state.dailyXp[t] ?? 0) + xp },
     streak: nextStreak(state.streak),
     nodes,
     outbox: [
       ...state.outbox,
-      { type: 'lesson_completed', node: nodeId ?? 'practice', at: new Date().toISOString(), ...summary, accuracy, xp },
+      { type: 'lesson_completed', node: nodeId ?? 'practice', at: new Date().toISOString(), ...summary, accuracy, xp, gems },
     ],
   })
-  return xp
+  return { xp, gems, parts }
 }
 
 export function resetProgress() {

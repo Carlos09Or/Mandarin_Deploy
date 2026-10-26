@@ -1,4 +1,4 @@
-import { CHARS, PATH, UNITS, charsOf, plainPinyin, word, type PathNode } from '../data/course'
+import { CHARS, PATH, UNITS, charsOf, plainPinyin, segment, word, type PathNode } from '../data/course'
 import type { Progress } from './progress'
 
 // A lesson mixes skills the way a class would: meet a word, recognise it, hear it,
@@ -10,6 +10,8 @@ export type Exercise =
   | { kind: 'choice'; prompt: ChoicePrompt; word: number; options: number[] }
   | { kind: 'match'; words: number[] }
   | { kind: 'trace'; char: string; word: number; guided: boolean }
+  /** Hear a sentence and build it from word tiles. `bank` has the tokens plus a few decoys. */
+  | { kind: 'sentence'; word: number; tokens: string[]; bank: string[] }
 
 const shuffle = <T,>(arr: T[]): T[] => {
   const a = [...arr]
@@ -58,6 +60,24 @@ export function weakestWords(p: Progress, pool: number[], count: number): number
     .slice(0, count)
 }
 
+/** Sentence exercise from the example of one of `words`, preferring sentences made of known words. */
+function sentenceFrom(words: number[], known: Set<string>, decoyPool: number[]): Exercise | null {
+  const options = words
+    .map((n) => ({ n, tokens: segment(word(n).example.hanzi) }))
+    .filter((o): o is { n: number; tokens: string[] } => !!o.tokens && o.tokens.length >= 3 && o.tokens.length <= 8)
+  if (!options.length) return null
+  const unknown = (t: string[]) => t.filter((x) => !known.has(x)).length
+  const best = Math.min(...options.map((o) => unknown(o.tokens)))
+  const pick = shuffle(options.filter((o) => unknown(o.tokens) === best))[0]
+  const decoys = shuffle(decoyPool.map((n) => word(n).hanzi))
+    .filter((h, i, all) => !pick.tokens.includes(h) && all.indexOf(h) === i)
+    .slice(0, pick.tokens.length >= 6 ? 1 : 2)
+  return { kind: 'sentence', word: pick.n, tokens: pick.tokens, bank: shuffle([...pick.tokens, ...decoys]) }
+}
+
+const knownBefore = (node: PathNode | null, p: Progress) =>
+  PATH.filter((x) => x.kind === 'lesson' && (p.nodes[x.id] || x === node)).flatMap((x) => x.words.map((n) => word(n).hanzi))
+
 /** Characters to trace: ones never traced first, simplest-looking words first. */
 function charsToTrace(words: number[], p: Progress, count: number) {
   const all = words.flatMap((n) => charsOf(word(n).hanzi).map((char) => ({ char, word: n })))
@@ -84,22 +104,36 @@ function lessonExercises(node: PathNode, p: Progress): Exercise[] {
   for (const t of charsToTrace(fresh, p, 1)) {
     seq.push({ kind: 'trace', char: t.char, word: t.word, guided: !p.chars[t.char] })
   }
+
+  // The lesson ends by putting its words to work in a full sentence.
+  const unitPool = UNITS.find((u) => u.id === node.unitId)?.words ?? []
+  const sentence = sentenceFrom(fresh, new Set(knownBefore(node, p)), [...fresh, ...unitPool])
+  if (sentence) seq.push(sentence)
   return seq
 }
 
-function reviewExercises(pool: number[], p: Progress, size: number): Exercise[] {
+function reviewExercises(pool: number[], p: Progress, size: number, sentences: number): Exercise[] {
   const picked = weakestWords(p, pool, size)
   const seq: Exercise[] = picked.map((n, i) => choice(n, (['hanzi-es', ...ROTATION] as ChoicePrompt[])[i % 4]))
   if (picked.length >= 5) seq.splice(Math.min(4, seq.length), 0, { kind: 'match', words: picked.slice(0, 5) })
   for (const t of charsToTrace(picked, p, 2)) seq.push({ kind: 'trace', char: t.char, word: t.word, guided: false })
+
+  const known = new Set(knownBefore(null, p))
+  const used = new Set<number>()
+  for (let i = 0; i < sentences; i++) {
+    const s = sentenceFrom(shuffle(pool.filter((n) => !used.has(n))), known, pool)
+    if (!s || s.kind !== 'sentence') break
+    used.add(s.word)
+    seq.push(s)
+  }
   return seq
 }
 
 export function buildNode(node: PathNode, p: Progress): Exercise[] {
-  return node.kind === 'lesson' ? lessonExercises(node, p) : reviewExercises(node.words, p, 12)
+  return node.kind === 'lesson' ? lessonExercises(node, p) : reviewExercises(node.words, p, 12, 2)
 }
 
-export const buildReview = (pool: number[], p: Progress) => reviewExercises(pool, p, 10)
+export const buildReview = (pool: number[], p: Progress) => reviewExercises(pool, p, 10, 1)
 
 /** Writing drill for one character: trace it, then write it twice from memory. */
 export const buildWriting = (char: string, n: number): Exercise[] => [
@@ -110,7 +144,11 @@ export const buildWriting = (char: string, n: number): Exercise[] => [
 
 /** A wrong answer comes back later with its options reshuffled. */
 export const retry = (ex: Exercise): Exercise =>
-  ex.kind === 'choice' ? { ...ex, options: shuffle(ex.options) } : ex
+  ex.kind === 'choice'
+    ? { ...ex, options: shuffle(ex.options) }
+    : ex.kind === 'sentence'
+      ? { ...ex, bank: shuffle(ex.bank) }
+      : ex
 
 /** Exercises that are graded and so count toward accuracy. */
 export const isGraded = (ex: Exercise) => ex.kind !== 'intro'

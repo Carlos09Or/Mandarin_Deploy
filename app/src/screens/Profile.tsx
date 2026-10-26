@@ -1,9 +1,16 @@
 import { useState } from 'react'
 import { PATH, WORDS } from '../data/course'
-import { DAILY_GOAL, learnedWords, liveStreak, resetProgress, today, useProgress } from '../lib/progress'
-import { IconFlame, IconStar } from '../components/icons'
+import { DAILY_GOAL, GEMS, learnedWords, liveStreak, resetProgress, today, useProgress } from '../lib/progress'
+import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
 
 const DAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+
+// Ideas only: each teacher will choose which rewards exist in their class.
+const REWARD_IDEAS = [
+  { title: 'Punto extra en un quiz', cost: 300 },
+  { title: 'Pista en la evaluación oral', cost: 200 },
+  { title: 'Elegir el tema de la próxima práctica', cost: 100 },
+]
 
 export function Profile() {
   const p = useProgress()
@@ -55,6 +62,36 @@ export function Profile() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="card overflow-hidden">
+        <div className="flex items-center gap-4 bg-sky-soft p-5">
+          <IconGem className="h-14 w-14 shrink-0" />
+          <div className="flex-1">
+            <p className="text-3xl leading-none font-black text-sky-dark">{p.gems}</p>
+            <p className="mt-1 font-bold text-sky-dark">gemas</p>
+          </div>
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-sky-dark">Próximamente</span>
+        </div>
+        <div className="flex flex-col gap-3 p-5">
+          <h3 className="font-black">Recompensas de clase</h3>
+          <p className="text-sm text-muted">
+            Tu profesor decidirá qué se puede canjear con gemas en su curso. Algunas ideas:
+          </p>
+          {REWARD_IDEAS.map((r) => (
+            <div key={r.title} className="flex items-center gap-3 rounded-2xl border-2 border-line px-4 py-3">
+              <IconLock className="h-5 w-5 shrink-0 text-line-dark" />
+              <span className="flex-1 font-bold">{r.title}</span>
+              <span className="flex items-center gap-1 font-black text-sky-dark">
+                {r.cost} <IconGem className="h-4 w-4" />
+              </span>
+            </div>
+          ))}
+          <p className="text-xs text-muted">
+            Ganas {GEMS.lesson} gemas por lección, {GEMS.perfect} más si no tienes errores y {GEMS.dailyGoal} al cumplir
+            tu meta diaria.
+          </p>
         </div>
       </section>
 

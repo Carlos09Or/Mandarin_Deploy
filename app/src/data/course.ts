@@ -73,3 +73,27 @@ export const charsOf = (hanzi: string) => [...new Set([...hanzi].filter((c) => /
 /** Pinyin without tone marks, for comparisons. */
 export const plainPinyin = (p: string) =>
   p.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]/g, '')
+
+const vocab = new Map(WORDS.map((w) => [w.hanzi, w]))
+const longest = Math.max(...WORDS.map((w) => [...w.hanzi].length))
+
+/**
+ * Splits a sentence into HSK 1 words, longest match first, ignoring punctuation.
+ * Returns null when some part isn't in the vocabulary.
+ */
+export function segment(sentence: string): string[] | null {
+  const chars = [...sentence.replace(/[，。？！、：；“”‘’,.?!:;\s]/g, '')]
+  const tokens: string[] = []
+  let i = 0
+  while (i < chars.length) {
+    let len = Math.min(longest, chars.length - i)
+    while (len > 0 && !vocab.has(chars.slice(i, i + len).join(''))) len--
+    if (!len) return null
+    tokens.push(chars.slice(i, i + len).join(''))
+    i += len
+  }
+  return tokens
+}
+
+/** Pinyin for a vocabulary token (first reading when there are two). */
+export const tokenPinyin = (token: string) => vocab.get(token)?.pinyin.split('/')[0] ?? ''
