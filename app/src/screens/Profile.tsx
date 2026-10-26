@@ -14,6 +14,8 @@ import {
 } from '../lib/progress'
 import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
 import { Mascot, type Mood } from '../components/Mascot'
+import { FriendScene } from '../components/Friends'
+import { FRIENDS, type FriendId } from '../data/friends'
 
 const DAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
 
@@ -129,6 +131,25 @@ export function Profile() {
               </button>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-1 text-2xl font-black">Amigos de Wāwa</h2>
+        <p className="mb-4 text-sm text-muted">Animales de Panamá que te acompañan en el camino. Su nombre es una palabra en chino.</p>
+        <div className="grid grid-cols-2 gap-3">
+          {(Object.keys(FRIENDS) as FriendId[]).map((id) => (
+            <div key={id} className="card flex flex-col items-center gap-1 px-3 pt-6 pb-4 text-center">
+              <div className="flex h-32 items-end justify-center">
+                <FriendScene id={id} size={120} />
+              </div>
+              <p className="mt-2 font-black">
+                {FRIENDS[id].name} <span className="han text-gold-dark">{FRIENDS[id].hanzi}</span>
+              </p>
+              <p className="text-sm font-bold text-muted">{FRIENDS[id].es}</p>
+              <p className="han text-xs text-sky-dark">{FRIENDS[id].meaning}</p>
+            </div>
+          ))}
         </div>
       </section>
 

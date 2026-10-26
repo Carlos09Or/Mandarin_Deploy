@@ -4,9 +4,19 @@ import { PATH, UNITS, accentFor, nodesOfUnit, word, type PathNode } from '../dat
 import { currentIndex, useProgress } from '../lib/progress'
 import { IconCheck, IconLock, IconStar, IconTrophy } from '../components/icons'
 import { Mascot } from '../components/Mascot'
+import { FriendScene } from '../components/Friends'
+import type { FriendId } from '../data/friends'
 
 // Horizontal offsets (px) that give the path its gentle zig-zag.
 const ZIGZAG = [0, 46, 70, 46, 0, -46, -70, -46]
+
+// One friend per unit, beside the bend of the path that leaves room for it.
+const SCENES: FriendId[] = ['harpia', 'wawa', 'sloth', 'tucan']
+const sceneFor = (unitId: number) => ({
+  id: SCENES[(unitId - 1) % SCENES.length],
+  // Rows 1–3 lean right, so the friend sits on the left; rows 4–6 lean left.
+  row: unitId % 2 ? 2 : 5,
+})
 
 type Props = { onStart: (node: PathNode) => void }
 
@@ -27,6 +37,7 @@ export function Learn({ onStart }: Props) {
         const accent = accentFor(unit.id)
         const doneCount = nodes.filter((n) => progress.nodes[n.id]).length
         const unitLocked = PATH.indexOf(nodes[0]) > current
+        const scene = sceneFor(unit.id)
         return (
           <section key={unit.id} className="flex flex-col items-center gap-6">
             <header
@@ -57,9 +68,22 @@ export function Learn({ onStart }: Props) {
                 const isOpen = open === node.id
                 const x = ZIGZAG[node.index % ZIGZAG.length]
                 return (
-                  <div key={node.id} ref={isCurrent ? currentRef : undefined} className="flex w-full flex-col items-center">
+                  <div
+                    key={node.id}
+                    ref={isCurrent ? currentRef : undefined}
+                    className="relative flex w-full flex-col items-center"
+                  >
+                    {node.index === scene.row && (
+                      <div
+                        className={`pointer-events-none absolute -top-10 ${scene.row === 2 ? 'left-0 sm:left-6' : 'right-0 sm:right-6'} ${
+                          unitLocked ? 'friend-locked' : ''
+                        }`}
+                      >
+                        <FriendScene id={scene.id} size={124} />
+                      </div>
+                    )}
                     <div className="relative" style={{ transform: `translateX(${x}px)` }}>
-                      {isCurrent && !isOpen && (
+                      {isCurrent && !isOpen && Math.abs(node.index - scene.row) > 1 && (
                         <motion.div
                           className="absolute -top-11 left-1/2 z-10 -translate-x-1/2 rounded-xl border-2 border-line bg-card px-3 py-1.5 text-sm font-black whitespace-nowrap uppercase"
                           style={{ color: accent.bg }}
@@ -70,7 +94,7 @@ export function Learn({ onStart }: Props) {
                           <span className="absolute -bottom-[7px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-r-2 border-b-2 border-line bg-card" />
                         </motion.div>
                       )}
-                      {isCurrent && !isOpen && (
+                      {isCurrent && !isOpen && Math.abs(node.index - scene.row) > 1 && (
                         <div
                           className="pointer-events-none absolute -top-6"
                           style={x >= 0 ? { right: '100%', marginRight: 18 } : { left: '100%', marginLeft: 18 }}
