@@ -7,7 +7,6 @@ import { recordAnswer, recordTrace } from '../lib/progress'
 import { AudioButton } from '../components/AudioButton'
 import { IconClose } from '../components/icons'
 import { Buddy } from '../components/Friends'
-import { LandscapeStrip } from '../journey/LandscapeStrip'
 import type { FriendId } from '../data/friends'
 import { Choice } from './Choice'
 import { Intro } from './Intro'
@@ -19,7 +18,7 @@ export type LessonSummary = { durationMs: number; answers: number; mistakes: num
 type Props = {
   exercises: Exercise[]
   buddy: FriendId
-  /** The stop this lesson rides to; its sign slides in on arrival. */
+  /** The stop this lesson rides to, announced when the lesson ends. */
   station?: string
   onExit: () => void
   onFinish: (s: LessonSummary) => void
@@ -152,7 +151,16 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
         <button type="button" aria-label="Quit lesson" onClick={() => setConfirmExit(true)} className="text-muted">
           <IconClose className="h-7 w-7" />
         </button>
-        <LandscapeStrip progress={done / total} station={station} arrived={arrived} />
+        <div className="h-4 flex-1 overflow-hidden rounded-full bg-line">
+          <motion.div
+            className="h-full rounded-full bg-jade"
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.max(4, (done / total) * 100)}%` }}
+            transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+          >
+            <div className="mx-2 mt-1 h-1 rounded-full bg-white/35" />
+          </motion.div>
+        </div>
       </header>
 
       <main className="flex-1 overflow-y-auto">

@@ -1,10 +1,25 @@
 import { useState } from 'react'
 import { PATH, WORDS } from '../data/course'
-import { DAILY_GOAL, GEMS, learnedWords, liveStreak, resetProgress, today, useProgress } from '../lib/progress'
+import {
+  DAILY_GOAL,
+  GEMS,
+  learnedWords,
+  liveStreak,
+  resetProgress,
+  setScenery,
+  today,
+  useProgress,
+  type Scenery,
+} from '../lib/progress'
 import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
 import { CharacterStudio } from '../components/CharacterStudio'
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+const SCENERY: { id: Scenery; label: string; hint: string }[] = [
+  { id: 'auto', label: 'Auto', hint: 'Follows your clock: night from 7 pm to 6 am.' },
+  { id: 'day', label: '☀️ Day', hint: 'Always daytime.' },
+  { id: 'night', label: '🌙 Night', hint: 'Always night: city lights and a darker sea.' },
+]
 
 // Ideas only: each teacher will choose which rewards exist in their class.
 const REWARD_IDEAS = [
@@ -113,6 +128,23 @@ export function Profile() {
           ))}
         </div>
         <p className="mt-3 text-sm text-muted">Daily goal: {DAILY_GOAL} XP (about 3 lessons).</p>
+      </section>
+
+      <section className="card flex flex-col gap-3 p-5">
+        <h3 className="font-black">Day &amp; night</h3>
+        <div className="grid grid-cols-3 gap-2">
+          {SCENERY.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setScenery(s.id)}
+              className={`tile py-2.5 text-sm font-extrabold ${p.scenery === s.id ? 'tile-selected' : ''}`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-sm text-muted">{SCENERY.find((s) => s.id === p.scenery)?.hint}</p>
       </section>
 
       <section className="card flex flex-col gap-3 p-5">

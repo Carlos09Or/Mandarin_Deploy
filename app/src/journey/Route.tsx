@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { UNITS } from '../data/course'
 import { PORTRAITS, asset, type Province } from '../data/journey'
-import { useProgress } from '../lib/progress'
+import { isNight, useProgress } from '../lib/progress'
 import { BookIcon, Knot } from './parts'
 import { nextStop, stopsOf, type Stop } from './stops'
 import { toast } from './toast'
@@ -17,10 +17,6 @@ type Props = {
 
 /** Characters the split-flap tiles spin through before they settle. */
 const FLAP = '你好我是谁他她们中国人朋友上车大小天日月水火山口'.split('')
-const night = () => {
-  const h = new Date().getHours()
-  return h < 6 || h >= 19
-}
 
 export function Route({ province, justDone, onBack, onBoard }: Props) {
   const progress = useProgress()
@@ -59,10 +55,11 @@ export function Route({ province, justDone, onBack, onBoard }: Props) {
 
   return (
     <div className="j-route">
-      <div className="j-sky">
+      {/* Provinces without a night painting just dim their day one. */}
+      <div className={`j-sky ${isNight(progress) && !province.header?.night ? 'dim' : ''}`}>
         <i style={{ backgroundImage: `url(${asset(province.header!.day)})` }} />
         {province.header?.night && (
-          <i style={{ backgroundImage: `url(${asset(province.header.night)})`, opacity: night() ? 1 : 0 }} />
+          <i style={{ backgroundImage: `url(${asset(province.header.night)})`, opacity: isNight(progress) ? 1 : 0 }} />
         )}
         <div className="j-head">
           <button type="button" className="j-back" onClick={onBack} aria-label="Back to the map">

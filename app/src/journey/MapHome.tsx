@@ -3,7 +3,7 @@ import { FRIENDS, FRIEND_IDS } from '../data/friends'
 import {
   BADGE_AT, BOATS, CLOUDS, EXTRA_HOLE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province,
 } from '../data/journey'
-import { markRevealed, setTraveler, useProgress } from '../lib/progress'
+import { isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
 import { Face } from './parts'
 import { currentProvince, isUnlocked, openProvinces, provinceDone } from './stops'
 import { toast } from './toast'
@@ -157,7 +157,7 @@ export function MapHome({ onOpen, event, onEventDone }: Props) {
 
   const here = provinceById(pinAt)
   return (
-    <div className="j-map">
+    <div className={`j-map ${isNight(progress) ? 'night' : ''}`}>
       <div className="j-map-scroll" ref={scrollRef}>
         <div className="j-stage" ref={stageRef}>
           <svg ref={svgRef} viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} preserveAspectRatio="none">

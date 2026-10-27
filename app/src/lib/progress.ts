@@ -29,6 +29,8 @@ export type Reward = {
   streakUp: boolean
 }
 
+export type Scenery = 'auto' | 'day' | 'night'
+
 export type Progress = {
   v: 1
   deviceId: string
@@ -42,6 +44,8 @@ export type Progress = {
   traveler: FriendId
   /** Provinces whose fog has already been cleared on the map. */
   revealed: string[]
+  /** Day or night scenery on the map and routes; 'auto' follows the clock. */
+  scenery: Scenery
   dailyXp: Record<string, number>
   streak: { count: number; last: string | null }
   nodes: Record<string, NodeResult>
@@ -66,6 +70,7 @@ function fresh(): Progress {
     outfits: {},
     traveler: 'wawa',
     revealed: [],
+    scenery: 'auto',
     dailyXp: {},
     streak: { count: 0, last: null },
     nodes: {},
@@ -195,6 +200,10 @@ export function setTraveler(id: FriendId) {
   commit({ ...state, traveler: id })
 }
 
+export function setScenery(scenery: Scenery) {
+  commit({ ...state, scenery })
+}
+
 export function markRevealed(province: string) {
   if (!state.revealed.includes(province)) commit({ ...state, revealed: [...state.revealed, province] })
 }
@@ -225,4 +234,11 @@ export const liveStreak = (p: Progress) => {
 }
 
 export const todayXp = (p: Progress) => p.dailyXp[today()] ?? 0
+
+/** Night scenery: chosen, or on 'auto' between 7 pm and 6 am. */
+export const isNight = (p: Progress) => {
+  if (p.scenery !== 'auto') return p.scenery === 'night'
+  const h = new Date().getHours()
+  return h < 6 || h >= 19
+}
 export { today }

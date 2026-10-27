@@ -13,7 +13,7 @@ import { toast } from './journey/toast'
 import { LessonComplete } from './lesson/LessonComplete'
 import { LessonPlayer, type LessonSummary } from './lesson/LessonPlayer'
 import { buildNode, buildReview, buildWriting, type Exercise } from './lib/lesson'
-import { completeNode, getProgress, useProgress, type Reward } from './lib/progress'
+import { completeNode, getProgress, isNight, useProgress, type Reward } from './lib/progress'
 import { Profile } from './screens/Profile'
 import { Review } from './screens/Review'
 import { Write } from './screens/Write'
@@ -138,6 +138,7 @@ export default function App() {
         <TrainRide
           place={ride.place}
           traveler={progress.traveler}
+          night={isNight(progress)}
           onDone={() => {
             startRide(ride)
             setRide(null)

@@ -46,6 +46,12 @@
   width: 100%;
   height: 100%;
   display: block;
+  transition: filter 1.2s ease;
+}
+.j-map.night .j-stage > svg,
+.j-map.night .j-boat,
+.j-map.night .j-cloud {
+  filter: brightness(0.6) saturate(0.85) hue-rotate(-8deg);
 }
 .j-cloud {
   position: absolute;
@@ -293,6 +299,9 @@
   transition: opacity 1.4s ease;
   -webkit-mask: linear-gradient(#000 55%, transparent);
   mask: linear-gradient(#000 55%, transparent);
+}
+.j-sky.dim > i {
+  filter: brightness(0.55) saturate(0.8) hue-rotate(-8deg);
 }
 .j-head {
   position: absolute;
@@ -611,46 +620,22 @@
   background: #3dbdf5;
   cursor: pointer;
 }
-.j-ride-sky {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 66%;
-  overflow: hidden;
-}
-.j-ride-mid {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 48%;
-  height: 22%;
-  overflow: hidden;
-}
-.j-ground {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 69%;
-  bottom: 0;
-  background: linear-gradient(#6b3b22 0 5px, #3f8a45 5px, #24603a);
-}
-.j-track {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(69% - 11px);
-  height: 15px;
-  overflow: hidden;
-}
-.j-track i {
+/* Measurements are those of the 375 × 812 stage; TrainRide scales the stage to the screen. */
+.j-ride-stage {
   position: absolute;
   top: 0;
   left: 0;
-  width: 200%;
+  height: 812px;
+  transform-origin: top left;
+  overflow: hidden;
+}
+/* The painting carries its own rails; rain falls over everything when it is the rainy one. */
+.j-rain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
-  background: linear-gradient(#b9c0c8 0 4px, #7d868f 4px 5px, transparent 5px),
-    repeating-linear-gradient(90deg, #6b3b22 0 12px, transparent 12px 30px);
+  pointer-events: none;
 }
 .j-speed i {
   position: absolute;
@@ -661,8 +646,8 @@
 .j-ride-cap {
   position: absolute;
   left: 50%;
-  bottom: calc(40px + env(safe-area-inset-bottom));
-  width: min(330px, calc(100% - 48px));
+  top: 610px;
+  width: 327px;
   transform: translateX(-50%);
   padding: 14px 10px 12px;
   border-radius: 20px;
@@ -700,55 +685,13 @@
 .j-strip img {
   height: 100%;
   width: auto;
+  /* The app's base styles cap images at their container's width; strips must stay wide. */
+  max-width: none;
   display: block;
   flex: none;
 }
 .j-strip img.mirror {
   transform: scaleX(-1);
-}
-
-/* The lesson's progress bar is a train window: the landscape moves on with each answer. */
-.j-window {
-  position: relative;
-  flex: 1;
-  height: 52px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 4px solid #6b3b22;
-  box-shadow: inset 0 0 0 2px #f2c14e;
-  background: #3dbdf5;
-}
-.j-window .far {
-  height: 230%;
-  top: -88%;
-}
-.j-window .near {
-  height: 105%;
-  top: auto;
-  bottom: -30%;
-}
-.j-glass {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.28) 0 18%, transparent 18% 30%, rgba(255, 255, 255, 0.12) 30% 34%, transparent 34%);
-}
-.j-sign {
-  position: absolute;
-  right: 8px;
-  top: 6px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: #fffaf0;
-  border: 1.5px solid #d21034;
-  font-size: 10.5px;
-  font-weight: 900;
-  color: #0a426d;
-  transform: translateX(160%);
-  transition: transform 0.6s cubic-bezier(0.2, 1.2, 0.4, 1);
-}
-.j-sign.on {
-  transform: none;
 }
 
 /* ---------- train (side view, built from the train, wheel and smoke images) ---------- */
