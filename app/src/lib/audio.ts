@@ -1,11 +1,12 @@
 // Mandarin speech, plus short feedback chimes.
-// Words and example sentences play pre-generated clips (Kokoro TTS, see tools/kokoro_colab.py)
-// from public/audio/<voice>/<id>.mp3, in the voice of the character on screen. Any text without
-// a clip, or a clip that fails to load, falls back to the device's own Chinese voice.
+// Words and example sentences play pre-generated clips (Azure neural voices, see
+// tools/azure_tts_colab.py) from public/audio/<voice>/<id>.mp3. The voice changes at random so
+// learners get used to different speakers, but stays put within one exercise or word card, so
+// replaying (or the slow button) sounds the same. Any text without a clip, or a clip that fails
+// to load, falls back to the device's own Chinese voice.
 
 import raw from '../data/hsk1.json'
 import voices from '../data/voices.json'
-import type { FriendId } from '../data/friends'
 
 const pad = (n: number) => String(n).padStart(3, '0')
 const CLIPS = new Map<string, string>()
@@ -14,17 +15,29 @@ for (const w of raw.words) {
   if (!CLIPS.has(w.example.hanzi)) CLIPS.set(w.example.hanzi, `s${pad(w.n)}`)
 }
 
-let clipVoice: string = voices.default
-/** Speak in a character's voice (null returns to the default one). */
-export function setVoiceFor(id: FriendId | null) {
-  clipVoice = (id && (voices.byCharacter as Record<string, string>)[id]) || voices.default
+let lastVoice = ''
+/** A random voice, never the same one twice in a row. */
+function randomVoice() {
+  const options = voices.voices.filter((v) => v !== lastVoice)
+  lastVoice = options[Math.floor(Math.random() * options.length)]
+  return lastVoice
+}
+
+let pinned: string | null = null
+/** Pick a new random voice and keep it until the next call (one exercise, one word card). */
+export function pinRandomVoice() {
+  pinned = randomVoice()
+}
+/** Back to a fresh random voice on every play. */
+export function unpinVoice() {
+  pinned = null
 }
 
 const missing = new Set<string>()
 let player: HTMLAudioElement | null = null
 
 function playClip(id: string, slow: boolean, fallback: () => void) {
-  const key = `${clipVoice}/${id}`
+  const key = `${pinned ?? randomVoice()}/${id}`
   if (missing.has(key)) return fallback()
   player?.pause()
   const a = new Audio(`${import.meta.env.BASE_URL}audio/${key}.mp3`)

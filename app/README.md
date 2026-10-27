@@ -40,8 +40,9 @@ node tools/export-v2-data.mjs
 
 ## Voice audio
 
-Words and example sentences play pre-generated clips from Azure neural voices, one voice per
-character (`src/data/voices.json`). Anything without a clip falls back to the device's Chinese voice.
+Words and example sentences play pre-generated clips from four Azure neural voices
+(`src/data/voices.json`). Each exercise and each word card picks one at random, never the same as the
+previous one, and keeps it for replays. Anything without a clip falls back to the device's Chinese voice.
 
 1. `node tools/export-audio-manifest.mjs` writes `tools/audio-manifest.json`: 600 items
    (`w001`–`w300` words, `s001`–`s300` sentences) with their text and pinyin.

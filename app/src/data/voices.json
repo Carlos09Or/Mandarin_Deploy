@@ -1,10 +1,3 @@
 {
-  "voices": ["zh-CN-XiaoxiaoNeural", "zh-CN-YunjianNeural", "zh-CN-YunxiNeural", "zh-CN-XiaoyiNeural"],
-  "byCharacter": {
-    "wawa": "zh-CN-XiaoxiaoNeural",
-    "harpia": "zh-CN-YunjianNeural",
-    "sloth": "zh-CN-YunxiNeural",
-    "tucan": "zh-CN-XiaoyiNeural"
-  },
-  "default": "zh-CN-XiaoxiaoNeural"
+  "voices": ["zh-CN-XiaoxiaoNeural", "zh-CN-YunjianNeural", "zh-CN-YunxiNeural", "zh-CN-XiaoyiNeural"]
 }

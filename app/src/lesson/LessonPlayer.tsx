@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { word } from '../data/course'
-import { chime, setVoiceFor } from '../lib/audio'
+import { chime, pinRandomVoice, unpinVoice } from '../lib/audio'
 import { retry, type Exercise } from '../lib/lesson'
 import { recordAnswer, recordTrace } from '../lib/progress'
 import { AudioButton } from '../components/AudioButton'
@@ -40,11 +40,11 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
     stats.current.start = Date.now()
   }, [])
 
-  // The lesson's companion lends it their voice.
+  // Each exercise gets one of the voices at random; replays within it keep the same voice.
   useEffect(() => {
-    setVoiceFor(buddy)
-    return () => setVoiceFor(null)
-  }, [buddy])
+    pinRandomVoice()
+  }, [pos])
+  useEffect(() => unpinVoice, [])
 
   const ex = queue[pos]
   const total = exercises.length

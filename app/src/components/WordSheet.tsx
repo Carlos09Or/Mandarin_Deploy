@@ -1,4 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react'
+import { useEffect } from 'react'
+import { pinRandomVoice, unpinVoice } from '../lib/audio'
 import { CHARS, RADICALS, charsOf, word } from '../data/course'
 import { AudioButton } from './AudioButton'
 import { IconClose } from './icons'
@@ -35,6 +37,11 @@ export function WordSheet({ n, onClose, onWrite }: Props) {
 
 function Body({ n, onClose, onWrite }: { n: number } & Omit<Props, 'n'>) {
   const w = word(n)
+  // One voice per open card, so the word, the slow button and the example match.
+  useEffect(() => {
+    pinRandomVoice()
+    return unpinVoice
+  }, [n])
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between">
