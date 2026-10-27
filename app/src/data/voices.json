@@ -1,10 +1,10 @@
 {
-  "voices": ["zf_xiaoxiao", "zm_yunjian", "zm_yunxi", "zf_xiaoyi"],
+  "voices": ["zh-CN-XiaoxiaoNeural", "zh-CN-YunjianNeural", "zh-CN-YunxiNeural", "zh-CN-XiaoyiNeural"],
   "byCharacter": {
-    "wawa": "zf_xiaoxiao",
-    "harpia": "zm_yunjian",
-    "sloth": "zm_yunxi",
-    "tucan": "zf_xiaoyi"
+    "wawa": "zh-CN-XiaoxiaoNeural",
+    "harpia": "zh-CN-YunjianNeural",
+    "sloth": "zh-CN-YunxiNeural",
+    "tucan": "zh-CN-XiaoyiNeural"
   },
-  "default": "zf_xiaoxiao"
+  "default": "zh-CN-XiaoxiaoNeural"
 }

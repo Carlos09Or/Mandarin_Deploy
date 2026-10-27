@@ -8,10 +8,10 @@
  },
  "path": "app/public/audio/{voice}/{id}.mp3",
  "voices": [
-  "zf_xiaoxiao",
-  "zm_yunjian",
-  "zm_yunxi",
-  "zf_xiaoyi"
+  "zh-CN-XiaoxiaoNeural",
+  "zh-CN-YunjianNeural",
+  "zh-CN-YunxiNeural",
+  "zh-CN-XiaoyiNeural"
  ],
  "items": [
   {
