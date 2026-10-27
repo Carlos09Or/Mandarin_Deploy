@@ -38,6 +38,10 @@ export type Progress = {
   gems: number
   /** Outfit setting per character; missing means 'auto'. */
   outfits: Partial<Record<FriendId, OutfitSetting>>
+  /** The character that marks where the learner is on the map and drives the train. */
+  traveler: FriendId
+  /** Provinces whose fog has already been cleared on the map. */
+  revealed: string[]
   dailyXp: Record<string, number>
   streak: { count: number; last: string | null }
   nodes: Record<string, NodeResult>
@@ -60,6 +64,8 @@ function fresh(): Progress {
     xp: 0,
     gems: 0,
     outfits: {},
+    traveler: 'wawa',
+    revealed: [],
     dailyXp: {},
     streak: { count: 0, last: null },
     nodes: {},
@@ -183,6 +189,14 @@ export function completeNode(
 
 export function setOutfit(id: FriendId, outfit: OutfitSetting) {
   commit({ ...state, outfits: { ...state.outfits, [id]: outfit } })
+}
+
+export function setTraveler(id: FriendId) {
+  commit({ ...state, traveler: id })
+}
+
+export function markRevealed(province: string) {
+  if (!state.revealed.includes(province)) commit({ ...state, revealed: [...state.revealed, province] })
 }
 
 export function resetProgress() {

@@ -29,12 +29,19 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,json}'],
+        globIgnores: ['journey/**'],
         runtimeCaching: [
           {
             // Voice clips are cached as they are played, so lessons already heard work offline.
             urlPattern: ({ url }) => url.pathname.includes('/audio/'),
             handler: 'CacheFirst',
             options: { cacheName: 'audio', expiration: { maxEntries: 4000 } },
+          },
+          {
+            // Journey artwork (map, train, passport) is cached the first time it is shown.
+            urlPattern: ({ url }) => url.pathname.includes('/journey/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'journey', expiration: { maxEntries: 80 } },
           },
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/,

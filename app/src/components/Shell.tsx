@@ -1,19 +1,29 @@
 import type { ReactNode } from 'react'
 import { DAILY_GOAL, liveStreak, todayXp, useProgress } from '../lib/progress'
-import { IconBrush, IconFlame, IconGem, IconPath, IconReview, IconStar, IconUser } from './icons'
+import { asset } from '../data/journey'
+import { IconFlame, IconGem, IconStar } from './icons'
 
-export type Tab = 'learn' | 'review' | 'write' | 'profile'
+export type Tab = 'map' | 'review' | 'write' | 'passport' | 'profile'
 
-const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
-  { id: 'learn', label: 'Learn', icon: <IconPath /> },
-  { id: 'review', label: 'Review', icon: <IconReview /> },
-  { id: 'write', label: 'Write', icon: <IconBrush /> },
-  { id: 'profile', label: 'Profile', icon: <IconUser /> },
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'map', label: 'Map' },
+  { id: 'review', label: 'Review' },
+  { id: 'write', label: 'Write' },
+  { id: 'passport', label: 'Passport' },
+  { id: 'profile', label: 'Profile' },
 ]
+const TabIcon = ({ id, on }: { id: Tab; on: boolean }) => (
+  <img
+    src={asset(`nav-${id}.webp`)}
+    alt=""
+    className={`h-8 w-8 transition-transform ${on ? '-translate-y-0.5 scale-110' : 'opacity-80 saturate-75'}`}
+  />
+)
 
-type Props = { tab: Tab; onTab: (t: Tab) => void; children: ReactNode }
+/** `bleed` gives the screen the whole area between the header and the dock (the map, a route). */
+type Props = { tab: Tab; onTab: (t: Tab) => void; bleed?: boolean; children: ReactNode }
 
-export function Shell({ tab, onTab, children }: Props) {
+export function Shell({ tab, onTab, bleed = false, children }: Props) {
   const p = useProgress()
   const streak = liveStreak(p)
   const xpToday = todayXp(p)
@@ -55,7 +65,7 @@ export function Shell({ tab, onTab, children }: Props) {
   )
 
   return (
-    <div className="flex min-h-full">
+    <div className={`flex ${bleed ? 'h-dvh' : 'min-h-full'}`}>
       {/* Desktop / tablet rail */}
       <nav className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-2 border-r-2 border-line px-4 py-6 md:flex">
         <div className="mb-6 flex items-center gap-3 px-2">
@@ -74,7 +84,7 @@ export function Shell({ tab, onTab, children }: Props) {
               tab === t.id ? 'border-sky/60 bg-sky-soft text-sky-dark' : 'border-transparent text-muted hover:bg-line/50'
             }`}
           >
-            {t.icon}
+            <TabIcon id={t.id} on={tab === t.id} />
             {t.label}
           </button>
         ))}
@@ -91,23 +101,27 @@ export function Shell({ tab, onTab, children }: Props) {
             {stats}
           </div>
         </header>
-        <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-6 pb-28 md:pb-10">{children}</main>
+        {bleed ? (
+          <main className="relative mb-[calc(70px+env(safe-area-inset-bottom))] flex-1 md:mb-0">{children}</main>
+        ) : (
+          <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-6 pb-28 md:pb-10">{children}</main>
+        )}
       </div>
 
       {/* Phone dock */}
       <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t-2 border-line bg-paper md:hidden">
-        <div className="mx-auto flex max-w-md justify-around px-2 pt-2 pb-1">
+        <div className="mx-auto flex max-w-md justify-around px-1 pt-1.5 pb-1">
           {TABS.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => onTab(t.id)}
               aria-label={t.label}
-              className={`flex flex-col items-center gap-0.5 rounded-2xl border-2 px-4 py-1.5 text-[11px] font-extrabold ${
-                tab === t.id ? 'border-sky/60 bg-sky-soft text-sky-dark' : 'border-transparent text-muted'
+              className={`flex flex-col items-center gap-0.5 px-2 pt-0.5 text-[11px] font-extrabold ${
+                tab === t.id ? 'text-sky-dark' : 'text-muted'
               }`}
             >
-              {t.icon}
+              <TabIcon id={t.id} on={tab === t.id} />
               {t.label}
             </button>
           ))}

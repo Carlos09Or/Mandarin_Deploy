@@ -7,6 +7,7 @@ import { recordAnswer, recordTrace } from '../lib/progress'
 import { AudioButton } from '../components/AudioButton'
 import { IconClose } from '../components/icons'
 import { Buddy } from '../components/Friends'
+import { LandscapeStrip } from '../journey/LandscapeStrip'
 import type { FriendId } from '../data/friends'
 import { Choice } from './Choice'
 import { Intro } from './Intro'
@@ -15,7 +16,14 @@ import { Sentence } from './Sentence'
 import { Trace } from './Trace'
 
 export type LessonSummary = { durationMs: number; answers: number; mistakes: number }
-type Props = { exercises: Exercise[]; buddy: FriendId; onExit: () => void; onFinish: (s: LessonSummary) => void }
+type Props = {
+  exercises: Exercise[]
+  buddy: FriendId
+  /** The stop this lesson rides to; its sign slides in on arrival. */
+  station?: string
+  onExit: () => void
+  onFinish: (s: LessonSummary) => void
+}
 
 const PRAISE = [
   ['很好！', 'hěn hǎo', 'Very good!'],
@@ -26,7 +34,7 @@ const PRAISE = [
 
 type Feedback = { correct: boolean; title: string; detail?: string; sub?: string }
 
-export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
+export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Props) {
   const [queue, setQueue] = useState(exercises)
   const [pos, setPos] = useState(0)
   const [done, setDone] = useState(0)
@@ -34,6 +42,7 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
   const [order, setOrder] = useState<number[]>([])
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [confirmExit, setConfirmExit] = useState(false)
+  const [arrived, setArrived] = useState(false)
   const stats = useRef({ answers: 0, mistakes: 0, start: 0 })
 
   useEffect(() => {
@@ -48,8 +57,9 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
 
   const ex = queue[pos]
   const total = exercises.length
-  // Lets browser tests read the current exercise; stripped from production builds.
-  if (import.meta.env.DEV) Object.assign(window, { __lesson: { ex, word } })
+  // Lets browser tests read the current exercise or jump to the end; stripped from production builds.
+  if (import.meta.env.DEV)
+    Object.assign(window, { __lesson: { ex, word, finish: () => onFinish({ durationMs: 95000, answers: 12, mistakes: 1 }) } })
 
   const advance = useCallback(() => {
     setSelected(null)
@@ -57,11 +67,15 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
     setFeedback(null)
     if (pos + 1 >= queue.length) {
       const s = stats.current
-      onFinish({ durationMs: Date.now() - s.start, answers: s.answers, mistakes: s.mistakes })
+      const summary = { durationMs: Date.now() - s.start, answers: s.answers, mistakes: s.mistakes }
+      if (!station) return onFinish(summary)
+      // Pull into the station before the score screen.
+      setArrived(true)
+      setTimeout(() => onFinish(summary), 1300)
     } else {
       setPos(pos + 1)
     }
-  }, [pos, queue.length, onFinish])
+  }, [pos, queue.length, onFinish, station])
 
   const grade = useCallback(
     (correct: boolean, fb: Feedback, requeue = false) => {
@@ -138,16 +152,7 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
         <button type="button" aria-label="Quit lesson" onClick={() => setConfirmExit(true)} className="text-muted">
           <IconClose className="h-7 w-7" />
         </button>
-        <div className="h-4 flex-1 overflow-hidden rounded-full bg-line">
-          <motion.div
-            className="h-full rounded-full bg-jade"
-            initial={{ width: 0 }}
-            animate={{ width: `${Math.max(4, (done / total) * 100)}%` }}
-            transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-          >
-            <div className="mx-2 mt-1 h-1 rounded-full bg-white/35" />
-          </motion.div>
-        </div>
+        <LandscapeStrip progress={done / total} station={station} arrived={arrived} />
       </header>
 
       <main className="flex-1 overflow-y-auto">
@@ -233,6 +238,22 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
           </button>
         </div>
       </footer>
+
+      <AnimatePresence>
+        {arrived && (
+          <motion.div
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-paper/90 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <motion.p className="han text-6xl font-black text-brand" initial={{ scale: 0.6 }} animate={{ scale: 1 }}>
+              到了！
+            </motion.p>
+            <p className="mt-2 text-xl font-black">{station}</p>
+            <p className="font-bold text-muted">dào le · you arrived</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {confirmExit && (

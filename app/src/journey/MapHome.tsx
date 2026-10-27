@@ -1,0 +1,413 @@
+import { useEffect, useRef, useState } from 'react'
+import { FRIENDS, FRIEND_IDS } from '../data/friends'
+import {
+  BADGE_AT, BOATS, CLOUDS, EXTRA_HOLE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province,
+} from '../data/journey'
+import { markRevealed, setTraveler, useProgress } from '../lib/progress'
+import { Face } from './parts'
+import { currentProvince, isUnlocked, openProvinces, provinceDone } from './stops'
+import { toast } from './toast'
+import './journey.css'
+
+/** Something the map should play when it opens: a hop from one province to the next. */
+export type MapEvent = { hopFrom: string; hopTo: string }
+
+type Props = { onOpen: (p: Province) => void; event: MapEvent | null; onEventDone: () => void }
+
+const pct = ([x, y]: readonly [number, number]) => ({ left: `${((x - VB.x) / VB.w) * 100}%`, top: `${((y - VB.y) / VB.h) * 100}%` })
+const regionById = new Map(REGIONS.map((r) => [r.id, r]))
+const badgeAt = (id: string) => BADGE_AT[id] ?? regionById.get(id)!.c
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+export function MapHome({ onOpen, event, onEventDone }: Props) {
+  const progress = useProgress()
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
+  const layerRef = useRef<HTMLDivElement>(null)
+  const pinRef = useRef<HTMLDivElement>(null)
+  const railRef = useRef<SVGPathElement>(null)
+  // Provinces whose fog is gone on screen (revealed before, or just animated).
+  const [shown, setShown] = useState(() => new Set(progress.revealed))
+  const [pinAt, setPinAt] = useState(() => event?.hopFrom ?? currentProvince(progress).id)
+  const [picking, setPicking] = useState(false)
+  const busy = useRef(false)
+
+  const placePin = ([x, y]: readonly [number, number]) => {
+    if (pinRef.current) Object.assign(pinRef.current.style, pct([x, y - 9]))
+  }
+  const centerOn = ([x]: readonly [number, number], smooth = true) => {
+    const sc = scrollRef.current
+    const stage = stageRef.current
+    if (!sc || !stage) return
+    const px = ((x - VB.x) / VB.w) * stage.clientWidth
+    sc.scrollTo({ left: px - sc.clientWidth / 2, behavior: smooth ? 'smooth' : 'auto' })
+  }
+
+  // Opening a province: the fog clears in a circle from its origin and its clouds fly away.
+  const reveal = (id: string) =>
+    new Promise<void>((resolve) => {
+      const r = regionById.get(id)!
+      const circle = svgRef.current!.querySelector<SVGCircleElement>(`#j-clip-${id} circle`)!
+      const o = ORIGIN[id] ?? r.c
+      const bb = svgRef.current!.querySelector<SVGGElement>(`#j-hole-${id}`)!.getBBox()
+      const corners = [[bb.x, bb.y], [bb.x + bb.width, bb.y], [bb.x, bb.y + bb.height], [bb.x + bb.width, bb.y + bb.height]]
+      const far = Math.max(...corners.map(([x, y]) => Math.hypot(x - o[0], y - o[1]))) + 10
+      layerRef.current!.querySelectorAll<HTMLElement>(`[data-cloud="${id}"]`).forEach((c, i) => {
+        const dx = Number(c.dataset.dx) || 1
+        const dy = Number(c.dataset.dy) || 1
+        const n = Math.hypot(dx, dy) || 1
+        setTimeout(() => {
+          c.style.transform = `translate(calc(-50% + ${(dx / n) * 260}px), calc(-50% + ${(dy / n) * 160 - 40}px)) scale(1.35)`
+          c.style.opacity = '0'
+        }, i * 90)
+      })
+      centerOn(o)
+      setTimeout(() => {
+        setShown((s) => new Set(s).add(id))
+        const p = provinceById(id)
+        toast(`${p.name} unlocked!<span class="j-han">${p.zh}</span>`)
+      }, 900)
+      const t0 = performance.now()
+      const step = (now: number) => {
+        const k = Math.min(1, Math.max(0, (now - t0) / 1700))
+        circle.setAttribute('r', (far * (1 - Math.pow(1 - k, 3))).toFixed(1))
+        if (k < 1) requestAnimationFrame(step)
+        else resolve()
+      }
+      requestAnimationFrame(step)
+    })
+
+  // The traveller hops from one badge to another along a gentle curve.
+  const hop = (from: string, to: string) =>
+    new Promise<void>((resolve) => {
+      const a = badgeAt(from)
+      const b = badgeAt(to)
+      const mx = (a[0] + b[0]) / 2
+      const my = Math.max(a[1], b[1]) + 16
+      const rail = railRef.current!
+      rail.setAttribute('d', `M${a[0]} ${a[1]} Q${mx} ${my} ${b[0]} ${b[1]}`)
+      const len = rail.getTotalLength()
+      const hops = Math.max(2, Math.round(len / 22))
+      centerOn([mx, my])
+      const t0 = performance.now()
+      const step = (now: number) => {
+        const k = Math.min(1, Math.max(0, (now - t0) / (380 * hops)))
+        const pt = rail.getPointAtLength(len * k)
+        placePin([pt.x, pt.y - Math.abs(Math.sin(Math.PI * k * hops)) * 7])
+        if (k < 1) requestAnimationFrame(step)
+        else {
+          setPinAt(to)
+          resolve()
+        }
+      }
+      requestAnimationFrame(step)
+    })
+
+  // First paint: open the fog that was already cleared, then play anything new.
+  useEffect(() => {
+    const svg = svgRef.current!
+    for (const id of progress.revealed) {
+      svg.querySelector(`#j-clip-${id} circle`)?.setAttribute('r', '2000')
+      layerRef.current!.querySelectorAll<HTMLElement>(`[data-cloud="${id}"]`).forEach((c) => (c.style.opacity = '0'))
+    }
+    placePin(badgeAt(pinAt))
+    centerOn(badgeAt(pinAt), false)
+    const pending = openProvinces(progress).filter((p) => !progress.revealed.includes(p.id))
+    let alive = true
+    ;(async () => {
+      busy.current = true
+      await sleep(600)
+      for (const p of pending) {
+        if (!alive) return
+        await reveal(p.id)
+        markRevealed(p.id)
+      }
+      if (event && alive) {
+        await hop(event.hopFrom, event.hopTo)
+        onEventDone()
+      }
+      busy.current = false
+    })()
+    return () => {
+      alive = false
+    }
+    // Runs once per visit to the map; later progress changes don't replay it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => placePin(badgeAt(pinAt)), [pinAt])
+  useEffect(() => startSea(layerRef.current!, svgRef.current!, stageRef.current!), [])
+  useEffect(() => dragToPan(scrollRef.current!), [])
+
+  const tap = (id: string) => {
+    const p = provinceById(id)
+    if (!p || busy.current) return
+    if (!isUnlocked(p, progress) || !shown.has(id)) {
+      toast(hasContent(p) ? `${p.name} · finish the province before it` : `${p.name} · coming soon`)
+      return
+    }
+    if (pinAt !== id) {
+      busy.current = true
+      hop(pinAt, id).then(() => (busy.current = false))
+      return
+    }
+    onOpen(p)
+  }
+
+  const here = provinceById(pinAt)
+  return (
+    <div className="j-map">
+      <div className="j-map-scroll" ref={scrollRef}>
+        <div className="j-stage" ref={stageRef}>
+          <svg ref={svgRef} viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} preserveAspectRatio="none">
+            <defs>
+              <filter id="j-soft" x="-10%" y="-10%" width="120%" height="120%">
+                <feGaussianBlur stdDeviation="2.2" />
+              </filter>
+              {REGIONS.map((r) => {
+                const o = ORIGIN[r.id] ?? r.c
+                return (
+                  <clipPath key={r.id} id={`j-clip-${r.id}`}>
+                    <circle cx={o[0]} cy={o[1]} r="0" />
+                  </clipPath>
+                )
+              })}
+              <mask id="j-fog" maskUnits="userSpaceOnUse" x={VB.x} y={VB.y} width={VB.w} height={VB.h}>
+                <rect x={VB.x} y={VB.y} width={VB.w} height={VB.h} fill="#fff" />
+                <g filter="url(#j-soft)">
+                  {REGIONS.map((r) => {
+                    const e = EXTRA_HOLE[r.id]
+                    return (
+                      <g key={r.id} id={`j-hole-${r.id}`} clipPath={`url(#j-clip-${r.id})`}>
+                        <path d={r.d} fill="#000" stroke="#000" strokeWidth="7" strokeLinejoin="round" />
+                        {e && <ellipse {...e} fill="#000" />}
+                      </g>
+                    )
+                  })}
+                </g>
+              </mask>
+            </defs>
+            <image href={asset('map-illustrated-clean.webp')} x={VB.x} y={VB.y} width={VB.w} height={VB.h} preserveAspectRatio="none" />
+            <image
+              href={asset('map-fog-clean.webp')}
+              x={VB.x - 1.3}
+              y={VB.y}
+              width={VB.w}
+              height={VB.h}
+              preserveAspectRatio="none"
+              mask="url(#j-fog)"
+            />
+            <path ref={railRef} fill="none" stroke="none" />
+          </svg>
+          <div ref={layerRef}>
+            {Object.entries(CLOUDS).map(([id, set]) =>
+              set.map(([img, dx, dy, w], i) => {
+                const c = regionById.get(id)!.c
+                return (
+                  <div
+                    key={`${id}${i}`}
+                    className="j-cloud"
+                    data-cloud={id}
+                    data-dx={dx}
+                    data-dy={dy}
+                    style={{ ...pct([c[0] + dx, c[1] + dy]), width: w }}
+                  >
+                    <img src={asset(`${img}.webp`)} alt="" draggable={false} />
+                  </div>
+                )
+              }),
+            )}
+            {REGIONS.filter((r) => r.unit).map((r) => {
+              const p = provinceById(r.id)
+              const at = badgeAt(r.id)
+              const done = provinceDone(p, progress)
+              const open = shown.has(r.id) && isUnlocked(p, progress)
+              return (
+                <div key={r.id}>
+                  <button
+                    type="button"
+                    className={`j-badge ${done ? 'done' : open ? 'open' : 'locked'}`}
+                    style={pct(at)}
+                    onClick={() => tap(r.id)}
+                    aria-label={`${p.name}${open ? '' : ' (locked)'}`}
+                  >
+                    {done ? '✓' : r.unit}
+                  </button>
+                  {open && (
+                    <div className="j-label" style={pct([at[0], at[1] + 12])}>
+                      {p.name}
+                      <span className="j-han">{p.zh}</span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+            <div className="j-pin" ref={pinRef}>
+              <div className="j-pin-bubble">
+                <Face id={progress.traveler} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="j-map-bar">
+        <button type="button" className="j-me" onClick={() => setPicking(true)} aria-label="Choose your traveller">
+          <Face id={progress.traveler} />
+        </button>
+        <div className="j-map-title">
+          <small>Mandarin journey</small>
+          <b>
+            {here?.name} <span className="j-han" style={{ color: '#d21034' }}>{here?.zh}</span>
+          </b>
+        </div>
+      </div>
+
+      {picking && (
+        <>
+          <div className="j-sheet-bg" onClick={() => setPicking(false)} />
+          <div className="j-sheet" role="dialog" aria-label="Choose your traveller">
+            <h3>Who's travelling?</h3>
+            <p>Your character marks where you are on the map and drives the train.</p>
+            <div className="j-picks">
+              {FRIEND_IDS.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={`j-pick ${progress.traveler === id ? 'on' : ''}`}
+                  onClick={() => {
+                    setTraveler(id)
+                    setTimeout(() => setPicking(false), 250)
+                  }}
+                >
+                  <Face id={id} />
+                  <b>{FRIENDS[id].name}</b>
+                  <span className="j-han">{FRIENDS[id].hanzi}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ---- The living sea: sailing boats with foam, and ripples on open water ----
+
+function startSea(layer: HTMLElement, svg: SVGSVGElement, stage: HTMLElement) {
+  let alive = true
+  const SAIL = 0.09
+  for (const b of BOATS) {
+    const el = document.createElement('div')
+    el.className = 'j-boat'
+    el.innerHTML = `<img src="${asset(`${b.src}.webp`)}" alt="" draggable="false">`
+    const [x0, y0, x1, y1] = b.box
+    const w = x1 - x0
+    const h = y1 - y0
+    el.style.width = `${w * 100}%`
+    layer.appendChild(el)
+    const t0 = performance.now() - Math.random() * b.secs * 1000
+    let lastFoam = 0
+    const sail = (now: number) => {
+      if (!alive) return
+      const aspect = stage.clientWidth / Math.max(1, stage.clientHeight)
+      const k = ((now - t0) / (b.secs * 1000)) % 1
+      const d = (k - 0.35) * SAIL
+      const x = x0 + b.dir[0] * d
+      const y = y0 + b.dir[1] * d * aspect
+      el.style.left = `${x * 100}%`
+      el.style.top = `${y * 100}%`
+      el.style.opacity = String(Math.min(1, k * 8, (1 - k) * 8))
+      if (now - lastFoam > 160) {
+        foam(layer, x + w * 0.5 - b.dir[0] * w * 0.42, y + h * 0.55 - b.dir[1] * h * 0.42, b.dir)
+        lastFoam = now
+      }
+      requestAnimationFrame(sail)
+    }
+    requestAnimationFrame(sail)
+  }
+  const land = [...svg.querySelectorAll<SVGPathElement>('#j-fog path')]
+  const ripple = () => {
+    if (!alive) return
+    const w = document.createElement('div')
+    w.className = 'j-wave'
+    w.innerHTML =
+      '<svg viewBox="0 0 24 8" width="24" height="8"><path d="M1 5 Q6 1 12 4.5 T23 4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" /></svg>'
+    Object.assign(w.style, pct(seaPoint(svg, land)))
+    layer.appendChild(w)
+    w.animate(
+      [
+        { opacity: 0, transform: 'translateX(0) scaleX(.5)' },
+        { opacity: 0.75, offset: 0.45 },
+        { opacity: 0, transform: `translateX(${6 + Math.random() * 10}px) scaleX(1.15)` },
+      ],
+      { duration: 3200 + Math.random() * 2600, easing: 'ease-in-out' },
+    ).onfinish = () => {
+      w.remove()
+      ripple()
+    }
+  }
+  for (let i = 0; i < 34; i++) setTimeout(ripple, i * 180)
+  return () => {
+    alive = false
+    layer.querySelectorAll('.j-boat, .j-foam, .j-wave').forEach((e) => e.remove())
+  }
+}
+
+function foam(layer: HTMLElement, x: number, y: number, dir: readonly number[]) {
+  const f = document.createElement('div')
+  f.className = 'j-foam'
+  f.style.left = `${x * 100}%`
+  f.style.top = `${y * 100}%`
+  layer.appendChild(f)
+  const side = (Math.random() - 0.5) * 2
+  const back = 10 + Math.random() * 8
+  const tx = -dir[0] * back - dir[1] * side * 6
+  const ty = -dir[1] * back + dir[0] * side * 6
+  const ang = (Math.atan2(dir[1], dir[0]) * 180) / Math.PI
+  f.animate(
+    [
+      { transform: `rotate(${ang}deg) scale(.6)`, opacity: 0.95 },
+      { transform: `translate(${tx}px, ${ty}px) rotate(${ang}deg) scale(2.4, 1.6)`, opacity: 0 },
+    ],
+    { duration: 1800 + Math.random() * 700, easing: 'ease-out' },
+  ).onfinish = () => f.remove()
+}
+
+/** A random point on open water, a little away from any coast. */
+function seaPoint(svg: SVGSVGElement, land: SVGPathElement[]): [number, number] {
+  const pt = svg.createSVGPoint()
+  for (let tries = 0; tries < 40; tries++) {
+    const x = VB.x + Math.random() * VB.w
+    const y = VB.y + Math.random() * VB.h
+    const near = [[0, 0], [14, 0], [-14, 0], [0, 10], [0, -10]].some(([dx, dy]) => {
+      pt.x = x + dx
+      pt.y = y + dy
+      return land.some((p) => p.isPointInFill(pt))
+    })
+    if (!near) return [x, y]
+  }
+  return [VB.x + 40, VB.y + 40]
+}
+
+/** Lets a mouse drag the map sideways, like a finger does on a phone. */
+function dragToPan(sc: HTMLElement) {
+  let down: { x: number; l: number } | null = null
+  const start = (e: PointerEvent) => {
+    if (e.pointerType === 'mouse' && !(e.target as HTMLElement).closest('button')) down = { x: e.clientX, l: sc.scrollLeft }
+  }
+  const move = (e: PointerEvent) => {
+    if (down) sc.scrollLeft = down.l - (e.clientX - down.x)
+  }
+  const end = () => (down = null)
+  sc.addEventListener('pointerdown', start)
+  window.addEventListener('pointermove', move)
+  window.addEventListener('pointerup', end)
+  return () => {
+    sc.removeEventListener('pointerdown', start)
+    window.removeEventListener('pointermove', move)
+    window.removeEventListener('pointerup', end)
+  }
+}

@@ -1,0 +1,1459 @@
+/* The Panama journey: map, route, train ride, passport. Plain CSS because most of it is
+   positioned artwork and keyframes; every class starts with j- to stay clear of the app's. */
+
+.j-han {
+  font-family: var(--font-han);
+}
+
+/* ---------- character portrait (cropped from the 200 × 200 art) ---------- */
+.j-face {
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+}
+.j-face img {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+
+/* ---------- map ---------- */
+.j-map {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #2f88d3;
+}
+.j-map-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  cursor: grab;
+}
+.j-map-scroll::-webkit-scrollbar {
+  display: none;
+}
+.j-stage {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 1672 / 941;
+}
+.j-stage > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.j-cloud {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: transform 1.5s cubic-bezier(0.3, 0.1, 0.3, 1), opacity 1.3s ease;
+}
+.j-cloud img {
+  width: 100%;
+  display: block;
+  animation: j-bob 5s ease-in-out infinite alternate;
+}
+@keyframes j-bob {
+  to {
+    transform: translate(6px, -4px);
+  }
+}
+.j-boat {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+.j-boat img {
+  width: 100%;
+  display: block;
+  transform-origin: 50% 70%;
+  animation: j-rock 2.6s ease-in-out infinite alternate;
+}
+@keyframes j-rock {
+  from {
+    transform: rotate(-1.6deg);
+  }
+  to {
+    transform: rotate(1.4deg) translateY(-1.5px);
+  }
+}
+.j-foam {
+  position: absolute;
+  z-index: 1;
+  width: 7px;
+  height: 3px;
+  margin: -1.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+}
+.j-wave {
+  position: absolute;
+  z-index: 1;
+  width: 24px;
+  height: 8px;
+  margin: -4px 0 0 -12px;
+  pointer-events: none;
+  opacity: 0;
+}
+.j-badge {
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 14px;
+  color: #fff;
+  background: #9aa9b6;
+  border: 3px solid #fff;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+  transition: background 0.4s;
+}
+.j-badge.locked::after {
+  content: '🔒';
+  position: absolute;
+  right: -9px;
+  bottom: -6px;
+  font-size: 12px;
+}
+.j-badge.open {
+  background: #d21034;
+  animation: j-pulse 1.6s ease-in-out infinite;
+}
+.j-badge.done {
+  background: #2f9e7e;
+}
+@keyframes j-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(242, 193, 78, 0.9), 0 3px 0 rgba(0, 0, 0, 0.18);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(242, 193, 78, 0), 0 3px 0 rgba(0, 0, 0, 0.18);
+  }
+}
+.j-label {
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, 0);
+  white-space: nowrap;
+  font-weight: 900;
+  font-size: 13px;
+  color: #0a426d;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 3px 9px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px -6px rgba(10, 66, 109, 0.6);
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+.j-label .j-han {
+  color: #d21034;
+  margin-left: 4px;
+}
+.j-pin {
+  position: absolute;
+  z-index: 4;
+  width: 50px;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+}
+.j-pin-bubble {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #fff6dd;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 12px -4px rgba(10, 40, 70, 0.55);
+  animation: j-hover 1.8s ease-in-out infinite;
+}
+.j-pin-bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  margin-left: -8px;
+  border: 8px solid transparent;
+  border-top: 10px solid #fff;
+  border-bottom: 0;
+}
+.j-pin .j-face {
+  width: 100%;
+  height: 100%;
+}
+@keyframes j-hover {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+.j-map-bar {
+  position: absolute;
+  z-index: 6;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.j-me {
+  pointer-events: auto;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: 50%;
+  border: 3px solid #f2c14e;
+  background: #fff6dd;
+  padding: 0;
+  box-shadow: 0 6px 14px -8px rgba(0, 0, 0, 0.6);
+}
+.j-me .j-face {
+  width: 100%;
+  height: 100%;
+}
+.j-map-title {
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  padding: 5px 12px;
+  box-shadow: 0 6px 14px -10px rgba(10, 66, 109, 0.6);
+}
+.j-map-title small {
+  display: block;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #8b7f75;
+  text-transform: uppercase;
+}
+.j-map-title b {
+  font-size: 16px;
+  font-weight: 900;
+  color: #0a426d;
+}
+.j-toast {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  bottom: calc(96px + env(safe-area-inset-bottom));
+  transform: translate(-50%, 30px);
+  opacity: 0;
+  transition: 0.45s cubic-bezier(0.2, 1.3, 0.4, 1);
+  background: #0a426d;
+  color: #fff;
+  font-weight: 900;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 16px;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+.j-toast.on {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+.j-toast .j-han {
+  color: #f2c14e;
+  margin-left: 4px;
+}
+
+/* ---------- route: one metro line and one departure board ---------- */
+.j-route {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  background: #fbf3dc;
+  scrollbar-width: none;
+}
+.j-route::-webkit-scrollbar {
+  display: none;
+}
+.j-sky {
+  position: relative;
+  height: 290px;
+}
+.j-sky > i {
+  position: absolute;
+  inset: 0;
+  background: center 22% / cover no-repeat;
+  transition: opacity 1.4s ease;
+  -webkit-mask: linear-gradient(#000 55%, transparent);
+  mask: linear-gradient(#000 55%, transparent);
+}
+.j-head {
+  position: absolute;
+  z-index: 2;
+  top: 16px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.j-back {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #0a426d;
+  font-weight: 900;
+  font-size: 18px;
+}
+.j-head small {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #0a426d;
+  opacity: 0.8;
+}
+.j-head h1 {
+  margin: 1px 0 0;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+  color: #0a426d;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.95);
+}
+.j-head h1 .j-han {
+  color: #d21034;
+  font-size: 25px;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+.j-prog {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #0a426d;
+}
+.j-prog b {
+  display: block;
+  width: 150px;
+  height: 7px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+}
+.j-prog b i {
+  display: block;
+  height: 100%;
+  background: #3fb14f;
+  border-radius: 9px;
+  transition: width 0.6s ease;
+}
+.j-line {
+  position: relative;
+  max-width: 560px;
+  margin: -28px auto 0;
+  padding: 0 16px 60px 0;
+}
+.j-rail {
+  position: absolute;
+  left: 86px;
+  width: 5px;
+  margin-left: -2.5px;
+  border-radius: 3px;
+  transition: height 0.7s cubic-bezier(0.4, 0, 0.2, 1), top 0.7s;
+}
+.j-rail.done {
+  background: #d21034;
+}
+.j-rail.todo {
+  background: repeating-linear-gradient(#cfc6b4 0 9px, transparent 9px 16px);
+}
+.j-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 72px;
+  width: 100%;
+  padding-left: 116px;
+  text-align: left;
+  color: #0a426d;
+}
+.j-row .j-ic {
+  position: absolute;
+  left: 86px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+}
+.j-row b {
+  display: block;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+.j-row small {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #9b9486;
+  margin-top: 2px;
+}
+.j-row.locked {
+  cursor: default;
+  color: #3d556b;
+}
+.j-knot {
+  width: 30px;
+  height: 46px;
+  display: block;
+}
+.j-knot.pop {
+  animation: j-knot-pop 0.6s cubic-bezier(0.3, 1.7, 0.5, 1);
+}
+@keyframes j-knot-pop {
+  0% {
+    transform: scale(0.3) rotate(-30deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+.j-bookic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #d21034;
+  border: 3px solid #fff;
+  box-shadow: 0 3px 8px -3px rgba(150, 10, 30, 0.6);
+  display: grid;
+  place-items: center;
+}
+.j-row.current {
+  min-height: 176px;
+}
+.j-ring {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #fff;
+  border: 5px solid #d21034;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 0 6px rgba(210, 16, 52, 0.12);
+}
+.j-ring::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d21034;
+}
+.j-rider {
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  width: 62px;
+  transform: translateY(-58%);
+  pointer-events: none;
+}
+.j-rider img {
+  width: 100%;
+  display: block;
+  animation: j-hover 2.2s ease-in-out infinite;
+}
+.j-goal-ic {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background: center / cover;
+  border: 5px solid #fff;
+  box-shadow: 0 10px 20px -10px rgba(10, 66, 109, 0.6);
+  margin-left: 42px;
+}
+.j-row.goal {
+  min-height: 136px;
+  padding-left: 160px;
+}
+.j-row.goal::before {
+  content: '';
+  position: absolute;
+  left: 86px;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  background: #fbf3dc;
+  border: 4px solid #cfc6b4;
+  z-index: 1;
+}
+.j-row.goal.done::before {
+  border-color: #d21034;
+  background: #d21034;
+}
+
+/* Split-flap departure board: tapping it is how you board. */
+.j-board {
+  position: relative;
+  border: 2px solid #d21034;
+  border-radius: 14px;
+  background: #fffaf0;
+  padding: 9px 14px 10px;
+  text-align: center;
+  box-shadow: 0 12px 22px -14px rgba(120, 20, 30, 0.55);
+  color: #0a426d;
+  min-width: 200px;
+}
+.j-board:active {
+  transform: translateY(2px);
+}
+.j-bd-head {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: #d21034;
+}
+.j-tiles {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin: 8px 0 7px;
+}
+.j-tile {
+  position: relative;
+  width: 54px;
+  height: 60px;
+  border-radius: 7px;
+  background: linear-gradient(#d8203c 0 50%, #c3142f 50%);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18), 0 2px 3px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.j-tile::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1.5px;
+  margin-top: -0.75px;
+  background: rgba(70, 0, 10, 0.55);
+}
+.j-tile::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 50%;
+  height: 8px;
+  margin-top: -4px;
+  background: linear-gradient(90deg, #7a0c1c 0 4px, transparent 4px calc(100% - 4px), #7a0c1c 0);
+}
+.j-tile i {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-style: normal;
+  font-family: var(--font-han);
+  font-weight: 900;
+  font-size: 34px;
+  color: #fff4d6;
+}
+.j-tile.flap i {
+  animation: j-flap 0.09s linear;
+}
+@keyframes j-flap {
+  50% {
+    transform: scaleY(0.05);
+    filter: brightness(0.6);
+  }
+}
+.j-bd-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-size: 15px;
+  font-weight: 900;
+}
+.j-bd-foot .py {
+  color: #2f88d3;
+}
+.j-bd-foot .place {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9b9486;
+}
+
+/* ---------- the ride: the train races past with everyone on board ---------- */
+.j-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  overflow: hidden;
+}
+.j-ride {
+  background: #3dbdf5;
+  cursor: pointer;
+}
+.j-ride-sky {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 66%;
+  overflow: hidden;
+}
+.j-ride-mid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 48%;
+  height: 22%;
+  overflow: hidden;
+}
+.j-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 69%;
+  bottom: 0;
+  background: linear-gradient(#6b3b22 0 5px, #3f8a45 5px, #24603a);
+}
+.j-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(69% - 11px);
+  height: 15px;
+  overflow: hidden;
+}
+.j-track i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(#b9c0c8 0 4px, #7d868f 4px 5px, transparent 5px),
+    repeating-linear-gradient(90deg, #6b3b22 0 12px, transparent 12px 30px);
+}
+.j-speed i {
+  position: absolute;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.75);
+}
+.j-ride-cap {
+  position: absolute;
+  left: 50%;
+  bottom: calc(40px + env(safe-area-inset-bottom));
+  width: min(330px, calc(100% - 48px));
+  transform: translateX(-50%);
+  padding: 14px 10px 12px;
+  border-radius: 20px;
+  background: rgba(255, 250, 240, 0.95);
+  box-shadow: 0 12px 24px -14px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  color: #0a426d;
+}
+.j-ride-cap .j-han {
+  display: block;
+  font-size: 30px;
+  font-weight: 900;
+  color: #d21034;
+}
+.j-ride-cap b {
+  font-size: 16px;
+  font-weight: 900;
+}
+.j-ride-cap small {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #9a7b4c;
+}
+
+/* ---------- repeating landscape strips ---------- */
+.j-strip {
+  position: absolute;
+  left: 0;
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+.j-strip img {
+  height: 100%;
+  width: auto;
+  display: block;
+  flex: none;
+}
+.j-strip img.mirror {
+  transform: scaleX(-1);
+}
+
+/* The lesson's progress bar is a train window: the landscape moves on with each answer. */
+.j-window {
+  position: relative;
+  flex: 1;
+  height: 52px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 4px solid #6b3b22;
+  box-shadow: inset 0 0 0 2px #f2c14e;
+  background: #3dbdf5;
+}
+.j-window .far {
+  height: 230%;
+  top: -88%;
+}
+.j-window .near {
+  height: 105%;
+  top: auto;
+  bottom: -30%;
+}
+.j-glass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.28) 0 18%, transparent 18% 30%, rgba(255, 255, 255, 0.12) 30% 34%, transparent 34%);
+}
+.j-sign {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #fffaf0;
+  border: 1.5px solid #d21034;
+  font-size: 10.5px;
+  font-weight: 900;
+  color: #0a426d;
+  transform: translateX(160%);
+  transition: transform 0.6s cubic-bezier(0.2, 1.2, 0.4, 1);
+}
+.j-sign.on {
+  transform: none;
+}
+
+/* ---------- train (side view, built from the train, wheel and smoke images) ---------- */
+.j-train {
+  position: absolute;
+  aspect-ratio: 1672 / 941;
+}
+.j-train .j-body {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.j-train .j-wheel {
+  position: absolute;
+  aspect-ratio: 1;
+}
+.j-train.moving .j-wheel {
+  animation: j-spin 0.5s linear infinite;
+}
+.j-train.fast .j-wheel {
+  animation-duration: 0.2s;
+}
+.j-train.moving .j-body,
+.j-train.moving .j-wheels,
+.j-train.moving .j-seats {
+  animation: j-rumble 0.18s steps(2) infinite;
+}
+.j-train .j-wheels,
+.j-train .j-seats {
+  position: absolute;
+  inset: 0;
+}
+@keyframes j-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes j-rumble {
+  50% {
+    transform: translateY(-0.8%);
+  }
+}
+/* A passenger leans out of a window: clipped at the sill, free above it. */
+.j-seat {
+  position: absolute;
+  clip-path: inset(-60% -40% 0 -40%);
+}
+.j-seat .j-face {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -14%;
+  aspect-ratio: 1;
+  border-radius: 0;
+}
+.j-seat .j-face img {
+  animation: j-wave 1.1s ease-in-out infinite alternate;
+}
+@keyframes j-wave {
+  from {
+    transform: translateY(6%) rotate(-4deg);
+  }
+  to {
+    transform: translateY(-4%) rotate(5deg);
+  }
+}
+.j-smoke {
+  position: absolute;
+  pointer-events: none;
+  width: 22%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) scale(0.25);
+  opacity: 0;
+}
+
+/* ---------- passport ---------- */
+.j-pp {
+  position: relative;
+  min-height: 100%;
+  border-radius: 24px;
+  padding: 18px 16px 40px;
+  background: radial-gradient(circle at 50% 30%, #fbf1df, #ead3b2 70%);
+  text-align: center;
+  color: #0a426d;
+}
+.j-pp small.kicker {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #8b7f75;
+  text-transform: uppercase;
+}
+.j-pp h2 {
+  margin: 2px 0 14px;
+  font-size: 22px;
+  font-weight: 900;
+}
+.j-book {
+  position: relative;
+  width: 300px;
+  height: 400px;
+  margin: 0 auto;
+  perspective: 1400px;
+}
+.j-page,
+.j-cover {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+}
+.j-page {
+  background: center / cover;
+  box-shadow: 0 18px 30px -18px rgba(60, 30, 10, 0.6);
+  overflow: hidden;
+}
+.j-page.shake {
+  animation: j-shake 0.32s ease;
+}
+@keyframes j-shake {
+  25% {
+    transform: translate(2px, 1px) rotate(0.3deg);
+  }
+  60% {
+    transform: translate(-2px, -1px) rotate(-0.2deg);
+  }
+}
+.j-leaf {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.6s cubic-bezier(0.5, 0, 0.2, 1), opacity 0.45s ease;
+}
+.j-leaf.left {
+  transform: translateX(-40%);
+  opacity: 0;
+  pointer-events: none;
+}
+.j-leaf.right {
+  transform: translateX(40%);
+  opacity: 0;
+  pointer-events: none;
+}
+.j-page-title {
+  position: absolute;
+  top: 26px;
+  left: 0;
+  right: 0;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: #b48a4a;
+}
+.j-cover {
+  z-index: 4;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  background: center / cover;
+  box-shadow: 0 22px 34px -18px rgba(60, 10, 10, 0.7);
+  transition: transform 1.1s cubic-bezier(0.5, 0.05, 0.25, 1), opacity 0.35s ease 0.85s;
+}
+.j-book.open .j-cover {
+  transform: rotateY(-180deg);
+  opacity: 0;
+  pointer-events: none;
+}
+.j-cover-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  color: #f6cf6a;
+  text-shadow: 0 1px 0 rgba(90, 40, 0, 0.6);
+}
+.j-cover-text.top {
+  top: 44px;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 0.28em;
+}
+.j-cover-text.top .j-han {
+  display: block;
+  font-size: 16px;
+  letter-spacing: 0.4em;
+  margin-top: 4px;
+}
+.j-cover-text.bottom {
+  bottom: 40px;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+}
+.j-stamp {
+  position: absolute;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  opacity: 0.9;
+}
+.j-stamp svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.j-stamp.a {
+  right: 16px;
+  top: 52px;
+  width: 150px;
+  height: 150px;
+  transform: rotate(-9deg);
+}
+.j-stamp.b {
+  left: 18px;
+  bottom: 34px;
+  width: 176px;
+  height: 112px;
+  transform: rotate(5deg);
+}
+.j-stamp.a.box {
+  width: 176px;
+  height: 112px;
+}
+.j-stamp.b.round {
+  width: 150px;
+  height: 150px;
+}
+.j-stamp.slam {
+  animation: j-slam 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+@keyframes j-slam {
+  0% {
+    opacity: 0;
+    scale: 2.1;
+  }
+  70% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0.9;
+    scale: 1;
+  }
+}
+.j-slot {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border: 2px dashed rgba(180, 138, 74, 0.55);
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: rgba(180, 138, 74, 0.85);
+}
+.j-slot .j-han {
+  display: block;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+}
+.j-postcard {
+  position: relative;
+  width: 252px;
+  aspect-ratio: 3 / 2;
+  margin: 0 auto;
+  perspective: 900px;
+  cursor: pointer;
+}
+.j-postcard.drop {
+  animation: j-drop 0.7s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+@keyframes j-drop {
+  from {
+    opacity: 0;
+    transform: translateY(60px) rotate(9deg);
+  }
+}
+.j-pc-inner {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.8s cubic-bezier(0.4, 0.1, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.j-postcard.flipped .j-pc-inner {
+  transform: rotateY(180deg);
+}
+.j-pc-front,
+.j-pc-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 6px;
+  box-shadow: 0 10px 18px -10px rgba(40, 20, 0, 0.6);
+}
+.j-pc-front {
+  background: center / cover;
+  border: 5px solid #fbf6ea;
+}
+.j-pc-back {
+  transform: rotateY(180deg);
+  background: #fbf6ea;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  padding: 12px;
+  gap: 10px;
+  color: #3a4a58;
+  text-align: left;
+}
+.j-pc-msg {
+  border-right: 1.5px solid #e2d6bd;
+  padding-right: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+.j-pc-msg .zh {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0a426d;
+  line-height: 1.25;
+}
+.j-pc-msg .py {
+  font-size: 11px;
+  font-weight: 800;
+  color: #2f88d3;
+}
+.j-pc-msg .en {
+  font-size: 11px;
+  font-weight: 700;
+  font-style: italic;
+  color: #8b7f75;
+}
+.j-pc-addr {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-bottom: 6px;
+}
+.j-pc-addr i {
+  display: block;
+  border-bottom: 1.5px solid #e2d6bd;
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 800;
+  padding-bottom: 1px;
+}
+.j-postage {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 46px;
+  height: 54px;
+  background: #fff;
+  padding: 4px;
+  -webkit-mask: radial-gradient(circle 2.4px, transparent 97%, #000) -3px -3px / 6px 6px,
+    linear-gradient(#000 0 0) center / calc(100% - 6px) calc(100% - 6px) no-repeat;
+  mask: radial-gradient(circle 2.4px, transparent 97%, #000) -3px -3px / 6px 6px,
+    linear-gradient(#000 0 0) center / calc(100% - 6px) calc(100% - 6px) no-repeat;
+}
+.j-postage div {
+  width: 100%;
+  height: 100%;
+  background: center / cover;
+}
+.j-pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+.j-pager button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  color: #0a426d;
+  font-weight: 900;
+  box-shadow: 0 3px 0 #dcc7a6;
+}
+.j-pager button:disabled {
+  opacity: 0.35;
+}
+.j-pager span {
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #9a7b4c;
+  min-width: 120px;
+}
+
+/* ---------- all aboard: the train crosses a bridge to the next province ---------- */
+.j-aboard {
+  background: #34b1da;
+}
+.j-ab-frame {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  aspect-ratio: 941 / 1672;
+  translate: -50% 0;
+  transform-origin: 50% 40%;
+  will-change: transform;
+}
+.j-ab-img {
+  position: absolute;
+  inset: 0;
+  background: center / cover;
+}
+.j-ab-water {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 60%;
+  height: 40%;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0) 0 14px, rgba(255, 255, 255, 0.18) 14px 16px);
+  animation: j-shimmer 3s ease-in-out infinite alternate;
+  mix-blend-mode: soft-light;
+}
+@keyframes j-shimmer {
+  to {
+    transform: translateY(6px);
+    opacity: 0.6;
+  }
+}
+.j-ab-train {
+  left: -90%;
+  top: 27.8%;
+  width: 78.3%;
+}
+/* The trip card is a train ticket: stub, notches, perforation, route and seat. */
+.j-ticket-wrap {
+  position: absolute;
+  left: 50%;
+  width: min(360px, calc(100% - 28px));
+  bottom: calc(30px + env(safe-area-inset-bottom));
+  translate: -50% 0;
+  filter: drop-shadow(0 16px 18px rgba(8, 40, 70, 0.45));
+  transform: translateY(80px) rotate(-4deg);
+  opacity: 0;
+  transition: transform 0.7s cubic-bezier(0.2, 1.2, 0.4, 1), opacity 0.4s;
+}
+.j-ticket-wrap.on {
+  transform: none;
+  opacity: 1;
+}
+.j-ticket {
+  display: flex;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fbf3dc center / 170% auto;
+  -webkit-mask: radial-gradient(circle 11px at calc(100% - 92px) 0, #0000 97%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle 11px at calc(100% - 92px) 100%, #0000 97%, #000) bottom / 100% 51% no-repeat;
+  mask: radial-gradient(circle 11px at calc(100% - 92px) 0, #0000 97%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle 11px at calc(100% - 92px) 100%, #0000 97%, #000) bottom / 100% 51% no-repeat;
+  text-align: left;
+}
+.j-tk-main {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.j-tk-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 7px 14px 6px;
+  background: #9e1b24;
+  color: #f6cf6a;
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+.j-tk-route {
+  display: grid;
+  grid-template-columns: 0.8fr 34px 1.3fr;
+  align-items: end;
+  padding: 10px 14px 0;
+  color: #0a426d;
+}
+.j-tk-route small,
+.j-tk-meta small {
+  display: block;
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  color: #a08560;
+}
+.j-tk-route b {
+  display: block;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+.j-tk-route .j-han {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #d21034;
+}
+.j-tk-route .to {
+  text-align: right;
+}
+.j-tk-line {
+  position: relative;
+  margin: 12px 20px;
+  height: 4px;
+  background: repeating-linear-gradient(90deg, #cdb68c 0 7px, transparent 7px 11px);
+}
+.j-tk-line > i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: #d21034;
+  border-radius: 4px;
+}
+.j-tk-line .st {
+  position: absolute;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%;
+  background: #fbf3dc;
+  border: 3px solid #d21034;
+}
+.j-tk-line .st.b {
+  left: 100%;
+  border-color: #cdb68c;
+}
+.j-tk-me {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: 50%;
+  background: #fff6dd;
+  border: 2.5px solid #fff;
+  box-shadow: 0 3px 8px -3px rgba(0, 0, 0, 0.5);
+}
+.j-tk-me .j-face {
+  width: 100%;
+  height: 100%;
+}
+.j-tk-meta {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 14px 10px;
+  border-top: 1.5px dashed #dcc9a4;
+}
+.j-tk-meta span {
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #0a426d;
+}
+.j-tk-stub {
+  position: relative;
+  width: 92px;
+  flex: none;
+  border-left: 2px dashed rgba(246, 207, 106, 0.6);
+  background: #9e1b24;
+  color: #f6cf6a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 0;
+  text-align: center;
+}
+.j-tk-zh {
+  font-size: 30px;
+  font-weight: 900;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+.j-tk-py {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff3cf;
+}
+.j-tk-en {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.j-tk-punch {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #2a8fc0;
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.45);
+  transform: scale(0);
+  transition: transform 0.25s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+.j-tk-punch.on {
+  transform: scale(1);
+}
+.j-tk-arrived {
+  position: absolute;
+  left: 66px;
+  top: 46px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid rgba(210, 16, 52, 0.85);
+  box-shadow: inset 0 0 0 4px #fbf3dc, inset 0 0 0 5.5px rgba(210, 16, 52, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(210, 16, 52, 0.9);
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transform: scale(2) rotate(-24deg);
+  pointer-events: none;
+}
+.j-tk-arrived .j-han {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+}
+.j-tk-arrived small {
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  margin-top: 3px;
+}
+.j-tk-arrived.on {
+  animation: j-punch-stamp 0.4s cubic-bezier(0.3, 1.5, 0.5, 1) forwards;
+}
+@keyframes j-punch-stamp {
+  to {
+    opacity: 0.92;
+    transform: scale(1) rotate(-14deg);
+  }
+}
+
+/* ---------- traveller picker ---------- */
+.j-sheet-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 58;
+  background: rgba(6, 30, 50, 0.35);
+}
+.j-sheet {
+  position: fixed;
+  z-index: 59;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0 auto;
+  max-width: 480px;
+  background: #fff;
+  border-radius: 26px 26px 0 0;
+  padding: 18px 16px calc(26px + env(safe-area-inset-bottom));
+  color: #0a426d;
+}
+.j-sheet h3 {
+  margin: 0 0 2px;
+  font-size: 18px;
+  font-weight: 900;
+}
+.j-sheet p {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #8b7f75;
+}
+.j-picks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.j-pick {
+  border: 2.5px solid #e3ebf1;
+  background: #f8fbfd;
+  border-radius: 18px;
+  padding: 8px 4px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.j-pick.on {
+  border-color: #f2c14e;
+  background: #fff6dd;
+}
+.j-pick .j-face {
+  width: 56px;
+  height: 56px;
+  background: #fff;
+}
+.j-pick b {
+  font-size: 12px;
+  font-weight: 900;
+}
+.j-pick span {
+  font-size: 12px;
+  color: #d21034;
+}
