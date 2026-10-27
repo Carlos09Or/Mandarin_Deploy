@@ -4,13 +4,13 @@ import { DAILY_GOAL, GEMS, learnedWords, liveStreak, resetProgress, today, usePr
 import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
 import { CharacterStudio } from '../components/CharacterStudio'
 
-const DAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 // Ideas only: each teacher will choose which rewards exist in their class.
 const REWARD_IDEAS = [
-  { title: 'Punto extra en un quiz', cost: 300 },
-  { title: 'Pista en la evaluación oral', cost: 200 },
-  { title: 'Elegir el tema de la próxima práctica', cost: 100 },
+  { title: 'An extra point on a quiz', cost: 300 },
+  { title: 'A hint in the oral exam', cost: 200 },
+  { title: 'Choose the next practice topic', cost: 100 },
 ]
 
 export function Profile() {
@@ -28,23 +28,23 @@ export function Profile() {
   const max = Math.max(DAILY_GOAL, ...week.map((d) => d.xp))
 
   const stats = [
-    { value: liveStreak(p), label: 'Días de racha', icon: <IconFlame className="h-7 w-7 text-brand" /> },
-    { value: p.xp, label: 'XP total', icon: <IconStar className="h-7 w-7 text-gold" /> },
-    { value: `${learnedWords(p).length}/${WORDS.length}`, label: 'Palabras', icon: <span className="han text-2xl text-sky">词</span> },
+    { value: liveStreak(p), label: 'Day streak', icon: <IconFlame className="h-7 w-7 text-brand" /> },
+    { value: p.xp, label: 'Total XP', icon: <IconStar className="h-7 w-7 text-gold" /> },
+    { value: `${learnedWords(p).length}/${WORDS.length}`, label: 'Words', icon: <span className="han text-2xl text-sky">词</span> },
     {
       value: `${PATH.filter((n) => p.nodes[n.id]).length}/${PATH.length}`,
-      label: 'Lecciones',
+      label: 'Lessons',
       icon: <span className="han text-2xl text-jade">课</span>,
     },
-    { value: Object.keys(p.chars).length, label: 'Caracteres escritos', icon: <span className="han text-2xl text-jade">写</span> },
-    { value: total ? `${Math.round((right / total) * 100)}%` : '—', label: 'Precisión', icon: <span className="han text-2xl text-gold-dark">准</span> },
+    { value: Object.keys(p.chars).length, label: 'Characters written', icon: <span className="han text-2xl text-jade">写</span> },
+    { value: total ? `${Math.round((right / total) * 100)}%` : '—', label: 'Accuracy', icon: <span className="han text-2xl text-gold-dark">准</span> },
   ]
 
   const download = () => {
     const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = `mandarin-progreso-${today()}.json`
+    a.download = `mandarin-progress-${today()}.json`
     a.click()
     URL.revokeObjectURL(a.href)
   }
@@ -54,7 +54,7 @@ export function Profile() {
       <CharacterStudio />
 
       <section>
-        <h2 className="mb-4 text-2xl font-black">Estadísticas</h2>
+        <h2 className="mb-4 text-2xl font-black">Stats</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {stats.map((s) => (
             <div key={s.label} className="card flex items-center gap-3 p-4">
@@ -73,14 +73,14 @@ export function Profile() {
           <IconGem className="h-14 w-14 shrink-0" />
           <div className="flex-1">
             <p className="text-3xl leading-none font-black text-sky-dark">{p.gems}</p>
-            <p className="mt-1 font-bold text-sky-dark">gemas</p>
+            <p className="mt-1 font-bold text-sky-dark">gems</p>
           </div>
-          <span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-sky-dark">Próximamente</span>
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-sky-dark">Coming soon</span>
         </div>
         <div className="flex flex-col gap-3 p-5">
-          <h3 className="font-black">Recompensas de clase</h3>
+          <h3 className="font-black">Class rewards</h3>
           <p className="text-sm text-muted">
-            Tu profesor decidirá qué se puede canjear con gemas en su curso. Algunas ideas:
+            Your teacher will decide what gems can be traded for in their course. Some ideas:
           </p>
           {REWARD_IDEAS.map((r) => (
             <div key={r.title} className="flex items-center gap-3 rounded-2xl border-2 border-line px-4 py-3">
@@ -92,14 +92,14 @@ export function Profile() {
             </div>
           ))}
           <p className="text-xs text-muted">
-            Ganas {GEMS.lesson} gemas por lección, {GEMS.perfect} más si no tienes errores y {GEMS.dailyGoal} al cumplir
-            tu meta diaria.
+            You earn {GEMS.lesson} gems per lesson, {GEMS.perfect} more with no mistakes, and {GEMS.dailyGoal} for reaching
+            your daily goal.
           </p>
         </div>
       </section>
 
       <section className="card p-5">
-        <h3 className="font-black">Últimos 7 días</h3>
+        <h3 className="font-black">Last 7 days</h3>
         <div className="mt-4 flex h-36 items-end gap-2">
           {week.map((d, i) => (
             <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
@@ -112,18 +112,18 @@ export function Profile() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-sm text-muted">Meta diaria: {DAILY_GOAL} XP (unas 3 lecciones).</p>
+        <p className="mt-3 text-sm text-muted">Daily goal: {DAILY_GOAL} XP (about 3 lessons).</p>
       </section>
 
       <section className="card flex flex-col gap-3 p-5">
-        <h3 className="font-black">Tus datos</h3>
+        <h3 className="font-black">Your data</h3>
         <p className="text-sm text-muted">
-          Tu progreso se guarda en este dispositivo. Pronto podrás crear una cuenta para sincronizarlo y unirte a la clase
-          de tu profesor.
+          Your progress is saved on this device. Soon you’ll be able to create an account to sync it and join your
+          teacher’s class.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <button type="button" onClick={download} className="btn btn-ghost flex-1">
-            Descargar mis datos
+            Download my data
           </button>
           {confirm ? (
             <button
@@ -134,11 +134,11 @@ export function Profile() {
               }}
               className="btn btn-wrong flex-1"
             >
-              Sí, borrar todo
+              Yes, erase everything
             </button>
           ) : (
             <button type="button" onClick={() => setConfirm(true)} className="btn btn-ghost flex-1 text-wrong">
-              Reiniciar progreso
+              Reset progress
             </button>
           )}
         </div>

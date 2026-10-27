@@ -46,7 +46,7 @@ function Body({ n, onClose, onWrite }: { n: number } & Omit<Props, 'n'>) {
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between">
         <span className="rounded-full bg-line px-3 py-1 text-xs font-extrabold text-muted">HSK 1 · #{w.n}</span>
-        <button type="button" onClick={onClose} aria-label="Cerrar" className="text-muted">
+        <button type="button" onClick={onClose} aria-label="Close" className="text-muted">
           <IconClose />
         </button>
       </div>
@@ -57,11 +57,7 @@ function Body({ n, onClose, onWrite }: { n: number } & Omit<Props, 'n'>) {
           <AudioButton text={w.hanzi} />
           <AudioButton text={w.hanzi} slow />
         </div>
-        <p className="mt-2 text-2xl font-extrabold">{w.es}</p>
-        <p className="text-sm text-muted">
-          <span className="mr-1 rounded bg-line px-1 text-[10px] font-extrabold">EN</span>
-          {w.en}
-        </p>
+        <p className="mt-2 text-2xl font-extrabold">{w.en}</p>
       </div>
       <p className="rounded-2xl bg-paper p-4 text-sm leading-relaxed text-ink/80">{w.note}</p>
       <div className="flex items-start gap-3 rounded-2xl border-2 border-line p-4">
@@ -85,12 +81,12 @@ function Body({ n, onClose, onWrite }: { n: number } & Omit<Props, 'n'>) {
                     {RADICALS[info.radical] ? ` · ${RADICALS[info.radical]}` : ''}
                   </>
                 ) : (
-                  'Carácter'
+                  'Character'
                 )}
               </p>
               {onWrite && (
                 <button type="button" className="btn btn-jade px-3 py-2 text-xs" onClick={() => onWrite(c, n)}>
-                  Escribir
+                  Write
                 </button>
               )}
             </div>

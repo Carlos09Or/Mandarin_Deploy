@@ -5,10 +5,10 @@ import { IconBrush, IconFlame, IconGem, IconPath, IconReview, IconStar, IconUser
 export type Tab = 'learn' | 'review' | 'write' | 'profile'
 
 const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
-  { id: 'learn', label: 'Aprender', icon: <IconPath /> },
-  { id: 'review', label: 'Repasar', icon: <IconReview /> },
-  { id: 'write', label: 'Escribir', icon: <IconBrush /> },
-  { id: 'profile', label: 'Perfil', icon: <IconUser /> },
+  { id: 'learn', label: 'Learn', icon: <IconPath /> },
+  { id: 'review', label: 'Review', icon: <IconReview /> },
+  { id: 'write', label: 'Write', icon: <IconBrush /> },
+  { id: 'profile', label: 'Profile', icon: <IconUser /> },
 ]
 
 type Props = { tab: Tab; onTab: (t: Tab) => void; children: ReactNode }
@@ -21,19 +21,19 @@ export function Shell({ tab, onTab, children }: Props) {
 
   const stats = (
     <div className="flex items-center gap-3 text-[15px] font-black sm:gap-4">
-      <span className={`flex items-center gap-1 ${streak ? 'text-brand' : 'text-muted/60'}`} title="Días de racha">
+      <span className={`flex items-center gap-1 ${streak ? 'text-brand' : 'text-muted/60'}`} title="Day streak">
         <IconFlame className="h-6 w-6" />
         {streak}
       </span>
-      <span className="flex items-center gap-1 text-gold-dark" title="XP total">
+      <span className="flex items-center gap-1 text-gold-dark" title="Total XP">
         <IconStar className="h-6 w-6 text-gold" />
         {p.xp}
       </span>
-      <span className="flex items-center gap-1 text-sky-dark" title="Gemas">
+      <span className="flex items-center gap-1 text-sky-dark" title="Gems">
         <IconGem className="h-6 w-6" />
         {p.gems}
       </span>
-      <span className="flex items-center gap-1.5 text-jade-dark" title={`Meta diaria: ${xpToday}/${DAILY_GOAL} XP`}>
+      <span className="flex items-center gap-1.5 text-jade-dark" title={`Daily goal: ${xpToday}/${DAILY_GOAL} XP`}>
         <svg viewBox="0 0 36 36" className="h-7 w-7 -rotate-90">
           <circle cx="18" cy="18" r="14" fill="none" stroke="var(--color-line)" strokeWidth="5" />
           <circle
@@ -62,7 +62,7 @@ export function Shell({ tab, onTab, children }: Props) {
           <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className="h-10 w-10" />
           <div className="leading-tight">
             <p className="font-black">Mandarin Hub</p>
-            <p className="text-xs font-bold text-muted">HSK 1 · gratis</p>
+            <p className="text-xs font-bold text-muted">HSK 1 · free</p>
           </div>
         </div>
         {TABS.map((t) => (

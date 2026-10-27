@@ -4,7 +4,7 @@ import type { Progress } from './progress'
 // A lesson mixes skills the way a class would: meet a word, recognise it, hear it,
 // produce it, then write one of its characters. Earlier words come back for review.
 
-export type ChoicePrompt = 'hanzi-es' | 'es-hanzi' | 'audio-hanzi' | 'hanzi-pinyin'
+export type ChoicePrompt = 'hanzi-en' | 'en-hanzi' | 'audio-hanzi' | 'hanzi-pinyin'
 export type Exercise =
   | { kind: 'intro'; word: number }
   | { kind: 'choice'; prompt: ChoicePrompt; word: number; options: number[] }
@@ -30,7 +30,7 @@ function distractors(target: number, prompt: ChoicePrompt): number[] {
   const clash = (n: number) => {
     const w = word(n)
     if (n === target || w.hanzi === t.hanzi) return true
-    if (prompt === 'hanzi-es' || prompt === 'es-hanzi') return w.es === t.es
+    if (prompt === 'hanzi-en' || prompt === 'en-hanzi') return w.en === t.en
     // Homophones like 他/她 would make listening and pinyin questions unanswerable.
     return plainPinyin(w.pinyin) === plainPinyin(t.pinyin)
   }
@@ -43,7 +43,7 @@ export function choice(n: number, prompt: ChoicePrompt): Exercise {
   return { kind: 'choice', prompt, word: n, options: shuffle([n, ...distractors(n, prompt)]) }
 }
 
-const ROTATION: ChoicePrompt[] = ['es-hanzi', 'audio-hanzi', 'hanzi-pinyin']
+const ROTATION: ChoicePrompt[] = ['en-hanzi', 'audio-hanzi', 'hanzi-pinyin']
 
 /** Learned words that most need another look: often missed, or not seen for a while. */
 export function weakestWords(p: Progress, pool: number[], count: number): number[] {
@@ -92,7 +92,7 @@ function lessonExercises(node: PathNode, p: Progress): Exercise[] {
   const seq: Exercise[] = []
   for (const n of fresh) {
     seq.push({ kind: 'intro', word: n })
-    seq.push(choice(n, 'hanzi-es'))
+    seq.push(choice(n, 'hanzi-en'))
   }
   seq.push({ kind: 'match', words: fresh })
 
@@ -114,7 +114,7 @@ function lessonExercises(node: PathNode, p: Progress): Exercise[] {
 
 function reviewExercises(pool: number[], p: Progress, size: number, sentences: number): Exercise[] {
   const picked = weakestWords(p, pool, size)
-  const seq: Exercise[] = picked.map((n, i) => choice(n, (['hanzi-es', ...ROTATION] as ChoicePrompt[])[i % 4]))
+  const seq: Exercise[] = picked.map((n, i) => choice(n, (['hanzi-en', ...ROTATION] as ChoicePrompt[])[i % 4]))
   if (picked.length >= 5) seq.splice(Math.min(4, seq.length), 0, { kind: 'match', words: picked.slice(0, 5) })
   for (const t of charsToTrace(picked, p, 2)) seq.push({ kind: 'trace', char: t.char, word: t.word, guided: false })
 

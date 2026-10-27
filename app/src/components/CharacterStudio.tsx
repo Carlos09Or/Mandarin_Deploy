@@ -5,19 +5,19 @@ import { Buddy } from './Friends'
 import type { Mood } from './Mascot'
 
 const MOODS: { id: Mood; label: string; wawaOnly?: boolean }[] = [
-  { id: 'idle', label: 'Tranquilo' },
-  { id: 'wave', label: 'Saluda', wawaOnly: true },
-  { id: 'happy', label: 'Acierto' },
-  { id: 'sad', label: 'Fallo' },
-  { id: 'celebrate', label: 'Celebra' },
-  { id: 'fire', label: 'Racha', wawaOnly: true },
+  { id: 'idle', label: 'Calm' },
+  { id: 'wave', label: 'Wave', wawaOnly: true },
+  { id: 'happy', label: 'Correct' },
+  { id: 'sad', label: 'Wrong' },
+  { id: 'celebrate', label: 'Celebrate' },
+  { id: 'fire', label: 'Streak', wawaOnly: true },
 ]
 
 const BLURB: Record<FriendId, string> = {
-  wawa: 'La rana dorada de Panamá, símbolo de buena suerte aquí y en China.',
-  harpia: 'El ave nacional de Panamá, lista para el desfile de noviembre.',
-  sloth: 'Vive colgado en los árboles del Darién y nunca tiene prisa.',
-  tucan: 'El tucán pico iris, el más colorido del bosque panameño.',
+  wawa: 'Panama’s golden frog, a symbol of good luck here and in China.',
+  harpia: 'Panama’s national bird, ready for the November parades.',
+  sloth: 'Hangs out in the trees of the Darién and is never in a hurry.',
+  tucan: 'The keel-billed toucan, the most colorful bird in Panama’s forests.',
 }
 
 /** Pick a character, preview every pose, and choose what they wear. */
@@ -57,7 +57,7 @@ export function CharacterStudio() {
           {FRIENDS[who].name} <span className="text-gold-dark">{FRIENDS[who].hanzi}</span>
         </p>
         <p className="text-sm font-bold text-muted">
-          {FRIENDS[who].es} · <span className="han text-sky-dark">{FRIENDS[who].meaning}</span>
+          {FRIENDS[who].kind} · <span className="han text-sky-dark">{FRIENDS[who].meaning}</span>
         </p>
         <p className="text-center text-sm text-muted">{BLURB[who]}</p>
       </div>
@@ -88,8 +88,8 @@ export function CharacterStudio() {
         >
           <Buddy id={who} outfit={today} size={56} />
           <span className="flex-1">
-            <span className="block font-extrabold">Automática</span>
-            <span className="block text-sm text-muted">Cambia de ropa cada día · hoy: {OUTFIT_LABELS[today]}</span>
+            <span className="block font-extrabold">Automatic</span>
+            <span className="block text-sm text-muted">New outfit every day · today: {OUTFIT_LABELS[today]}</span>
           </span>
         </button>
         <div className="grid grid-cols-3 gap-2">

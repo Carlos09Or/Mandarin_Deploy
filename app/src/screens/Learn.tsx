@@ -46,7 +46,7 @@ export function Learn({ onStart }: Props) {
             >
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-extrabold tracking-widest uppercase opacity-85">
-                  Unidad {unit.id} · {doneCount}/{nodes.length}
+                  Unit {unit.id} · {doneCount}/{nodes.length}
                 </p>
                 <h2 className="mt-0.5 text-xl leading-tight font-black sm:text-2xl">{unit.title}</h2>
                 <p className="mt-1 text-sm leading-snug opacity-90">{unit.description}</p>
@@ -90,7 +90,7 @@ export function Learn({ onStart }: Props) {
                           animate={{ y: [0, -4, 0] }}
                           transition={{ repeat: Infinity, duration: 1.6 }}
                         >
-                          {done ? 'Repasar' : 'Empezar'}
+                          {done ? 'Review' : 'Start'}
                           <span className="absolute -bottom-[7px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-r-2 border-b-2 border-line bg-card" />
                         </motion.div>
                       )}
@@ -111,7 +111,7 @@ export function Learn({ onStart }: Props) {
                       <button
                         type="button"
                         onClick={() => setOpen(isOpen ? null : node.id)}
-                        aria-label={`${node.kind === 'checkpoint' ? 'Repaso de unidad' : `Lección ${node.index + 1}`}${locked ? ' (bloqueada)' : ''}`}
+                        aria-label={`${node.kind === 'checkpoint' ? 'Unit review' : `Lesson ${node.index + 1}`}${locked ? ' (locked)' : ''}`}
                         className={`relative flex items-center justify-center rounded-full transition-transform duration-75 active:translate-y-[4px] ${
                           node.kind === 'checkpoint' ? 'h-[84px] w-[84px]' : 'h-[72px] w-[72px]'
                         }`}
@@ -172,7 +172,7 @@ type CardProps = { node: PathNode; locked: boolean; done: boolean; color: string
 
 function NodeCard({ node, locked, done, color, dark, onStart }: CardProps) {
   const lessons = nodesOfUnit(node.unitId).filter((n) => n.kind === 'lesson').length
-  const title = node.kind === 'checkpoint' ? 'Repaso de la unidad' : `Lección ${node.index + 1} de ${lessons}`
+  const title = node.kind === 'checkpoint' ? 'Unit review' : `Lesson ${node.index + 1} of ${lessons}`
   const preview = node.kind === 'checkpoint' ? node.words.slice(0, 8) : node.words
   return (
     <div className="mt-5 rounded-3xl p-4 text-white" style={{ background: color }}>
@@ -187,10 +187,10 @@ function NodeCard({ node, locked, done, color, dark, onStart }: CardProps) {
       </div>
       <p className="mt-2 text-sm opacity-90">
         {locked
-          ? 'Completa las lecciones anteriores para desbloquearla.'
+          ? 'Finish the previous lessons to unlock it.'
           : node.kind === 'checkpoint'
-            ? 'Repasa las palabras que más te cuestan de toda la unidad.'
-            : '5 palabras nuevas, su sonido y un carácter para escribir.'}
+            ? 'Review the words you find hardest across the whole unit.'
+            : '5 new words, their sounds, and a character to write.'}
       </p>
       <button
         type="button"
@@ -199,7 +199,7 @@ function NodeCard({ node, locked, done, color, dark, onStart }: CardProps) {
         className="btn mt-4 w-full bg-white disabled:bg-white/40 disabled:text-white"
         style={{ color, boxShadow: locked ? 'none' : `0 4px 0 ${dark}` }}
       >
-        {locked ? 'Bloqueada' : done ? 'Repasar · +10 XP' : 'Empezar · +10 XP'}
+        {locked ? 'Locked' : done ? 'Review · +10 XP' : 'Start · +10 XP'}
       </button>
     </div>
   )

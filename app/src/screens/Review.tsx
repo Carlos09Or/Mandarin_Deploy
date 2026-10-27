@@ -25,7 +25,7 @@ export function Review({ onReview, onWrite }: Props) {
     if (!q) return pool
     const qp = plainPinyin(q)
     return pool.filter(
-      (w) => w.hanzi.includes(q) || w.es.toLowerCase().includes(q) || (qp && plainPinyin(w.pinyin).startsWith(qp)),
+      (w) => w.hanzi.includes(q) || w.en.toLowerCase().includes(q) || (qp && plainPinyin(w.pinyin).startsWith(qp)),
     )
   }, [scope, query, learned.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -36,11 +36,11 @@ export function Review({ onReview, onWrite }: Props) {
           复
         </div>
         <div className="flex-1">
-          <h2 className="text-xl font-black">Repaso inteligente</h2>
+          <h2 className="text-xl font-black">Smart review</h2>
           <p className="text-muted">
             {learned.length >= MIN_WORDS
-              ? `Practica las palabras que más te cuestan entre tus ${learned.length} aprendidas.`
-              : 'Completa tu primera lección para desbloquear el repaso.'}
+              ? `Practice the hardest of your ${learned.length} learned words.`
+              : 'Finish your first lesson to unlock review.'}
           </p>
         </div>
         <button
@@ -49,13 +49,13 @@ export function Review({ onReview, onWrite }: Props) {
           onClick={() => onReview(learned)}
           className="btn btn-primary sm:w-40"
         >
-          Repasar
+          Review
         </button>
       </section>
 
       {weak.length > 0 && (
         <section>
-          <h3 className="mb-3 text-sm font-extrabold tracking-widest text-muted uppercase">Para reforzar</h3>
+          <h3 className="mb-3 text-sm font-extrabold tracking-widest text-muted uppercase">Needs practice</h3>
           <div className="flex flex-wrap gap-2">
             {weak.map((n) => (
               <button
@@ -65,7 +65,7 @@ export function Review({ onReview, onWrite }: Props) {
                 className="tile flex items-baseline gap-2 border-wrong/30 px-3 py-2"
               >
                 <span className="han text-xl">{word(n).hanzi}</span>
-                <span className="text-sm text-muted">{word(n).es}</span>
+                <span className="text-sm text-muted">{word(n).en}</span>
               </button>
             ))}
           </div>
@@ -74,7 +74,7 @@ export function Review({ onReview, onWrite }: Props) {
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-2xl font-black">Diccionario</h3>
+          <h3 className="text-2xl font-black">Dictionary</h3>
           <div className="flex rounded-2xl border-2 border-line bg-card p-1 text-sm font-extrabold">
             {(['learned', 'all'] as const).map((s) => (
               <button
@@ -83,7 +83,7 @@ export function Review({ onReview, onWrite }: Props) {
                 onClick={() => setScope(s)}
                 className={`flex-1 rounded-xl px-4 py-2 ${scope === s ? 'bg-sky-soft text-sky-dark' : 'text-muted'}`}
               >
-                {s === 'learned' ? `Aprendidas (${learned.length})` : 'Todas (300)'}
+                {s === 'learned' ? `Learned (${learned.length})` : 'All (300)'}
               </button>
             ))}
           </div>
@@ -92,12 +92,12 @@ export function Review({ onReview, onWrite }: Props) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Busca por hanzi, pinyin o español"
+          placeholder="Search by hanzi, pinyin or English"
           className="w-full rounded-2xl border-2 border-line bg-card px-4 py-3 text-base outline-none focus:border-sky"
         />
         {list.length === 0 ? (
           <p className="py-8 text-center text-muted">
-            {scope === 'learned' && !query ? 'Aún no has aprendido palabras. ¡Empieza tu primera lección!' : 'Sin resultados.'}
+            {scope === 'learned' && !query ? 'You haven’t learned any words yet. Start your first lesson!' : 'No results.'}
           </p>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -114,11 +114,11 @@ export function Review({ onReview, onWrite }: Props) {
                   <AudioButton text={w.hanzi} size="sm" />
                 </span>
                 {!learnedSet.has(w.n) && scope === 'all' && (
-                  <span className="absolute top-2 left-2 h-2 w-2 rounded-full bg-line-dark" title="Aún no aprendida" />
+                  <span className="absolute top-2 left-2 h-2 w-2 rounded-full bg-line-dark" title="Not learned yet" />
                 )}
                 <span className="han text-4xl">{w.hanzi}</span>
                 <span className="text-sm font-bold text-sky-dark">{w.pinyin}</span>
-                <span className="line-clamp-2 text-sm leading-tight">{w.es}</span>
+                <span className="line-clamp-2 text-sm leading-tight">{w.en}</span>
               </div>
             ))}
           </div>

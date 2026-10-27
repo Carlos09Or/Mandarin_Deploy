@@ -142,7 +142,7 @@ export function Sentence({ ex, order, onOrder, revealed }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <h2 className="text-2xl font-extrabold">Escucha y ordena la frase</h2>
+      <h2 className="text-2xl font-extrabold">Listen and build the sentence</h2>
 
       <div className="flex items-center gap-4">
         <AudioButton text={w.example.hanzi} size="lg" />
@@ -152,12 +152,11 @@ export function Sentence({ ex, order, onOrder, revealed }: Props) {
           onClick={() => setShowHint(!showHint)}
           className="ml-auto rounded-xl px-3 py-2 text-sm font-extrabold text-sky-dark hover:bg-sky-soft"
         >
-          {showHint ? 'Ocultar pista' : 'Ver pista'}
+          {showHint ? 'Hide hint' : 'Show hint'}
         </button>
       </div>
       {showHint && (
         <p className="-mt-2 rounded-2xl bg-sky-soft px-4 py-2.5 text-sm text-sky-dark">
-          <span className="mr-1 rounded bg-white px-1 text-[10px] font-extrabold">EN</span>
           {w.example.en}
         </p>
       )}

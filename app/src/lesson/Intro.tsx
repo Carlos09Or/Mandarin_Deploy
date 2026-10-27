@@ -14,7 +14,7 @@ export function Intro({ n }: { n: number }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-sm font-extrabold tracking-widest text-brand uppercase">Palabra nueva</p>
+      <p className="text-sm font-extrabold tracking-widest text-brand uppercase">New word</p>
       <div className="card flex flex-col items-center gap-3 px-6 pt-7 pb-6 text-center">
         <div className="flex items-center gap-4">
           <span className="han text-7xl font-medium sm:text-8xl">{w.hanzi}</span>
@@ -24,7 +24,7 @@ export function Intro({ n }: { n: number }) {
           <AudioButton text={w.hanzi} />
           <AudioButton text={w.hanzi} slow />
         </div>
-        <p className="mt-1 text-2xl font-extrabold">{w.es}</p>
+        <p className="mt-1 text-2xl font-extrabold">{w.en}</p>
       </div>
 
       <div className="card px-5 py-4">
@@ -33,10 +33,7 @@ export function Intro({ n }: { n: number }) {
           <div className="min-w-0">
             <p className="han text-xl leading-snug">{w.example.hanzi}</p>
             <p className="text-sm font-semibold text-sky-dark">{w.example.pinyin}</p>
-            <p className="text-sm text-muted">
-              <span className="mr-1 rounded bg-line px-1 text-[10px] font-extrabold">EN</span>
-              {w.example.en}
-            </p>
+            <p className="text-sm text-muted">{w.example.en}</p>
           </div>
         </div>
       </div>

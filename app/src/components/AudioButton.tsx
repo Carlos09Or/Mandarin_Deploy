@@ -17,7 +17,7 @@ export function AudioButton({ text, size = 'md', slow = false, label }: Props) {
         e.stopPropagation()
         speak(text, { slow })
       }}
-      aria-label={label ?? (slow ? 'Escuchar despacio' : 'Escuchar')}
+      aria-label={label ?? (slow ? 'Listen slowly' : 'Listen')}
       className={`inline-flex shrink-0 items-center justify-center bg-sky text-white shadow-[0_4px_0_var(--color-sky-dark)] transition-transform duration-75 active:translate-y-[3px] active:shadow-[0_1px_0_var(--color-sky-dark)] ${SIZES[size]}`}
     >
       {slow ? <IconTurtle /> : <IconSpeaker />}

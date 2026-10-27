@@ -58,7 +58,7 @@ export function LessonComplete({ summary, reward, newWords, buddy, onContinue }:
             onClick={() => (i + 1 < steps.length ? setI(i + 1) : onContinue())}
             className="btn btn-primary w-full sm:w-44"
           >
-            {steps[i + 1] === 'reward' ? 'Ver recompensa' : 'Continuar'}
+            {steps[i + 1] === 'reward' ? 'See reward' : 'Continue'}
           </button>
         </div>
       </footer>
@@ -81,8 +81,8 @@ function SummaryStep({
   const mins = Math.floor(summary.durationMs / 60000)
   const secs = Math.round((summary.durationMs % 60000) / 1000)
   const tiles = [
-    { label: 'Precisión', value: `${accuracy}%`, color: 'bg-jade', dark: 'text-jade-dark' },
-    { label: 'Tiempo', value: `${mins}:${String(secs).padStart(2, '0')}`, color: 'bg-sky', dark: 'text-sky-dark' },
+    { label: 'Accuracy', value: `${accuracy}%`, color: 'bg-jade', dark: 'text-jade-dark' },
+    { label: 'Time', value: `${mins}:${String(secs).padStart(2, '0')}`, color: 'bg-sky', dark: 'text-sky-dark' },
     { label: 'XP', value: `+${xp}`, color: 'bg-gold', dark: 'text-gold-dark' },
   ]
 
@@ -106,9 +106,9 @@ function SummaryStep({
       </motion.div>
       <div>
         <h1 className="text-3xl font-black text-gold-dark">
-          {accuracy === 100 ? '¡Lección perfecta!' : '¡Terminaste la lección!'}
+          {accuracy === 100 ? 'Perfect lesson!' : 'Lesson complete!'}
         </h1>
-        <p className="mt-1 text-muted">{accuracy === 100 ? 'Sin un solo error.' : 'Cada repaso te acerca a dominarlas.'}</p>
+        <p className="mt-1 text-muted">{accuracy === 100 ? 'Not a single mistake.' : 'Every review brings you closer to mastering them.'}</p>
       </div>
 
       <div className="grid w-full max-w-md grid-cols-3 gap-3">
@@ -128,12 +128,12 @@ function SummaryStep({
 
       {newWords.length > 0 && (
         <div className="w-full max-w-md">
-          <p className="mb-3 text-sm font-extrabold tracking-widest text-muted uppercase">Palabras nuevas</p>
+          <p className="mb-3 text-sm font-extrabold tracking-widest text-muted uppercase">New words</p>
           <div className="flex flex-wrap justify-center gap-2">
             {newWords.map((n) => (
               <span key={n} className="card flex max-w-32 flex-col items-center rounded-2xl px-3 py-1.5">
                 <span className="han text-xl">{word(n).hanzi}</span>
-                <span className="text-xs leading-tight text-muted">{word(n).es}</span>
+                <span className="text-xs leading-tight text-muted">{word(n).en}</span>
               </span>
             ))}
           </div>
@@ -143,7 +143,7 @@ function SummaryStep({
   )
 }
 
-const WEEK = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+const WEEK = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 function StreakStep({ streak }: { streak: number }) {
   const dailyXp = useProgress().dailyXp
@@ -188,10 +188,10 @@ function StreakStep({ streak }: { streak: number }) {
       </div>
       <div>
         <h1 className="text-3xl font-black text-brand">
-          {streak === 1 ? '¡Empezaste una racha!' : `¡${streak} días de racha!`}
+          {streak === 1 ? 'You started a streak!' : `${streak}-day streak!`}
         </h1>
         <p className="mt-1 text-muted">
-          {streak === 1 ? 'Vuelve mañana para que crezca.' : 'Wāwa está orgullosa. ¡No la rompas mañana!'}
+          {streak === 1 ? 'Come back tomorrow to keep it growing.' : 'Wāwa is proud of you. Don’t break it tomorrow!'}
         </p>
       </div>
       <div className="flex gap-2">
@@ -262,9 +262,9 @@ function RewardStep({ reward }: { reward: Reward }) {
       </div>
 
       <div>
-        <p className="text-sm font-extrabold tracking-widest text-sky-dark uppercase">Recompensa</p>
+        <p className="text-sm font-extrabold tracking-widest text-sky-dark uppercase">Reward</p>
         <p className="text-5xl font-black text-sky-dark">+{shown}</p>
-        <p className="font-bold text-muted">gemas</p>
+        <p className="font-bold text-muted">gems</p>
       </div>
 
       <div className="w-full max-w-xs overflow-hidden rounded-2xl border-2 border-line bg-card text-left">
@@ -285,8 +285,8 @@ function RewardStep({ reward }: { reward: Reward }) {
       </div>
 
       <p className="max-w-xs text-sm text-muted">
-        Tienes <b className="text-sky-dark">{total} gemas</b>. Pronto podrás canjearlas por beneficios que active tu
-        profesor.
+        You have <b className="text-sky-dark">{total} gems</b>. Soon you’ll be able to trade them for rewards your
+        teacher sets up.
       </p>
     </>
   )

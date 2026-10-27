@@ -15,8 +15,8 @@ export default defineConfig({
       manifest: {
         name: 'Mandarin Learning Hub · HSK 1',
         short_name: 'Mandarin Hub',
-        description: 'Aprende mandarín HSK 1 gratis: lecciones, escritura de hanzi y repaso.',
-        lang: 'es',
+        description: 'Learn HSK 1 Mandarin for free: lessons, hanzi writing and review.',
+        lang: 'en',
         theme_color: '#e0453a',
         background_color: '#fbf7f0',
         display: 'standalone',

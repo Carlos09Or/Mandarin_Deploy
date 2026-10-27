@@ -13,18 +13,18 @@ type Props = {
 }
 
 const QUESTION = {
-  'hanzi-es': '¿Qué significa?',
-  'es-hanzi': 'Elige el hanzi correcto',
-  'audio-hanzi': '¿Qué escuchas?',
-  'hanzi-pinyin': '¿Cómo se pronuncia?',
+  'hanzi-en': 'What does it mean?',
+  'en-hanzi': 'Choose the right hanzi',
+  'audio-hanzi': 'What do you hear?',
+  'hanzi-pinyin': 'How is it pronounced?',
 }
 
 export function Choice({ ex, selected, onSelect, revealed }: Props) {
   const w = word(ex.word)
-  const hanziOptions = ex.prompt === 'es-hanzi' || ex.prompt === 'audio-hanzi'
+  const hanziOptions = ex.prompt === 'en-hanzi' || ex.prompt === 'audio-hanzi'
 
   useEffect(() => {
-    if (ex.prompt === 'audio-hanzi' || ex.prompt === 'hanzi-es') {
+    if (ex.prompt === 'audio-hanzi' || ex.prompt === 'hanzi-en') {
       const t = setTimeout(() => speak(w.hanzi), 250)
       return () => clearTimeout(t)
     }
@@ -44,7 +44,7 @@ export function Choice({ ex, selected, onSelect, revealed }: Props) {
     const o = word(n)
     if (hanziOptions) return <span className="han text-4xl sm:text-5xl">{o.hanzi}</span>
     if (ex.prompt === 'hanzi-pinyin') return <span className="text-xl font-bold">{o.pinyin}</span>
-    return <span className="text-lg font-bold">{o.es}</span>
+    return <span className="text-lg font-bold">{o.en}</span>
   }
 
   const stateClass = (n: number) => {
@@ -64,11 +64,11 @@ export function Choice({ ex, selected, onSelect, revealed }: Props) {
             <AudioButton text={w.hanzi} size="lg" />
             <AudioButton text={w.hanzi} slow />
           </div>
-        ) : ex.prompt === 'es-hanzi' ? (
-          <p className="card px-6 py-5 text-center text-3xl font-extrabold">«{w.es}»</p>
+        ) : ex.prompt === 'en-hanzi' ? (
+          <p className="card px-6 py-5 text-center text-3xl font-extrabold">“{w.en}”</p>
         ) : (
           <div className="flex items-center gap-4">
-            {ex.prompt === 'hanzi-es' && <AudioButton text={w.hanzi} />}
+            {ex.prompt === 'hanzi-en' && <AudioButton text={w.hanzi} />}
             <span className="han text-7xl font-medium sm:text-8xl">{w.hanzi}</span>
           </div>
         )}
@@ -82,7 +82,7 @@ export function Choice({ ex, selected, onSelect, revealed }: Props) {
             disabled={revealed}
             onClick={() => {
               onSelect(n)
-              if (ex.prompt === 'es-hanzi') speak(word(n).hanzi)
+              if (ex.prompt === 'en-hanzi') speak(word(n).hanzi)
             }}
             className={`tile relative flex items-center justify-center px-4 ${hanziOptions ? 'min-h-24' : 'min-h-16'} ${stateClass(n)}`}
           >

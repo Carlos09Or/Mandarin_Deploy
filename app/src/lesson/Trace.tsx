@@ -98,9 +98,9 @@ export function Trace({ char, n, guided, onDone }: Props) {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h2 className="text-2xl font-extrabold">{guided ? 'Traza el carácter' : 'Escríbelo de memoria'}</h2>
+        <h2 className="text-2xl font-extrabold">{guided ? 'Trace the character' : 'Write it from memory'}</h2>
         <p className="mt-1 text-muted">
-          {guided ? 'Sigue el contorno en el orden correcto de trazos.' : 'Si fallas tres veces, verás una pista.'}
+          {guided ? 'Follow the outline in the correct stroke order.' : 'Miss three times and you’ll get a hint.'}
         </p>
       </div>
 
@@ -114,7 +114,7 @@ export function Trace({ char, n, guided, onDone }: Props) {
               </span>
             ))}
           </span>{' '}
-          <span className="font-bold text-sky-dark">{w.pinyin}</span> · <span className="font-bold">{w.es}</span>
+          <span className="font-bold text-sky-dark">{w.pinyin}</span> · <span className="font-bold">{w.en}</span>
         </p>
       </div>
 
@@ -133,9 +133,9 @@ export function Trace({ char, n, guided, onDone }: Props) {
           <div ref={box} className="relative touch-none" />
           {failed && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center text-muted">
-              <p>No se pudieron cargar los trazos de {char}.</p>
+              <p>Couldn’t load the strokes for {char}.</p>
               <button type="button" className="btn btn-ghost py-2.5 text-sm" onClick={() => onDone(0)}>
-                Saltar
+                Skip
               </button>
             </div>
           )}
@@ -145,7 +145,7 @@ export function Trace({ char, n, guided, onDone }: Props) {
       {!finished && !failed && (
         <div className="flex justify-center">
           <button type="button" className="btn btn-ghost py-2.5 text-sm" onClick={animating ? skipDemo : showOrder}>
-            {animating ? 'Saltar y escribir' : 'Ver orden de trazos'}
+            {animating ? 'Skip and write' : 'Show stroke order'}
           </button>
         </div>
       )}

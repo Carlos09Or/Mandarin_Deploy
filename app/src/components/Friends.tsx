@@ -61,7 +61,7 @@ const Drop = ({ x, y }: { x: number; y: number }) => (
 export function Harpia({ size = 140, mood = 'idle', outfit }: Props) {
   const look = useOutfit('harpia', outfit)
   return (
-    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label="Yīngyīng, el águila harpía">
+    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label="Yīngyīng, the harpy eagle">
       <Branch y={166} />
       {mood === 'celebrate' && <Sparkles />}
       <g className="friend-body">
@@ -128,7 +128,7 @@ export function Sloth({ size = 140, mood = 'idle', outfit }: Props) {
   const look = useOutfit('sloth', outfit)
   const awake = mood !== 'idle'
   return (
-    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label="Lǎnlǎn, el perezoso">
+    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label="Lǎnlǎn, the sloth">
       {mood === 'celebrate' && <Sparkles />}
       <g className="sloth-swing">
         <path d="M78 96 Q64 62 72 32 M122 96 Q136 62 128 32" stroke="#a07d58" strokeWidth="16" strokeLinecap="round" fill="none" />
@@ -218,7 +218,7 @@ export function Tucan({ size = 140, mood = 'idle', outfit }: Props) {
   const look = useOutfit('tucan', outfit)
   const id = useId().replace(/:/g, '')
   return (
-    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label="Zuǐzuǐ, el tucán">
+    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label="Zuǐzuǐ, the toucan">
       <defs>
         <clipPath id={`bill-${id}`}>
           <path d="M112 64 Q152 52 186 80 Q182 92 168 94 Q140 98 112 94 Q106 80 112 64Z" />
@@ -286,7 +286,7 @@ export function FlyScene({ size = 120 }: { size?: number }) {
           <circle cx="5" cy="-1.5" r="2.2" fill="#e0453a" />
         </g>
         <text x="150" y="18" className="fly-yum" fill="#e0453a" style={{ fontSize: 20, fontWeight: 900 }}>
-          ¡ñam!
+          好吃！
         </text>
       </svg>
     </div>

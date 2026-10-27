@@ -31,24 +31,37 @@ const UNIT_ES = {
   10: ['Describir personas y cosas', 'Adjetivos, sentimientos y cómo describir el mundo.'],
 };
 
+// The app's guide language is English. Spanish translations (tools/translations-es/) are kept
+// alongside as *Es fields for a possible language switch later.
+const trDir = path.join(root, 'tools/translations-es');
+const tr = Object.assign(
+  {},
+  ...['part1.json', 'part2.json', 'part3.json'].map((f) => JSON.parse(fs.readFileSync(path.join(trDir, f), 'utf8'))),
+);
+const radicalsEs = JSON.parse(fs.readFileSync(path.join(trDir, 'radicals.json'), 'utf8'));
+
 const words = WORDS.map((w) => {
   const m = LEARNING_META[String(w.n)];
+  const t = tr[String(w.n)];
+  if (!t?.ex || !t?.note) throw new Error(`Missing Spanish translation for word ${w.n} (${w.hanzi})`);
   return {
     n: w.n,
     hanzi: w.hanzi,
     pinyin: w.pinyin,
-    es: ES_FIXES[w.n] ?? w.es,
     en: m.en,
+    es: ES_FIXES[w.n] ?? w.es,
     note: m.explanation,
-    example: m.example,
+    noteEs: t.note,
+    example: { ...m.example, es: t.ex },
   };
 });
 
 const units = PRACTICE_BLOCKS.map((b) => ({
   id: b.id,
-  title: UNIT_ES[b.id][0],
-  description: UNIT_ES[b.id][1],
-  titleEn: b.title,
+  title: b.title,
+  description: b.description,
+  titleEs: UNIT_ES[b.id][0],
+  descriptionEs: UNIT_ES[b.id][1],
   words: b.words,
 }));
 
@@ -61,7 +74,7 @@ const outDir = path.join(root, 'app/src/data');
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(
   path.join(outDir, 'hsk1.json'),
-  JSON.stringify({ words, units, chars, radicals: RADICAL_HINTS }, null, 1) + '\n',
+  JSON.stringify({ words, units, chars, radicals: RADICAL_HINTS, radicalsEs: radicalsEs }, null, 1) + '\n',
 );
 
 // Stroke data, only for the characters the course uses.

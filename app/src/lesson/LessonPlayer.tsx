@@ -18,10 +18,10 @@ export type LessonSummary = { durationMs: number; answers: number; mistakes: num
 type Props = { exercises: Exercise[]; buddy: FriendId; onExit: () => void; onFinish: (s: LessonSummary) => void }
 
 const PRAISE = [
-  ['很好！', 'hěn hǎo', '¡Muy bien!'],
-  ['太棒了！', 'tài bàng le', '¡Excelente!'],
-  ['对了！', 'duì le', '¡Correcto!'],
-  ['非常好！', 'fēicháng hǎo', '¡Perfecto!'],
+  ['很好！', 'hěn hǎo', 'Very good!'],
+  ['太棒了！', 'tài bàng le', 'Excellent!'],
+  ['对了！', 'duì le', 'Correct!'],
+  ['非常好！', 'fēicháng hǎo', 'Perfect!'],
 ]
 
 type Feedback = { correct: boolean; title: string; detail?: string; sub?: string }
@@ -83,7 +83,7 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
       const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
       grade(
         correct,
-        { correct, title: correct ? `${p[0]} ${p[2]}` : 'Frase correcta:', detail: ewx.hanzi, sub: `${ewx.pinyin} · ${ewx.en}` },
+        { correct, title: correct ? `${p[0]} ${p[2]}` : 'Correct sentence:', detail: ewx.hanzi, sub: `${ewx.pinyin} · ${ewx.en}` },
         true,
       )
       return
@@ -96,8 +96,8 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
     grade(
       correct,
       correct
-        ? { correct, title: `${p[0]} ${p[2]}`, detail: `${w.hanzi} · ${w.pinyin} · ${w.es}` }
-        : { correct, title: 'Respuesta correcta:', detail: `${w.hanzi} · ${w.pinyin} · ${w.es}` },
+        ? { correct, title: `${p[0]} ${p[2]}`, detail: `${w.hanzi} · ${w.pinyin} · ${w.en}` }
+        : { correct, title: 'Correct answer:', detail: `${w.hanzi} · ${w.pinyin} · ${w.en}` },
       true,
     )
   }, [ex, selected, order, grade])
@@ -122,7 +122,7 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [confirmExit])
 
-  const primaryLabel = (ex.kind === 'choice' || ex.kind === 'sentence') && !feedback ? 'Comprobar' : 'Continuar'
+  const primaryLabel = (ex.kind === 'choice' || ex.kind === 'sentence') && !feedback ? 'Check' : 'Continue'
   const primaryDisabled =
     !feedback &&
     ((ex.kind === 'choice' && selected === null) ||
@@ -135,7 +135,7 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-paper">
       <header className="mx-auto flex w-full max-w-2xl items-center gap-4 px-4 pt-[max(env(safe-area-inset-top),16px)] pb-2">
-        <button type="button" aria-label="Salir de la lección" onClick={() => setConfirmExit(true)} className="text-muted">
+        <button type="button" aria-label="Quit lesson" onClick={() => setConfirmExit(true)} className="text-muted">
           <IconClose className="h-7 w-7" />
         </button>
         <div className="h-4 flex-1 overflow-hidden rounded-full bg-line">
@@ -171,7 +171,7 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
                 <Match
                   words={ex.words}
                   onDone={(m) =>
-                    grade(m === 0, { correct: true, title: m === 0 ? '¡Todas a la primera!' : '¡Parejas completas!' })
+                    grade(m === 0, { correct: true, title: m === 0 ? 'All on the first try!' : 'All pairs matched!' })
                   }
                 />
               )}
@@ -185,8 +185,8 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
                     recordTrace(ex.char, m)
                     grade(m < 3, {
                       correct: true,
-                      title: m === 0 ? '¡Trazo perfecto!' : m < 3 ? '¡Bien escrito!' : 'Escrito. Repásalo en Escribir.',
-                      detail: `${ex.char} · ${m} ${m === 1 ? 'error' : 'errores'}`,
+                      title: m === 0 ? 'Perfect strokes!' : m < 3 ? 'Well written!' : 'Done. Practice it in Write.',
+                      detail: `${ex.char} · ${m} ${m === 1 ? 'mistake' : 'mistakes'}`,
                     })
                   }}
                 />
@@ -251,14 +251,14 @@ export function LessonPlayer({ exercises, buddy, onExit, onFinish }: Props) {
               className="safe-bottom w-full max-w-md rounded-t-3xl bg-card p-6 text-center sm:rounded-3xl"
             >
               <p className="han text-5xl">等等！</p>
-              <p className="mt-3 text-xl font-extrabold">¿Seguro que quieres salir?</p>
-              <p className="mt-1 text-muted">Perderás el avance de esta lección.</p>
+              <p className="mt-3 text-xl font-extrabold">Are you sure you want to quit?</p>
+              <p className="mt-1 text-muted">You’ll lose your progress in this lesson.</p>
               <div className="mt-6 flex flex-col gap-3">
                 <button type="button" className="btn btn-primary" onClick={() => setConfirmExit(false)}>
-                  Seguir aprendiendo
+                  Keep learning
                 </button>
                 <button type="button" className="btn text-wrong" onClick={onExit}>
-                  Salir
+                  Quit
                 </button>
               </div>
             </motion.div>

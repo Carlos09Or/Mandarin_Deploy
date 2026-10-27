@@ -26,7 +26,7 @@ export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Prop
       height={size}
       className={`wawa wawa-${mood} ${className}`}
       role="img"
-      aria-label="Wāwa, la rana dorada"
+      aria-label="Wāwa, the golden frog"
     >
       <ellipse className="wawa-shadow" cx="100" cy="188" rx="52" ry="8" fill="#2b2420" opacity=".12" />
 

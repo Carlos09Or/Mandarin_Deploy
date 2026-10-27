@@ -53,7 +53,7 @@ export function Match({ words, onDone }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-2xl font-extrabold">Une las parejas</h2>
+      <h2 className="text-2xl font-extrabold">Match the pairs</h2>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-3">
           {left.map((n) => (
@@ -80,7 +80,7 @@ export function Match({ words, onDone }: Props) {
               onClick={() => pick('r', n)}
               className={`tile min-h-16 px-3 text-base leading-tight font-bold ${cls(n, 'r')}`}
             >
-              {word(n).es}
+              {word(n).en}
             </button>
           ))}
         </div>

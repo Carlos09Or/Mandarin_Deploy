@@ -151,9 +151,9 @@ export function completeNode(
   const xp = 10 + (perfect ? 5 : 0)
   const t = today()
   const before = state.dailyXp[t] ?? 0
-  const parts = [{ label: 'Lección completada', gems: GEMS.lesson }]
-  if (perfect) parts.push({ label: 'Sin errores', gems: GEMS.perfect })
-  if (before < DAILY_GOAL && before + xp >= DAILY_GOAL) parts.push({ label: 'Meta diaria', gems: GEMS.dailyGoal })
+  const parts = [{ label: 'Lesson complete', gems: GEMS.lesson }]
+  if (perfect) parts.push({ label: 'No mistakes', gems: GEMS.perfect })
+  if (before < DAILY_GOAL && before + xp >= DAILY_GOAL) parts.push({ label: 'Daily goal', gems: GEMS.dailyGoal })
   const gems = parts.reduce((a, p) => a + p.gems, 0)
   const streak = nextStreak(state.streak)
   const streakUp = state.streak.last !== t

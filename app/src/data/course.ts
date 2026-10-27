@@ -1,16 +1,25 @@
 import raw from './hsk1.json'
 
-export type Example = { hanzi: string; pinyin: string; en: string }
+export type Example = { hanzi: string; pinyin: string; en: string; es: string }
 export type Word = {
   n: number
   hanzi: string
   pinyin: string
-  es: string
   en: string
   note: string
+  /** Spanish versions, kept for a possible language switch; the app shows English. */
+  es: string
+  noteEs: string
   example: Example
 }
-export type Unit = { id: number; title: string; description: string; titleEn: string; words: number[] }
+export type Unit = {
+  id: number
+  title: string
+  description: string
+  titleEs: string
+  descriptionEs: string
+  words: number[]
+}
 export type CharInfo = { radical: string | null; components: string[]; clue: string }
 
 export type NodeKind = 'lesson' | 'checkpoint'

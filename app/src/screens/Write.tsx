@@ -25,28 +25,28 @@ export function Write({ onWrite }: Props) {
           写
         </div>
         <div>
-          <h2 className="text-xl font-black">Escritura</h2>
+          <h2 className="text-xl font-black">Writing</h2>
           <p className="text-muted">
-            Primero calcas el carácter y luego lo escribes dos veces de memoria, con el orden de trazos correcto.
+            Trace each character first, then write it twice from memory with the correct stroke order.
           </p>
         </div>
       </section>
 
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-bold text-muted">
-          {unlocked.size} caracteres desbloqueados · {clean} escritos sin errores
+          {unlocked.size} characters unlocked · {clean} written without mistakes
         </p>
         <button
           type="button"
           onClick={() => setShowAll(!showAll)}
           className="rounded-xl px-3 py-1.5 text-sm font-extrabold text-sky-dark hover:bg-sky-soft"
         >
-          {showAll ? 'Solo los míos' : 'Ver los 248'}
+          {showAll ? 'Only mine' : 'See all 248'}
         </button>
       </div>
 
       {chars.length === 0 ? (
-        <p className="py-10 text-center text-muted">Completa una lección para desbloquear tus primeros caracteres.</p>
+        <p className="py-10 text-center text-muted">Finish a lesson to unlock your first characters.</p>
       ) : (
         <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
           {chars.map(([c, n]) => {
