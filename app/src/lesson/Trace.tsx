@@ -2,18 +2,11 @@ import HanziWriter from 'hanzi-writer'
 import { useEffect, useRef, useState } from 'react'
 import { word } from '../data/course'
 import { speak } from '../lib/audio'
+import { loadChar } from '../lib/hanzi'
 import { AudioButton } from '../components/AudioButton'
 
 type Props = { char: string; n: number; guided: boolean; onDone: (mistakes: number) => void }
 
-type Loader = NonNullable<Parameters<typeof HanziWriter.create>[2]>['charDataLoader']
-
-const loadChar: Loader = (char, onLoad, onError) => {
-  fetch(`${import.meta.env.BASE_URL}hanzi/${char}.json`)
-    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-    .then(onLoad)
-    .catch(onError)
-}
 
 export function Trace({ char, n, guided, onDone }: Props) {
   const box = useRef<HTMLDivElement>(null)

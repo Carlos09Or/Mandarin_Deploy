@@ -1,0 +1,693 @@
+{
+ "我": {
+  "parts": [
+   {
+    "glyph": "手",
+    "meaning": "hand"
+   },
+   {
+    "glyph": "戈",
+    "meaning": "halberd"
+   }
+  ],
+  "memory": "A hand holding a halberd, ready to defend: that is me."
+ },
+ "们": {
+  "parts": [
+   {
+    "glyph": "亻",
+    "meaning": "person"
+   },
+   {
+    "glyph": "门",
+    "meaning": "gate"
+   }
+  ],
+  "memory": "People gathered at a gate: more than one, so it makes words plural."
+ },
+ "你": {
+  "parts": [
+   {
+    "glyph": "亻",
+    "meaning": "person"
+   },
+   {
+    "glyph": "尔",
+    "meaning": "you"
+   }
+  ],
+  "memory": "The person standing over there: you."
+ },
+ "他": {
+  "parts": [
+   {
+    "glyph": "亻",
+    "meaning": "person"
+   },
+   {
+    "glyph": "也",
+    "meaning": "also"
+   }
+  ],
+  "memory": "Also a person, a man: he."
+ },
+ "她": {
+  "parts": [
+   {
+    "glyph": "女",
+    "meaning": "woman"
+   },
+   {
+    "glyph": "也",
+    "meaning": "also"
+   }
+  ],
+  "memory": "Also a person, a woman: she."
+ },
+ "爸": {
+  "parts": [
+   {
+    "glyph": "父",
+    "meaning": "father"
+   },
+   {
+    "glyph": "巴",
+    "meaning": "ba (sound)"
+   }
+  ],
+  "memory": "\"Father\" on top, and it sounds like ba: dad."
+ },
+ "妈": {
+  "parts": [
+   {
+    "glyph": "女",
+    "meaning": "woman"
+   },
+   {
+    "glyph": "马",
+    "meaning": "horse, sounds ma"
+   }
+  ],
+  "memory": "A woman, and it sounds like ma (horse): mom."
+ },
+ "儿": {
+  "parts": [
+   {
+    "glyph": "儿",
+    "meaning": "legs of a child"
+   }
+  ],
+  "memory": "Two little legs running: a child, a son."
+ },
+ "子": {
+  "parts": [
+   {
+    "glyph": "子",
+    "meaning": "baby with open arms"
+   }
+  ],
+  "memory": "A baby wrapped up with its arms open: child."
+ },
+ "女": {
+  "parts": [
+   {
+    "glyph": "女",
+    "meaning": "kneeling woman"
+   }
+  ],
+  "memory": "A woman kneeling with crossed arms: woman, female."
+ },
+ "老": {
+  "parts": [
+   {
+    "glyph": "耂",
+    "meaning": "old man with long hair"
+   },
+   {
+    "glyph": "匕",
+    "meaning": "cane"
+   }
+  ],
+  "memory": "An old man with long hair leaning on a cane: old."
+ },
+ "师": {
+  "parts": [
+   {
+    "glyph": "丨",
+    "meaning": "a pole"
+   },
+   {
+    "glyph": "帀",
+    "meaning": "banner"
+   }
+  ],
+  "memory": "A master standing by a banner: teacher, master."
+ },
+ "学": {
+  "parts": [
+   {
+    "glyph": "⺍",
+    "meaning": "sparks of knowledge"
+   },
+   {
+    "glyph": "冖",
+    "meaning": "cover / roof"
+   },
+   {
+    "glyph": "子",
+    "meaning": "child"
+   }
+  ],
+  "memory": "A child under a roof, with ideas sparking above: to study."
+ },
+ "生": {
+  "parts": [
+   {
+    "glyph": "生",
+    "meaning": "a sprout from the earth"
+   }
+  ],
+  "memory": "A sprout pushing out of the ground: life, to be born, student."
+ },
+ "同": {
+  "parts": [
+   {
+    "glyph": "冂",
+    "meaning": "cover"
+   },
+   {
+    "glyph": "一",
+    "meaning": "one"
+   },
+   {
+    "glyph": "口",
+    "meaning": "mouth"
+   }
+  ],
+  "memory": "One cover over the mouths: everyone says the same thing, together."
+ },
+ "朋": {
+  "parts": [
+   {
+    "glyph": "月",
+    "meaning": "moon"
+   },
+   {
+    "glyph": "月",
+    "meaning": "moon"
+   }
+  ],
+  "memory": "Two moons side by side, always together: friend."
+ },
+ "友": {
+  "parts": [
+   {
+    "glyph": "𠂇",
+    "meaning": "hand"
+   },
+   {
+    "glyph": "又",
+    "meaning": "hand"
+   }
+  ],
+  "memory": "Two hands helping each other: friend."
+ },
+ "医": {
+  "parts": [
+   {
+    "glyph": "匚",
+    "meaning": "box"
+   },
+   {
+    "glyph": "矢",
+    "meaning": "arrow"
+   }
+  ],
+  "memory": "An arrow pulled out and put in a box: healing, doctor."
+ },
+ "名": {
+  "parts": [
+   {
+    "glyph": "夕",
+    "meaning": "evening"
+   },
+   {
+    "glyph": "口",
+    "meaning": "mouth"
+   }
+  ],
+  "memory": "In the evening dark you call out with your mouth: your name."
+ },
+ "字": {
+  "parts": [
+   {
+    "glyph": "宀",
+    "meaning": "roof"
+   },
+   {
+    "glyph": "子",
+    "meaning": "child"
+   }
+  ],
+  "memory": "A child under a roof learning to write: character, word."
+ },
+ "您": {
+  "parts": [
+   {
+    "glyph": "你",
+    "meaning": "you"
+   },
+   {
+    "glyph": "心",
+    "meaning": "heart"
+   }
+  ],
+  "memory": "\"You\" with your heart below it: the polite, respectful you."
+ },
+ "它": {
+  "parts": [
+   {
+    "glyph": "宀",
+    "meaning": "roof"
+   },
+   {
+    "glyph": "匕",
+    "meaning": "spoon / curl"
+   }
+  ],
+  "memory": "A little creature curled up under a roof: it (animals and things)."
+ },
+ "弟": {
+  "parts": [
+   {
+    "glyph": "弟",
+    "meaning": "rope wound around a stick, in order"
+   }
+  ],
+  "memory": "A rope wound around a stick, turn after turn, in order: the younger brother comes after."
+ },
+ "哥": {
+  "parts": [
+   {
+    "glyph": "可",
+    "meaning": "can"
+   },
+   {
+    "glyph": "可",
+    "meaning": "can"
+   }
+  ],
+  "memory": "\"Can\" on top of \"can\": the big brother who can do everything."
+ },
+ "姐": {
+  "parts": [
+   {
+    "glyph": "女",
+    "meaning": "woman"
+   },
+   {
+    "glyph": "且",
+    "meaning": "moreover / ancestor tablet"
+   }
+  ],
+  "memory": "A woman, the one who comes first: older sister."
+ },
+ "妹": {
+  "parts": [
+   {
+    "glyph": "女",
+    "meaning": "woman"
+   },
+   {
+    "glyph": "未",
+    "meaning": "not yet"
+   }
+  ],
+  "memory": "A girl who is not yet grown: younger sister."
+ },
+ "孩": {
+  "parts": [
+   {
+    "glyph": "子",
+    "meaning": "child"
+   },
+   {
+    "glyph": "亥",
+    "meaning": "pig (zodiac)"
+   }
+  ],
+  "memory": "A child, little like a piglet: child."
+ },
+ "家": {
+  "parts": [
+   {
+    "glyph": "宀",
+    "meaning": "roof"
+   },
+   {
+    "glyph": "豕",
+    "meaning": "pig"
+   }
+  ],
+  "memory": "A pig under a roof: home, family."
+ },
+ "人": {
+  "parts": [
+   {
+    "glyph": "人",
+    "meaning": "a person walking"
+   }
+  ],
+  "memory": "Two legs walking: person."
+ },
+ "大": {
+  "parts": [
+   {
+    "glyph": "大",
+    "meaning": "person with arms wide open"
+   }
+  ],
+  "memory": "A person stretching their arms wide: big."
+ },
+ "男": {
+  "parts": [
+   {
+    "glyph": "田",
+    "meaning": "field"
+   },
+   {
+    "glyph": "力",
+    "meaning": "strength"
+   }
+  ],
+  "memory": "Strength in the field: man."
+ },
+ "这": {
+  "parts": [
+   {
+    "glyph": "辶",
+    "meaning": "walk"
+   },
+   {
+    "glyph": "文",
+    "meaning": "writing"
+   }
+  ],
+  "memory": "The writing right here where you walk: this."
+ },
+ "那": {
+  "parts": [
+   {
+    "glyph": "冄",
+    "meaning": "fur / soft"
+   },
+   {
+    "glyph": "阝",
+    "meaning": "town"
+   }
+  ],
+  "memory": "That town far over there: that."
+ },
+ "哪": {
+  "parts": [
+   {
+    "glyph": "口",
+    "meaning": "mouth"
+   },
+   {
+    "glyph": "那",
+    "meaning": "that"
+   }
+  ],
+  "memory": "A mouth asking \"that?\": which, where?"
+ },
+ "谁": {
+  "parts": [
+   {
+    "glyph": "讠",
+    "meaning": "speech"
+   },
+   {
+    "glyph": "隹",
+    "meaning": "bird"
+   }
+  ],
+  "memory": "Speech to a bird: who is there?"
+ },
+ "什": {
+  "parts": [
+   {
+    "glyph": "亻",
+    "meaning": "person"
+   },
+   {
+    "glyph": "十",
+    "meaning": "ten"
+   }
+  ],
+  "memory": "A person facing ten things: what?"
+ },
+ "么": {
+  "parts": [
+   {
+    "glyph": "丿",
+    "meaning": "stroke"
+   },
+   {
+    "glyph": "厶",
+    "meaning": "private / self"
+   }
+  ],
+  "memory": "A little hook that ends questions: in 什么 (what) and 怎么 (how)."
+ },
+ "多": {
+  "parts": [
+   {
+    "glyph": "夕",
+    "meaning": "evening"
+   },
+   {
+    "glyph": "夕",
+    "meaning": "evening"
+   }
+  ],
+  "memory": "Evening after evening: many."
+ },
+ "少": {
+  "parts": [
+   {
+    "glyph": "小",
+    "meaning": "small"
+   },
+   {
+    "glyph": "丿",
+    "meaning": "a slice off"
+   }
+  ],
+  "memory": "Small, and a slice taken away: few, less."
+ },
+ "几": {
+  "parts": [
+   {
+    "glyph": "几",
+    "meaning": "a small table"
+   }
+  ],
+  "memory": "A small table: how many things can it hold?"
+ },
+ "怎": {
+  "parts": [
+   {
+    "glyph": "乍",
+    "meaning": "sudden"
+   },
+   {
+    "glyph": "心",
+    "meaning": "heart"
+   }
+  ],
+  "memory": "A sudden feeling in the heart: how?"
+ },
+ "样": {
+  "parts": [
+   {
+    "glyph": "木",
+    "meaning": "tree"
+   },
+   {
+    "glyph": "羊",
+    "meaning": "sheep"
+   }
+  ],
+  "memory": "A tree and a sheep, each with its own look: shape, kind."
+ },
+ "吗": {
+  "parts": [
+   {
+    "glyph": "口",
+    "meaning": "mouth"
+   },
+   {
+    "glyph": "马",
+    "meaning": "horse, sounds ma"
+   }
+  ],
+  "memory": "A mouth plus ma: the yes-or-no question sound."
+ },
+ "呢": {
+  "parts": [
+   {
+    "glyph": "口",
+    "meaning": "mouth"
+   },
+   {
+    "glyph": "尼",
+    "meaning": "nun, sounds ni"
+   }
+  ],
+  "memory": "A mouth plus ne: \"and you?\""
+ },
+ "喂": {
+  "parts": [
+   {
+    "glyph": "口",
+    "meaning": "mouth"
+   },
+   {
+    "glyph": "畏",
+    "meaning": "fear"
+   }
+  ],
+  "memory": "A mouth calling carefully: hello on the phone."
+ },
+ "请": {
+  "parts": [
+   {
+    "glyph": "讠",
+    "meaning": "speech"
+   },
+   {
+    "glyph": "青",
+    "meaning": "clear / blue"
+   }
+  ],
+  "memory": "Clear, kind words: please, to invite."
+ },
+ "没": {
+  "parts": [
+   {
+    "glyph": "氵",
+    "meaning": "water"
+   },
+   {
+    "glyph": "殳",
+    "meaning": "weapon"
+   }
+  ],
+  "memory": "Something sunk under water: gone, not have."
+ },
+ "关": {
+  "parts": [
+   {
+    "glyph": "丷",
+    "meaning": "bolt"
+   },
+   {
+    "glyph": "天",
+    "meaning": "sky / door"
+   }
+  ],
+  "memory": "Bolting the gate shut: to close, relation."
+ },
+ "系": {
+  "parts": [
+   {
+    "glyph": "丿",
+    "meaning": "stroke"
+   },
+   {
+    "glyph": "糸",
+    "meaning": "silk thread"
+   }
+  ],
+  "memory": "Silk threads tied together: to connect, relation."
+ },
+ "个": {
+  "parts": [
+   {
+    "glyph": "人",
+    "meaning": "person"
+   },
+   {
+    "glyph": "丨",
+    "meaning": "one stick"
+   }
+  ],
+  "memory": "One person, one stick: the general counting word."
+ },
+ "里": {
+  "parts": [
+   {
+    "glyph": "田",
+    "meaning": "field"
+   },
+   {
+    "glyph": "土",
+    "meaning": "earth"
+   }
+  ],
+  "memory": "Fields and earth: a village, inside."
+ },
+ "些": {
+  "parts": [
+   {
+    "glyph": "此",
+    "meaning": "this"
+   },
+   {
+    "glyph": "二",
+    "meaning": "two"
+   }
+  ],
+  "memory": "This and two more: some, a few."
+ },
+ "边": {
+  "parts": [
+   {
+    "glyph": "辶",
+    "meaning": "walk"
+   },
+   {
+    "glyph": "力",
+    "meaning": "strength"
+   }
+  ],
+  "memory": "Walking with strength along the edge: side."
+ },
+ "问": {
+  "parts": [
+   {
+    "glyph": "门",
+    "meaning": "door"
+   },
+   {
+    "glyph": "口",
+    "meaning": "mouth"
+   }
+  ],
+  "memory": "A mouth at the door: to ask."
+ },
+ "好": {
+  "parts": [
+   {
+    "glyph": "女",
+    "meaning": "woman"
+   },
+   {
+    "glyph": "子",
+    "meaning": "child"
+   }
+  ],
+  "memory": "A woman with her child: good."
+ }
+}
