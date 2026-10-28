@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { word } from '../data/course'
+import { plainPinyin, word } from '../data/course'
 import { chime, pinRandomVoice, unpinVoice } from '../lib/audio'
 import { retry, type Exercise } from '../lib/lesson'
 import { recordAnswer, recordTrace } from '../lib/progress'
@@ -9,9 +9,12 @@ import { IconClose } from '../components/icons'
 import { Buddy } from '../components/Friends'
 import type { FriendId } from '../data/friends'
 import { Choice } from './Choice'
+import { Cloze } from './Cloze'
 import { Intro } from './Intro'
 import { Match } from './Match'
+import { Pinyin } from './Pinyin'
 import { Sentence } from './Sentence'
+import { ToneExercise } from './Tone'
 import { Trace } from './Trace'
 
 export type LessonSummary = { durationMs: number; answers: number; mistakes: number }
@@ -33,12 +36,17 @@ const PRAISE = [
 
 type Feedback = { correct: boolean; title: string; detail?: string; sub?: string }
 
+/** Pinyin as typed: tone marks, numbers, spaces and v-for-ü don't matter. */
+const plain = (s: string) => plainPinyin(s.replace(/v/gi, 'u'))
+const readings = (pinyin: string) => pinyin.split('/').map(plain)
+
 export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Props) {
   const [queue, setQueue] = useState(exercises)
   const [pos, setPos] = useState(0)
   const [done, setDone] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
   const [order, setOrder] = useState<number[]>([])
+  const [typed, setTyped] = useState('')
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [confirmExit, setConfirmExit] = useState(false)
   const [arrived, setArrived] = useState(false)
@@ -63,6 +71,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
   const advance = useCallback(() => {
     setSelected(null)
     setOrder([])
+    setTyped('')
     setFeedback(null)
     if (pos + 1 >= queue.length) {
       const s = stats.current
@@ -75,6 +84,11 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
       setPos(pos + 1)
     }
   }, [pos, queue.length, onFinish, station])
+
+  // Dev only: lets browser tests step past an exercise.
+  useEffect(() => {
+    if (import.meta.env.DEV) Object.assign((window as unknown as { __lesson: object }).__lesson, { next: advance })
+  }, [advance])
 
   const grade = useCallback(
     (correct: boolean, fb: Feedback, requeue = false) => {
@@ -101,6 +115,47 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
       )
       return
     }
+    if (ex.kind === 'cloze') {
+      if (selected === null) return
+      const correct = ex.options[selected] === ex.tokens[ex.blank]
+      const ewx = word(ex.word).example
+      const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
+      grade(
+        correct,
+        { correct, title: correct ? `${p[0]} ${p[2]}` : 'Correct sentence:', detail: ewx.hanzi, sub: `${ewx.pinyin} · ${ewx.en}` },
+        true,
+      )
+      return
+    }
+    if (ex.kind === 'tone') {
+      if (selected === null) return
+      const correct = selected === ex.tone
+      const w = word(ex.word)
+      const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
+      grade(
+        correct,
+        {
+          correct,
+          title: correct ? `${p[0]} ${p[2]}` : `Correct answer: tone ${ex.tone}`,
+          detail: `${w.hanzi} · ${w.pinyin} · ${w.en}`,
+        },
+        true,
+      )
+      return
+    }
+    if (ex.kind === 'pinyin') {
+      if (!typed.trim()) return
+      const w = word(ex.word)
+      const correct = readings(w.pinyin).includes(plain(typed))
+      recordAnswer(ex.word, correct)
+      const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
+      grade(
+        correct,
+        { correct, title: correct ? `${p[0]} ${p[2]}` : 'Correct answer:', detail: `${w.hanzi} · ${w.pinyin} · ${w.en}` },
+        true,
+      )
+      return
+    }
     if (ex.kind !== 'choice' || selected === null) return
     const correct = selected === ex.word
     recordAnswer(ex.word, correct)
@@ -113,7 +168,14 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
         : { correct, title: 'Correct answer:', detail: `${w.hanzi} · ${w.pinyin} · ${w.en}` },
       true,
     )
-  }, [ex, selected, order, grade])
+  }, [ex, selected, order, typed, grade])
+
+  const giveUp = () => {
+    if (ex.kind !== 'pinyin' || feedback) return
+    const w = word(ex.word)
+    recordAnswer(ex.word, false)
+    grade(false, { correct: false, title: 'Correct answer:', detail: `${w.hanzi} · ${w.pinyin} · ${w.en}` }, true)
+  }
 
   const onPrimary = () => {
     if (feedback) return advance()
@@ -135,39 +197,46 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
     return () => window.removeEventListener('keydown', onKey)
   }, [confirmExit])
 
-  const primaryLabel = (ex.kind === 'choice' || ex.kind === 'sentence') && !feedback ? 'Check' : 'Continue'
+  const primaryLabel = ex.kind !== 'intro' && !feedback ? 'Check' : 'Continue'
   const primaryDisabled =
     !feedback &&
     ((ex.kind === 'choice' && selected === null) ||
       (ex.kind === 'sentence' && order.length === 0) ||
+      (ex.kind === 'pinyin' && !typed.trim()) ||
+      ((ex.kind === 'cloze' || ex.kind === 'tone') && selected === null) ||
       ex.kind === 'match' ||
       ex.kind === 'trace')
   const fbAudio =
-    ex.kind === 'sentence' ? word(ex.word).example.hanzi : ex.kind === 'intro' || ex.kind === 'match' ? null : word(ex.word).hanzi
+    ex.kind === 'sentence' || ex.kind === 'cloze'
+      ? word(ex.word).example.hanzi
+      : ex.kind === 'intro' || ex.kind === 'match'
+        ? null
+        : word(ex.word).hanzi
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-paper">
-      <header className="mx-auto flex w-full max-w-2xl items-center gap-4 px-4 pt-[max(env(safe-area-inset-top),16px)] pb-2">
+      <header className="mx-auto flex w-full max-w-lg items-center gap-4 px-4 pt-[max(env(safe-area-inset-top),16px)] pb-2">
         <button type="button" aria-label="Quit lesson" onClick={() => setConfirmExit(true)} className="text-muted">
           <IconClose className="h-7 w-7" />
         </button>
-        <div className="h-4 flex-1 overflow-hidden rounded-full bg-line">
+        <div className="h-3 flex-1 overflow-hidden rounded-full bg-line">
           <motion.div
             className="h-full rounded-full bg-jade"
             initial={{ width: 0 }}
             animate={{ width: `${Math.max(4, (done / total) * 100)}%` }}
             transition={{ type: 'spring', stiffness: 120, damping: 20 }}
           >
-            <div className="mx-2 mt-1 h-1 rounded-full bg-white/35" />
+            <div className="mx-2 mt-[3px] h-[3px] rounded-full bg-white/35" />
           </motion.div>
         </div>
       </header>
 
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-8 sm:px-6 sm:pt-8">
+        <div className="mx-auto flex min-h-full w-full max-w-lg flex-col px-5 pt-6 pb-6 sm:pt-10">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={pos}
+              className="flex flex-1 flex-col"
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -40 }}
@@ -179,6 +248,15 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
               )}
               {ex.kind === 'sentence' && (
                 <Sentence ex={ex} order={order} onOrder={setOrder} revealed={!!feedback} />
+              )}
+              {ex.kind === 'pinyin' && (
+                <Pinyin ex={ex} value={typed} onChange={setTyped} onGiveUp={giveUp} revealed={!!feedback} />
+              )}
+              {ex.kind === 'cloze' && (
+                <Cloze ex={ex} selected={selected} onSelect={setSelected} revealed={!!feedback} />
+              )}
+              {ex.kind === 'tone' && (
+                <ToneExercise ex={ex} selected={selected} onSelect={setSelected} revealed={!!feedback} />
               )}
               {ex.kind === 'match' && (
                 <Match
@@ -193,7 +271,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
                   key={`${pos}-${ex.char}`}
                   char={ex.char}
                   n={ex.word}
-                  guided={ex.guided}
+                  guide={ex.guide}
                   onDone={(m) => {
                     recordTrace(ex.char, m)
                     grade(m < 3, {
@@ -210,11 +288,11 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
       </main>
 
       <footer
-        className={`safe-bottom border-t-2 transition-colors ${
-          !feedback ? 'border-line bg-paper' : feedback.correct ? 'border-transparent bg-jade-soft' : 'border-transparent bg-wrong-soft'
+        className={`safe-bottom transition-colors ${
+          !feedback ? 'bg-paper' : feedback.correct ? 'rounded-t-3xl bg-jade-soft' : 'rounded-t-3xl bg-wrong-soft'
         }`}
       >
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:px-6 sm:py-6">
+        <div className="mx-auto flex w-full max-w-lg flex-col gap-4 px-5 py-4">
           <AnimatePresence>
             {feedback && (
               <motion.div
@@ -234,13 +312,12 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
               </motion.div>
             )}
           </AnimatePresence>
-          {!feedback && <div className="hidden flex-1 sm:block" />}
-          <button
+                    <button
             id="lesson-primary"
             type="button"
             disabled={primaryDisabled}
             onClick={onPrimary}
-            className={`btn w-full sm:w-44 ${feedback && !feedback.correct ? 'btn-wrong' : feedback ? 'btn-jade' : 'btn-primary'}`}
+            className={`btn w-full ${feedback && !feedback.correct ? 'btn-wrong' : 'btn-jade'}`}
           >
             {primaryLabel}
           </button>

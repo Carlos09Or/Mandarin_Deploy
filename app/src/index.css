@@ -89,6 +89,28 @@
   .card {
     @apply rounded-3xl border-2 border-line bg-card;
   }
+
+  /* Answer pill of a lesson exercise: full width, one line, in the thumb's reach. */
+  .opt {
+    @apply flex min-h-16 w-full items-center justify-center rounded-2xl border-2 border-line bg-card px-4 text-lg font-bold shadow-[0_3px_0_var(--color-line)] transition-[transform,box-shadow,border-color,background-color,color] duration-75 select-none active:translate-y-[2px] active:shadow-[0_1px_0_var(--color-line)] disabled:translate-y-0;
+  }
+  .opt-selected {
+    @apply border-jade bg-jade-soft shadow-[0_3px_0_#9fd8c3];
+  }
+  .opt-correct {
+    @apply border-jade bg-jade text-white shadow-[0_3px_0_var(--color-jade-dark)];
+  }
+  .opt-wrong {
+    @apply border-wrong bg-wrong-soft text-wrong shadow-[0_3px_0_#f2b1aa];
+  }
+}
+
+/* A scrolling wheel without the scrollbar */
+.wheel {
+  scrollbar-width: none;
+}
+.wheel::-webkit-scrollbar {
+  display: none;
 }
 
 .safe-bottom {

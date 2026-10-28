@@ -17,7 +17,7 @@ export function Intro({ n }: { n: number }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-sm font-extrabold tracking-widest text-brand uppercase">New word</p>
+      <p className="text-xs font-extrabold tracking-[0.18em] text-muted uppercase">New word</p>
       <div className="card flex flex-col items-center gap-3 px-6 pt-7 pb-6 text-center">
         {reveal ? (
           <>

@@ -3,15 +3,19 @@ import { useEffect, useRef, useState } from 'react'
 import { word } from '../data/course'
 import { speak } from '../lib/audio'
 import { loadChar } from '../lib/hanzi'
-import { AudioButton } from '../components/AudioButton'
+import type { Guide } from '../lib/lesson'
+import { Stage } from './Stage'
 
-type Props = { char: string; n: number; guided: boolean; onDone: (mistakes: number) => void }
+type Props = { char: string; n: number; guide: Guide; onDone: (mistakes: number) => void }
+
+// How visible the character's outline is behind the grid, and how soon a missed stroke gets a hint.
+const OUTLINE: Record<Guide, string> = { full: '#d8cdbd', faint: '#ece4d7', none: '#ffffff' }
 
 
-export function Trace({ char, n, guided, onDone }: Props) {
+export function Trace({ char, n, guide, onDone }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const writer = useRef<HanziWriter | null>(null)
-  const [size] = useState(() => Math.min(300, window.innerWidth - 64))
+  const [size] = useState(() => Math.min(320, window.innerWidth - 72))
   const [finished, setFinished] = useState(false)
   const [failed, setFailed] = useState(false)
   const [animating, setAnimating] = useState(false)
@@ -23,7 +27,7 @@ export function Trace({ char, n, guided, onDone }: Props) {
     demo.current++
     setAnimating(false)
     writer.current?.quiz({
-      showHintAfterMisses: guided ? 2 : 3,
+      showHintAfterMisses: guide === 'none' ? 3 : 2,
       highlightOnComplete: true,
       onComplete: ({ totalMistakes }) => {
         setFinished(true)
@@ -43,10 +47,10 @@ export function Trace({ char, n, guided, onDone }: Props) {
       height: size,
       padding: 18,
       showCharacter: false,
-      showOutline: guided,
-      strokeColor: '#2b2420',
-      outlineColor: '#e6dccd',
-      drawingColor: '#2b2420',
+      showOutline: guide !== 'none',
+      strokeColor: '#2f9e7e',
+      outlineColor: OUTLINE[guide],
+      drawingColor: '#2f9e7e',
       drawingWidth: 26,
       highlightColor: '#3b8fd9',
       highlightCompleteColor: '#2f9e7e',
@@ -64,7 +68,7 @@ export function Trace({ char, n, guided, onDone }: Props) {
       writer.current = null
       el.innerHTML = ''
     }
-  }, [char, guided, size]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [char, guide, size]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const showOrder = async () => {
     const wr = writer.current
@@ -88,35 +92,31 @@ export function Trace({ char, n, guided, onDone }: Props) {
     startQuiz()
   }
 
+  const chars = [...w.hanzi]
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <h2 className="text-2xl font-extrabold">{guided ? 'Trace the character' : 'Write it from memory'}</h2>
-        <p className="mt-1 text-muted">
-          {guided ? 'Follow the outline in the correct stroke order.' : 'Miss three times and you’ll get a hint.'}
-        </p>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <AudioButton text={w.hanzi} size="sm" />
-        <p className="text-lg">
-          <span className="han text-2xl">
-            {[...w.hanzi].map((c, i) => (
-              <span key={i} className={c === char ? 'text-brand' : 'text-muted/60'}>
+    <Stage eyebrow={guide === 'none' ? 'Draw from memory' : 'Trace'} title={`Write “${w.en}”.`}>
+      {chars.length > 1 && (
+        <p className="han -mt-3 text-3xl font-bold">
+          {chars.map((c, i) =>
+            c === char ? (
+              <span key={i} className="mx-0.5 inline-block rounded-lg border-2 border-dashed border-jade px-1.5 text-jade">
+                {guide === 'none' ? '？' : c}
+              </span>
+            ) : (
+              <span key={i} className="text-muted/70">
                 {c}
               </span>
-            ))}
-          </span>{' '}
-          <span className="font-bold text-sky-dark">{w.pinyin}</span> · <span className="font-bold">{w.en}</span>
+            ),
+          )}
         </p>
-      </div>
+      )}
 
       <div className="flex justify-center">
         <div className="relative rounded-3xl border-2 border-line bg-card p-2" style={{ width: size + 20, height: size + 20 }}>
           {/* 米字格: the practice grid used in Chinese copybooks */}
           <svg className="pointer-events-none absolute inset-2.5" width={size} height={size} aria-hidden>
-            <rect x="1" y="1" width={size - 2} height={size - 2} fill="none" stroke="#f0c9c2" strokeWidth="2" rx="8" />
-            <g stroke="#f4d6d0" strokeWidth="1.5" strokeDasharray="6 6">
+            <rect x="1" y="1" width={size - 2} height={size - 2} fill="none" stroke="#e1d6c5" strokeWidth="2" rx="8" />
+            <g stroke="#ece3d5" strokeWidth="1.5" strokeDasharray="6 6">
               <line x1={size / 2} y1="0" x2={size / 2} y2={size} />
               <line x1="0" y1={size / 2} x2={size} y2={size / 2} />
               <line x1="0" y1="0" x2={size} y2={size} />
@@ -137,11 +137,15 @@ export function Trace({ char, n, guided, onDone }: Props) {
 
       {!finished && !failed && (
         <div className="flex justify-center">
-          <button type="button" className="btn btn-ghost py-2.5 text-sm" onClick={animating ? skipDemo : showOrder}>
+          <button
+            type="button"
+            className="px-3 py-2 text-sm font-extrabold text-sky-dark"
+            onClick={animating ? skipDemo : showOrder}
+          >
             {animating ? 'Skip and write' : 'Show stroke order'}
           </button>
         </div>
       )}
-    </div>
+    </Stage>
   )
 }

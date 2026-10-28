@@ -4,6 +4,7 @@ import { tokenPinyin, word } from '../data/course'
 import { speak } from '../lib/audio'
 import type { Exercise } from '../lib/lesson'
 import { AudioButton } from '../components/AudioButton'
+import { Stage } from './Stage'
 
 type Props = {
   ex: Extract<Exercise, { kind: 'sentence' }>
@@ -19,7 +20,6 @@ const DRAG_THRESHOLD = 6
 
 export function Sentence({ ex, order, onOrder, revealed }: Props) {
   const w = word(ex.word)
-  const [showHint, setShowHint] = useState(false)
   const [drag, setDrag] = useState<Drag | null>(null)
   const [caret, setCaret] = useState<{ x: number; y: number; h: number } | null>(null)
   const answerZone = useRef<HTMLDivElement>(null)
@@ -140,41 +140,27 @@ export function Sentence({ ex, order, onOrder, revealed }: Props) {
     </motion.button>
   )
 
+  // One dashed slot per word still to place, so the learner sees how long the sentence is.
+  const empty = Math.max(0, ex.tokens.length - order.length)
+
   return (
-    <div className="flex flex-col gap-5">
-      <h2 className="text-2xl font-extrabold">Listen and build the sentence</h2>
-
-      <div className="flex items-center gap-4">
-        <AudioButton text={w.example.hanzi} size="lg" />
-        <AudioButton text={w.example.hanzi} slow />
-        <button
-          type="button"
-          onClick={() => setShowHint(!showHint)}
-          className="ml-auto rounded-xl px-3 py-2 text-sm font-extrabold text-sky-dark hover:bg-sky-soft"
-        >
-          {showHint ? 'Hide hint' : 'Show hint'}
-        </button>
+    <Stage eyebrow="Build a sentence" title={w.example.en}>
+      <div className="-mt-2 flex items-center gap-3">
+        <AudioButton text={w.example.hanzi} size="sm" />
+        <AudioButton text={w.example.hanzi} size="sm" slow />
       </div>
-      {showHint && (
-        <p className="-mt-2 rounded-2xl bg-sky-soft px-4 py-2.5 text-sm text-sky-dark">
-          {w.example.en}
-        </p>
-      )}
 
-      {/* Answer: tiles sit on ruled lines, like a notebook */}
-      <div
-        ref={answerZone}
-        className="flex min-h-[132px] flex-wrap content-start gap-2 py-1"
-        style={{
-          backgroundImage: 'linear-gradient(to bottom, transparent 63px, var(--color-line-dark) 63px, var(--color-line-dark) 65px, transparent 65px)',
-          backgroundSize: '100% 66px',
-        }}
-      >
+      <div ref={answerZone} className="flex min-h-[72px] flex-wrap content-start gap-2 pt-2">
         {order.map((id) => tile(id, 'answer'))}
+        {Array.from({ length: empty }, (_, i) => (
+          <span key={`slot-${i}`} className="h-[62px] w-[76px] rounded-2xl border-2 border-dashed border-line-dark bg-card/60" />
+        ))}
       </div>
+
+      <div className="flex-1" />
 
       {/* Word bank: used tiles leave their outline behind so nothing jumps around */}
-      <div ref={bankZone} className="flex flex-wrap justify-center gap-2 pt-2">
+      <div ref={bankZone} className="flex flex-wrap justify-center gap-2 rounded-3xl bg-line/60 p-3">
         {ex.bank.map((token, id) =>
           order.includes(id) ? (
             <span key={id} className="flex flex-col items-center rounded-2xl bg-line px-3 pt-1.5 pb-1 text-transparent select-none">
@@ -198,10 +184,10 @@ export function Sentence({ ex, order, onOrder, revealed }: Props) {
       )}
       {caret && (
         <div
-          className="pointer-events-none fixed z-40 w-1 rounded-full bg-sky"
+          className="pointer-events-none fixed z-40 w-1 rounded-full bg-jade"
           style={{ left: caret.x, top: caret.y, height: caret.h }}
         />
       )}
-    </div>
+    </Stage>
   )
 }
