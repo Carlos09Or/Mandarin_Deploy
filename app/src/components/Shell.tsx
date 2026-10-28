@@ -69,9 +69,9 @@ export function Shell({ tab, onTab, bleed = false, children }: Props) {
       {/* Desktop / tablet rail */}
       <nav className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-2 border-r-2 border-line-dark bg-card px-4 py-6 md:flex">
         <div className="mb-6 flex items-center gap-3 px-2">
-          <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className="h-10 w-10" />
+          <img src={`${import.meta.env.BASE_URL}icon-192.png`} alt="" className="h-11 w-11 rounded-xl" />
           <div className="leading-tight">
-            <p className="font-black">Mandarin Hub</p>
+            <p className="font-display text-lg font-bold text-sky-dark">Mandarin Journey</p>
             <p className="text-xs font-bold text-muted">HSK 1 · free</p>
           </div>
         </div>
@@ -94,9 +94,9 @@ export function Shell({ tab, onTab, bleed = false, children }: Props) {
         {/* On a phone or tablet the stats sit up here; on a computer they move to the right rail. */}
         <header className="sticky top-0 z-30 border-b-2 border-line bg-paper/90 backdrop-blur pt-[env(safe-area-inset-top)] min-[900px]:hidden">
           <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
-            <p className="font-black md:hidden">
-              <span className="han text-brand">汉</span>
-              <span className="hidden min-[430px]:inline"> Mandarin Hub</span>
+            <p className="font-display flex items-center gap-2 text-lg font-bold text-sky-dark md:hidden">
+              <img src={`${import.meta.env.BASE_URL}icon-192.png`} alt="" className="h-8 w-8 rounded-[10px]" />
+              <span className="hidden min-[430px]:inline">Mandarin Journey</span>
             </p>
             <p className="hidden text-xl font-black md:block">{TABS.find((t) => t.id === tab)?.label}</p>
             {stats}

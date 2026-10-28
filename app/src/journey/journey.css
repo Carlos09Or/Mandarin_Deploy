@@ -1426,37 +1426,12 @@
 }
 .j-splash-logo {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
 }
-.j-splash-logo > .j-han {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
-  background: #d21034;
-  color: #fff;
-  font-size: 38px;
-  font-weight: 900;
-  text-shadow: none;
-  box-shadow: 0 6px 0 #9e1b24;
-}
-.j-splash-logo b {
-  margin-top: 12px;
-  font-size: 28px;
-  font-weight: 900;
-}
-.j-splash-logo small {
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-.j-splash-logo small .j-han {
-  color: #d21034;
-}
-.j-splash.night .j-splash-logo small .j-han {
-  color: #ff6b81;
+.j-splash-logo img {
+  width: min(64vw, 270px);
+  height: auto;
+  filter: drop-shadow(0 8px 12px rgba(1, 30, 80, 0.28));
 }
 /* The loading bar: hanzi and pinyin on the left, the percentage on the right, the bar below. */
 .j-splash-load {
@@ -1663,60 +1638,93 @@
   width: 100%;
   height: 100%;
 }
+/* ---------- title sign, shared by the map and the routes ----------
+   A hanging wooden sign cut in three: the hibiscus end, a stretchy middle and the right end.
+   The height sets the scale, so the painting never distorts, and the text sits on the panel. */
 .j-card {
+  --h: 78px;
+  --capL: calc(var(--h) * 0.81);
+  --capR: calc(var(--h) * 0.35);
   min-width: 0;
-  padding: 7px 16px 9px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.78);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 8px 20px -12px rgba(10, 66, 109, 0.6);
+  height: var(--h);
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 0 var(--capR) 0 var(--capL);
+  border-image: url('/brand/sign-day.webp') 0 87 0 203 fill / 0 var(--capR) 0 var(--capL) stretch;
+  padding: calc(var(--h) * 0.3) 12px calc(var(--h) * 0.16) calc(var(--h) * 0.2);
+  filter: drop-shadow(0 6px 8px rgba(40, 25, 5, 0.28));
+  /* The ropes fade out at the top instead of ending in a cut. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 16%);
   color: #0a426d;
+}
+.j-card.tall {
+  --h: 102px;
+}
+.j-titlebar.night .j-card {
+  --capL: calc(var(--h) * 0.45);
+  --capR: calc(var(--h) * 0.56);
+  border-image: url('/brand/sign-night.webp') 0 150 0 120 fill / 0 var(--capR) 0 var(--capL) stretch;
+  padding-top: calc(var(--h) * 0.37);
+  padding-left: calc(var(--h) * 0.1);
+  color: #fff6dc;
+}
+.j-titlebar.night .j-card {
+  --h: 86px;
+}
+.j-titlebar.night .j-card.tall {
+  --h: 124px;
 }
 .j-card small {
   display: block;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 900;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: #8b7f75;
+  color: #8a6a3d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.j-titlebar.night .j-card small {
+  color: #f5dca6;
 }
 .j-card-name {
   margin: 1px 0 0;
-  font-size: 21px;
-  font-weight: 900;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
   line-height: 1.15;
   white-space: nowrap;
 }
 .j-card-name .j-han {
   margin-left: 6px;
+  font-family: var(--font-brand-han);
+  font-weight: 400;
   color: #d21034;
 }
+.j-titlebar.night .j-card-name .j-han {
+  color: #facd6f;
+}
 .j-card .j-prog {
-  margin-top: 6px;
+  margin-top: 3px;
+  color: #6b5236;
 }
 .j-card .j-prog b {
-  width: 140px;
-  background: rgba(10, 66, 109, 0.12);
+  width: 112px;
+  background: rgba(93, 43, 21, 0.2);
 }
-.j-titlebar.night .j-round,
-.j-titlebar.night .j-card {
-  background: rgba(10, 30, 55, 0.6);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #fff;
-}
-.j-titlebar.night .j-card small {
-  color: rgba(255, 255, 255, 0.7);
-}
-.j-titlebar.night .j-card-name .j-han {
-  color: #ff8a8a;
+.j-card .j-prog b i {
+  background: #ec9f21;
 }
 .j-titlebar.night .j-card .j-prog {
-  color: #fff;
+  color: #f5dca6;
 }
 .j-titlebar.night .j-card .j-prog b {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
+}
+.j-titlebar.night .j-card .j-prog b i {
+  background: #facd6f;
 }
 
 /* ---------- friends beside the route ---------- */
@@ -1851,49 +1859,21 @@
   margin-right: auto;
 }
 
-/* ---------- title card as a paper label over the painting ---------- */
-.j-titlebar.paper .j-round,
-.j-titlebar.paper .j-card {
+/* ---------- round buttons over a painted backdrop ---------- */
+.j-titlebar.paper .j-round {
   background: rgba(250, 243, 227, 0.9);
   border: 1px solid rgba(160, 128, 88, 0.3);
   box-shadow: 0 8px 22px -14px rgba(70, 55, 35, 0.55);
   color: #34495f;
 }
-.j-titlebar.paper .j-card small {
-  color: #a08c70;
-  letter-spacing: 0.16em;
+.j-titlebar.night .j-round {
+  background: rgba(10, 30, 55, 0.6);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
 }
-.j-titlebar.paper .j-card-name .j-han {
-  color: #c4503d;
-}
-.j-titlebar.paper .j-card .j-prog {
-  color: #6b5a44;
-}
-.j-titlebar.paper .j-card .j-prog b {
-  background: rgba(120, 95, 60, 0.15);
-}
-.j-titlebar.paper .j-card .j-prog b i {
-  background: #d9a441;
-}
-.j-titlebar.paper.night .j-round,
-.j-titlebar.paper.night .j-card {
+.j-titlebar.paper.night .j-round {
   background: rgba(24, 41, 69, 0.8);
   border-color: rgba(240, 214, 160, 0.22);
   box-shadow: 0 8px 22px -14px rgba(0, 0, 0, 0.65);
   color: #efe6d2;
-}
-.j-titlebar.paper.night .j-card small {
-  color: rgba(232, 214, 180, 0.65);
-}
-.j-titlebar.paper.night .j-card-name .j-han {
-  color: #f0a08f;
-}
-.j-titlebar.paper.night .j-card .j-prog {
-  color: #efe6d2;
-}
-.j-titlebar.paper.night .j-card .j-prog b {
-  background: rgba(255, 255, 255, 0.18);
-}
-.j-titlebar.paper.night .j-card .j-prog b i {
-  background: #e8b95a;
 }

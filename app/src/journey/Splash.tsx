@@ -51,11 +51,7 @@ export function Splash({ onDone }: { onDone: () => void }) {
       <img className="j-splash-art" src={art} alt="" fetchPriority="high" decoding="async" />
       <div className="j-splash-top">
         <div className="j-splash-logo">
-          <span className="j-han">汉</span>
-          <b>Mandarin Journey</b>
-          <small>
-            Panama → <span className="j-han">中国</span>
-          </small>
+          <img src={`${import.meta.env.BASE_URL}brand/wordmark.webp`} alt="Mandarin Journey · Panama to China" />
         </div>
         <div className="j-splash-load">
           <div className="j-splash-row">

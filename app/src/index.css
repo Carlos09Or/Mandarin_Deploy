@@ -3,6 +3,9 @@
 @theme {
   --font-sans: 'Nunito', ui-rounded, system-ui, sans-serif;
   --font-han: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  /* Brand lettering for the app name and the title signs; lesson hanzi stay on --font-han. */
+  --font-display: 'Fredoka', 'Nunito', ui-rounded, system-ui, sans-serif;
+  --font-brand-han: 'ZCOOL KuaiLe', 'Noto Sans SC', 'PingFang SC', sans-serif;
 
   --color-paper: #fbf7f0;
   --color-card: #ffffff;

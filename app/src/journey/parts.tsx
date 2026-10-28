@@ -150,7 +150,7 @@ export function TitleCard({
   return (
     <div className={`j-titlebar ${paper ? 'paper' : ''} ${night ? 'night' : ''}`}>
       {lead}
-      <div className="j-card">
+      <div className={`j-card ${progress ? 'tall' : ''}`}>
         <small>{kicker}</small>
         <p className="j-card-name" role="heading" aria-level={1}>
           {name}

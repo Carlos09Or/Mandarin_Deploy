@@ -13,13 +13,13 @@ export default defineConfig({
       // A new service worker takes over at once; src/lib/updates.ts registers it and reloads onto it.
       registerType: 'autoUpdate',
       injectRegister: false,
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['apple-touch-icon.png'],
       manifest: {
-        name: 'Mandarin Learning Hub · HSK 1',
-        short_name: 'Mandarin Hub',
+        name: 'Mandarin Journey · HSK 1',
+        short_name: 'Mandarin Journey',
         description: 'Learn HSK 1 Mandarin for free: lessons, hanzi writing and review.',
         lang: 'en',
-        theme_color: '#e0453a',
+        theme_color: '#fbf7f0',
         background_color: '#fbf7f0',
         display: 'standalone',
         start_url: '.',
