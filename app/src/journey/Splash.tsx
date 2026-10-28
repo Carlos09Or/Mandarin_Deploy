@@ -1,30 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
 import { asset } from '../data/journey'
+import { getProgress, isNight } from '../lib/progress'
 import { preloadJourney } from './preload'
 import './journey.css'
 
 /** Never block the app for longer than this, even on a very slow connection. */
 const MAX_WAIT = 25000
-/** The train always takes at least this long to cross, so the screen never just flashes by. */
+/** The bar always takes at least this long to fill, so the screen never just flashes by. */
 const MIN_SHOW = 3200
-/** Where the painted rails run in ride-bg-papercut.webp (fraction of its height). */
-const RAIL = 473 / 667
 
 /**
- * The loading screen: the felt train crosses the painted track at a steady pace while the
- * journey's pictures load, then leaves the station and the app opens with everything ready.
+ * The loading screen: a still painting of the four friends watching the train cross the bay, at
+ * sunrise by day and under the moon at night, with a bar that fills while the journey's pictures
+ * load. Then the app opens with everything ready.
  */
 export function Splash({ onDone }: { onDone: () => void }) {
+  const [night] = useState(() => isNight(getProgress()))
   const [shown, setShown] = useState(0)
   const [leaving, setLeaving] = useState(false)
   const loaded = useRef(0)
+  const art = asset(night ? 'splash-night.webp' : 'splash-day.webp')
+  const pct = Math.round(shown * 100)
 
   useEffect(() => {
     let alive = true
     const t0 = performance.now()
     const give = setTimeout(() => (loaded.current = 1), MAX_WAIT)
     preloadJourney((s) => (loaded.current = s)).then(() => (loaded.current = 1))
-    // The train shows whichever is behind: what has loaded, or the minimum time.
+    // The bar shows whichever is behind: what has loaded, or the minimum time.
     const step = (now: number) => {
       if (!alive) return
       const share = Math.min(loaded.current, (now - t0) / MIN_SHOW)
@@ -42,32 +45,31 @@ export function Splash({ onDone }: { onDone: () => void }) {
   }, [])
 
   return (
-    <div className={`j-splash ${leaving ? 'leaving' : ''}`} role="status" aria-label="Loading">
-      <div className="j-splash-sky" style={{ backgroundImage: `url(${asset('ride-bg-papercut.webp')})` }} />
-      <div className="j-splash-logo">
-        <span className="j-han">汉</span>
-        <b>Mandarin Journey</b>
-        <small>
-          Panama → <span className="j-han">中国</span>
-        </small>
+    <div className={`j-splash ${night ? 'night' : ''} ${leaving ? 'leaving' : ''}`} role="status" aria-label="Loading">
+      {/* A blurred copy fills any screen shape the painting does not reach. */}
+      <div className="j-splash-fill" style={{ backgroundImage: `url(${art})` }} />
+      <img className="j-splash-art" src={art} alt="" fetchPriority="high" decoding="async" />
+      <div className="j-splash-top">
+        <div className="j-splash-logo">
+          <span className="j-han">汉</span>
+          <b>Mandarin Journey</b>
+          <small>
+            Panama → <span className="j-han">中国</span>
+          </small>
+        </div>
+        <div className="j-splash-load">
+          <div className="j-splash-row">
+            <span className="j-splash-label">
+              <b className="j-han">{leaving ? '上车！' : '加载中'}</b>
+              <small>{leaving ? 'shàng chē · All aboard!' : 'jiāzài zhōng · Loading'}</small>
+            </span>
+            <span className="j-splash-pct">{pct}%</span>
+          </div>
+          <div className="j-splash-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
+            <i style={{ width: `${pct}%` }} />
+          </div>
+        </div>
       </div>
-      <div className="j-splash-track" style={{ top: `${RAIL * 100}%` }}>
-        <img
-          className="j-splash-train"
-          src={asset('train-felt.webp')}
-          alt=""
-          style={{ left: leaving ? '115%' : `calc(${shown} * (100% - min(62%, 420px) * 0.88) - min(62%, 420px) * 0.12)` }}
-        />
-      </div>
-      <p className="j-splash-text">
-        {leaving ? (
-          <>
-            <span className="j-han">上车！</span> All aboard!
-          </>
-        ) : (
-          <>Loading the journey… {Math.round(shown * 100)}%</>
-        )}
-      </p>
     </div>
   )
 }
