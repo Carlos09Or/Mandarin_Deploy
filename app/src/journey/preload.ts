@@ -20,8 +20,6 @@ const FILES = [
   'stops/airplane.webp', 'stops/promenade.webp', 'stops/church.webp', 'stops/chinese-gate.webp', 'stops/bicycle.webp',
   'stops/ruin-tower.webp', 'stops/storybook.webp', 'stops/fishing-boat.webp', 'stops/waterfall.webp', 'stops/mountain.webp',
   'stops/beach-umbrella.webp', 'stops/arch-bridge.webp',
-  // new-word illustrations
-  'felt/wo-hand.webp', 'felt/wo-weapon.webp', 'felt/wo-together.webp', 'felt/ni.webp', 'felt/ta-he.webp', 'felt/ta-she.webp',
 ]
 
 /** Decoded images are kept here for the whole session, so the browser never drops them. */
