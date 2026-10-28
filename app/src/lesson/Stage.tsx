@@ -6,7 +6,7 @@ import type { ReactNode } from 'react'
  */
 export function Stage({ eyebrow, title, children }: { eyebrow: string; title?: ReactNode; children: ReactNode }) {
   return (
-    <div className="flex min-h-full flex-col gap-6">
+    <div className="flex flex-1 flex-col gap-6">
       <div>
         <p className="text-xs font-extrabold tracking-[0.18em] text-muted uppercase">{eyebrow}</p>
         {title && <h2 className="mt-2 text-[28px] leading-tight font-extrabold">{title}</h2>}
