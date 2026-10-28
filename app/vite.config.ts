@@ -10,7 +10,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // A new service worker takes over at once; src/lib/updates.ts registers it and reloads onto it.
       registerType: 'autoUpdate',
+      injectRegister: false,
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Mandarin Learning Hub · HSK 1',
@@ -28,6 +30,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // A new service worker takes over at once instead of waiting for every tab to close.
+        skipWaiting: true,
+        clientsClaim: true,
         // The journey artwork is precached too, so after the first visit everything opens from the device.
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,json,webp}'],
         runtimeCaching: [

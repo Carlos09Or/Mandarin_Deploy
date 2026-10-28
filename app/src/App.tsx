@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Shell, type Tab } from './components/Shell'
 import type { PathNode } from './data/course'
 import { FRIEND_IDS, type FriendId } from './data/friends'
@@ -10,6 +10,7 @@ import { Route } from './journey/Route'
 import { Splash } from './journey/Splash'
 import { TrainRide } from './journey/TrainRide'
 import { nextProvince } from './journey/stops'
+import { holdUpdates } from './lib/updates'
 import { toast } from './journey/toast'
 import { LessonComplete } from './lesson/LessonComplete'
 import { LessonPlayer, type LessonSummary } from './lesson/LessonPlayer'
@@ -52,6 +53,10 @@ export default function App() {
   // The loading screen preloads every picture once; the app is mounted behind it meanwhile.
   const [loaded, setLoaded] = useState(false)
   const mapVisible = tab === 'map' && !province
+
+  // A new version of the app reloads the page, so it waits until the learner isn't mid-lesson.
+  const busy = !!(ride || session || result || stamp || aboard)
+  useEffect(() => (busy ? holdUpdates() : undefined), [busy])
 
   const start = (exercises: Exercise[], nodeId: string | null = null, newWords: number[] = [], journey?: Ride) =>
     setSession({ exercises, nodeId, newWords, key: Date.now(), buddy: nextBuddy(), station: journey?.place, province: journey?.province })
