@@ -1,4 +1,4 @@
-import type { CSSProperties, Ref } from 'react'
+import type { CSSProperties, ReactNode, Ref } from 'react'
 import type { FriendId } from '../data/friends'
 import { PORTRAITS, asset } from '../data/journey'
 
@@ -123,3 +123,50 @@ export const BookIcon = () => (
     </svg>
   </div>
 )
+
+/**
+ * The title card shared by the map and the routes: a round button on the left (the traveller or
+ * "back") and a frosted card with a small kicker, the place in English and Chinese, and an
+ * optional progress bar. Dark glass at night.
+ */
+export function TitleCard({
+  lead,
+  kicker,
+  name,
+  zh,
+  progress,
+  night,
+  paper,
+}: {
+  lead: ReactNode
+  kicker: string
+  name: string
+  zh: string
+  progress?: [done: number, total: number]
+  night?: boolean
+  /** Warm paper card (cream by day, slate by night) for routes drawn over a painted backdrop. */
+  paper?: boolean
+}) {
+  return (
+    <div className={`j-titlebar ${paper ? 'paper' : ''} ${night ? 'night' : ''}`}>
+      {lead}
+      <div className="j-card">
+        <small>{kicker}</small>
+        <p className="j-card-name" role="heading" aria-level={1}>
+          {name}
+          <span className="j-han">{zh}</span>
+        </p>
+        {progress && (
+          <div className="j-prog">
+            <b>
+              <i style={{ width: `${(progress[0] / progress[1]) * 100}%` }} />
+            </b>
+            <span>
+              {progress[0]}/{progress[1]}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

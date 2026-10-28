@@ -1,0 +1,442 @@
+{
+ "我": {
+  "type": "ideographic",
+  "hint": "A hand 扌 holding a weapon 戈",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰扌戈",
+  "radical": "戈"
+ },
+ "们": {
+  "type": "pictophonetic",
+  "hint": "people",
+  "semantic": "亻",
+  "phonetic": "门",
+  "decomposition": "⿰亻门",
+  "radical": "亻"
+ },
+ "你": {
+  "type": "ideographic",
+  "hint": "Pronoun 尔 for a person 亻",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰亻尔",
+  "radical": "亻"
+ },
+ "他": {
+  "type": "ideographic",
+  "hint": "An additional, \"also\" 也  person 亻",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰亻也",
+  "radical": "亻"
+ },
+ "她": {
+  "type": "ideographic",
+  "hint": "A woman 女 beside you 也",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰女也",
+  "radical": "女"
+ },
+ "爸": {
+  "type": "pictophonetic",
+  "hint": "father",
+  "semantic": "父",
+  "phonetic": "巴",
+  "decomposition": "⿱父巴",
+  "radical": "父"
+ },
+ "妈": {
+  "type": "pictophonetic",
+  "hint": "woman",
+  "semantic": "女",
+  "phonetic": "马",
+  "decomposition": "⿰女马",
+  "radical": "女"
+ },
+ "儿": {
+  "type": "pictographic",
+  "hint": "Simplified form of 兒, a picture of a child; compare 人",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰丿乚",
+  "radical": "儿"
+ },
+ "子": {
+  "type": "pictographic",
+  "hint": "A child in a wrap, with outstretched arms but bundled legs",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿻了一",
+  "radical": "子"
+ },
+ "女": {
+  "type": "pictographic",
+  "hint": "A woman turned to the side",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "？",
+  "radical": "女"
+ },
+ "老": {
+  "type": "pictographic",
+  "hint": "A person bent over with long hair 匕 and a crutch; compare 耂",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱耂匕",
+  "radical": "老"
+ },
+ "师": {
+  "type": "ideographic",
+  "hint": "To skillfully wield 帀 a knife 刂",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰刂帀",
+  "radical": "巾"
+ },
+ "学": {
+  "type": "ideographic",
+  "hint": "A building 冖 where children 子 study; ⺍ provides the pronunciation",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱⿱⺍冖子",
+  "radical": "子"
+ },
+ "生": {
+  "type": "ideographic",
+  "hint": " A shoot 屮 growing in the soil 土",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿻一土",
+  "radical": "生"
+ },
+ "同": {
+  "type": "ideographic",
+  "hint": "Sharing a common 凡 tongue 口",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿵凡口",
+  "radical": "口"
+ },
+ "朋": {
+  "type": "ideographic",
+  "hint": "Two people 月 walking together",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰月月",
+  "radical": "月"
+ },
+ "友": {
+  "type": "ideographic",
+  "hint": "Two hands 又 joined, representing friendship; 又 also provides the pronunciation",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿸？又",
+  "radical": "又"
+ },
+ "医": {
+  "type": "pictophonetic",
+  "hint": "arrow",
+  "semantic": "矢",
+  "phonetic": "匸",
+  "decomposition": "⿷匸矢",
+  "radical": "匸"
+ },
+ "名": {
+  "type": "ideographic",
+  "hint": "A name called out 口 to hail someone at night 夕",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿸夕口",
+  "radical": "口"
+ },
+ "字": {
+  "type": "ideographic",
+  "hint": "A child 子 in a house 宀; 子 also provides the pronunciation",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱宀子",
+  "radical": "子"
+ },
+ "您": {
+  "type": "ideographic",
+  "hint": "You 你 said with affection 心",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱你心",
+  "radical": "心"
+ },
+ "它": {
+  "type": "unknown",
+  "hint": null,
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱宀匕",
+  "radical": "宀"
+ },
+ "弟": {
+  "type": "unknown",
+  "hint": null,
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱丷⿻弓？",
+  "radical": "弓"
+ },
+ "哥": {
+  "type": "ideographic",
+  "hint": "One person talking 可 over another 可",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱可可",
+  "radical": "口"
+ },
+ "姐": {
+  "type": "pictophonetic",
+  "hint": "woman",
+  "semantic": "女",
+  "phonetic": "且",
+  "decomposition": "⿰女且",
+  "radical": "女"
+ },
+ "妹": {
+  "type": "pictophonetic",
+  "hint": "woman",
+  "semantic": "女",
+  "phonetic": "未",
+  "decomposition": "⿰女未",
+  "radical": "女"
+ },
+ "孩": {
+  "type": "pictophonetic",
+  "hint": "child",
+  "semantic": "子",
+  "phonetic": "亥",
+  "decomposition": "⿰子亥",
+  "radical": "子"
+ },
+ "家": {
+  "type": "pictophonetic",
+  "hint": "roof",
+  "semantic": "宀",
+  "phonetic": "豕",
+  "decomposition": "⿱宀豕",
+  "radical": "宀"
+ },
+ "人": {
+  "type": "pictographic",
+  "hint": "The legs of a human being",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "？",
+  "radical": "人"
+ },
+ "大": {
+  "type": "ideographic",
+  "hint": "A man 人 with outstretched arms",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿻一人",
+  "radical": "大"
+ },
+ "男": {
+  "type": "ideographic",
+  "hint": "Someone who can work 力 the farm 田",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱田力",
+  "radical": "田"
+ },
+ "这": {
+  "type": "unknown",
+  "hint": null,
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿺辶文",
+  "radical": "辶"
+ },
+ "那": {
+  "type": "unknown",
+  "hint": null,
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰⿹？？阝",
+  "radical": "阝"
+ },
+ "哪": {
+  "type": "pictophonetic",
+  "hint": "mouth",
+  "semantic": "口",
+  "phonetic": "那",
+  "decomposition": "⿰口那",
+  "radical": "口"
+ },
+ "谁": {
+  "type": "pictophonetic",
+  "hint": "speech",
+  "semantic": "讠",
+  "phonetic": "隹",
+  "decomposition": "⿰讠隹",
+  "radical": "讠"
+ },
+ "什": {
+  "type": "ideographic",
+  "hint": "A file of ten 十 people 亻",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰亻十",
+  "radical": "亻"
+ },
+ "么": {
+  "type": "unknown",
+  "hint": null,
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱丿厶",
+  "radical": "丿"
+ },
+ "多": {
+  "type": "ideographic",
+  "hint": "Two nights 夕, suggesting many",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱夕夕",
+  "radical": "夕"
+ },
+ "少": {
+  "type": "pictographic",
+  "hint": "Grains of sand; 小 provides the pronunciation and meaning",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱小丿",
+  "radical": "小"
+ },
+ "几": {
+  "type": "pictographic",
+  "hint": "A small table; compare 丌",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰丿乙",
+  "radical": "几"
+ },
+ "怎": {
+  "type": "pictophonetic",
+  "hint": "heart",
+  "semantic": "心",
+  "phonetic": "乍",
+  "decomposition": "⿱乍心",
+  "radical": "心"
+ },
+ "样": {
+  "type": "pictophonetic",
+  "hint": "tree",
+  "semantic": "木",
+  "phonetic": "羊",
+  "decomposition": "⿰木羊",
+  "radical": "木"
+ },
+ "吗": {
+  "type": "pictophonetic",
+  "hint": "mouth",
+  "semantic": "口",
+  "phonetic": "马",
+  "decomposition": "⿰口马",
+  "radical": "口"
+ },
+ "呢": {
+  "type": "pictophonetic",
+  "hint": "mouth",
+  "semantic": "口",
+  "phonetic": "尼",
+  "decomposition": "⿰口尼",
+  "radical": "口"
+ },
+ "喂": {
+  "type": "pictophonetic",
+  "hint": "mouth",
+  "semantic": "口",
+  "phonetic": "畏",
+  "decomposition": "⿰口畏",
+  "radical": "口"
+ },
+ "请": {
+  "type": "pictophonetic",
+  "hint": "speech",
+  "semantic": "讠",
+  "phonetic": "青",
+  "decomposition": "⿰讠青",
+  "radical": "讠"
+ },
+ "没": {
+  "type": "pictophonetic",
+  "hint": "water",
+  "semantic": "氵",
+  "phonetic": "殳",
+  "decomposition": "⿰氵殳",
+  "radical": "氵"
+ },
+ "关": {
+  "type": "unknown",
+  "hint": null,
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱丷天",
+  "radical": "丷"
+ },
+ "系": {
+  "type": "pictophonetic",
+  "hint": "thread",
+  "semantic": "糸",
+  "phonetic": null,
+  "decomposition": "⿱丿糸",
+  "radical": "糸"
+ },
+ "个": {
+  "type": "ideographic",
+  "hint": "A tally 丨 of people 人",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱人丨",
+  "radical": "丨"
+ },
+ "里": {
+  "type": "ideographic",
+  "hint": "Unit of measure for farm 田 land 土",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿱田土",
+  "radical": "里"
+ },
+ "些": {
+  "type": "pictophonetic",
+  "hint": "two",
+  "semantic": "二",
+  "phonetic": "此",
+  "decomposition": "⿱此二",
+  "radical": "二"
+ },
+ "边": {
+  "type": "pictophonetic",
+  "hint": "walk",
+  "semantic": "辶",
+  "phonetic": "臱",
+  "decomposition": "⿺辶力",
+  "radical": "辶"
+ },
+ "问": {
+  "type": "pictophonetic",
+  "hint": "mouth",
+  "semantic": "口",
+  "phonetic": "门",
+  "decomposition": "⿵门口",
+  "radical": "门"
+ },
+ "好": {
+  "type": "ideographic",
+  "hint": "A woman 女 with a son 子",
+  "semantic": null,
+  "phonetic": null,
+  "decomposition": "⿰女子",
+  "radical": "女"
+ }
+}

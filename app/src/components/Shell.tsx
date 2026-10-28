@@ -67,7 +67,7 @@ export function Shell({ tab, onTab, bleed = false, children }: Props) {
   return (
     <div className={`flex ${bleed ? 'h-dvh' : 'min-h-full'}`}>
       {/* Desktop / tablet rail */}
-      <nav className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-2 border-r-2 border-line px-4 py-6 md:flex">
+      <nav className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-2 border-r-2 border-line-dark bg-card px-4 py-6 md:flex">
         <div className="mb-6 flex items-center gap-3 px-2">
           <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className="h-10 w-10" />
           <div className="leading-tight">
@@ -91,7 +91,8 @@ export function Shell({ tab, onTab, bleed = false, children }: Props) {
       </nav>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 border-b-2 border-line bg-paper/90 backdrop-blur pt-[env(safe-area-inset-top)]">
+        {/* On a phone or tablet the stats sit up here; on a computer they move to the right rail. */}
+        <header className="sticky top-0 z-30 border-b-2 border-line bg-paper/90 backdrop-blur pt-[env(safe-area-inset-top)] min-[900px]:hidden">
           <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
             <p className="font-black md:hidden">
               <span className="han text-brand">汉</span>
@@ -107,6 +108,11 @@ export function Shell({ tab, onTab, bleed = false, children }: Props) {
           <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-6 pb-28 md:pb-10">{children}</main>
         )}
       </div>
+
+      {/* Computer: stats in a right rail, so the middle is just the screen, between the menu and this rail */}
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-l-2 border-line-dark bg-card px-5 py-7 min-[900px]:flex xl:w-80 xl:px-6">
+        <div className="[&>div]:justify-between">{stats}</div>
+      </aside>
 
       {/* Phone dock */}
       <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t-2 border-line bg-paper md:hidden">

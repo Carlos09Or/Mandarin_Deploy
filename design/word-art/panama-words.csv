@@ -1,0 +1,61 @@
+n,word,pinyin,meaning,province,lesson,characters
+1,我,wǒ,I / me,Panama,1,我
+2,我们,wǒmen,we / us,Panama,1,我们
+3,你,nǐ,you,Panama,1,你
+4,他,tā,he / him,Panama,1,他
+5,她,tā,she / her,Panama,1,她
+70,爸爸,bàba,dad / father,Panama,2,爸爸
+71,妈妈,māma,mom / mother,Panama,2,妈妈
+72,儿子,érzi,son,Panama,2,儿子
+73,女儿,nǚ’ér,daughter,Panama,2,女儿
+74,老师,lǎoshī,teacher,Panama,2,老师
+75,学生,xuéshēng,student,Panama,3,学生
+76,同学,tóngxué,classmate,Panama,3,同学
+77,朋友,péngyou,friend,Panama,3,朋友
+78,医生,yīshēng,doctor,Panama,3,医生
+100,名字,míngzi,name,Panama,3,名字
+151,你们,nǐmen,you (plural),Panama,4,你们
+152,您,nín,you (polite),Panama,4,您
+153,他们,tāmen,they / them,Panama,4,他们
+154,她们,tāmen,they / them (female),Panama,4,她们
+155,它,tā,it,Panama,4,它
+156,它们,tāmen,they (animals / things),Panama,5,它们
+157,弟弟,dìdi,younger brother,Panama,5,弟弟
+158,哥哥,gēge,older brother,Panama,5,哥哥
+159,姐姐,jiějie,older sister,Panama,5,姐姐
+160,妹妹,mèimei,younger sister,Panama,5,妹妹
+161,孩子,háizi,child,Panama,6,孩子
+162,家人,jiārén,family member,Panama,6,家人
+163,大家,dàjiā,everyone,Panama,6,大家
+164,男朋友,nánpéngyou,boyfriend,Panama,6,男朋友
+165,女朋友,nǚpéngyou,girlfriend,Panama,6,女朋友
+6,这,zhè,this,Panama Oeste,1,这
+7,那,nà,that,Panama Oeste,1,那
+8,哪,nǎ,which,Panama Oeste,1,哪
+9,哪儿,nǎr,where,Panama Oeste,1,哪儿
+10,谁,shéi/shuí,who,Panama Oeste,1,谁
+11,什么,shénme,what,Panama Oeste,2,什么
+12,多少,duōshao,how much / how many,Panama Oeste,2,多少
+13,几,jǐ,how many (small count),Panama Oeste,2,几
+14,怎么,zěnme,how,Panama Oeste,2,怎么
+15,怎么样,zěnmeyàng,how is it? / how about...?,Panama Oeste,2,怎么样
+41,吗,ma,yes-no question particle,Panama Oeste,3,吗
+42,呢,ne,question / topic particle,Panama Oeste,3,呢
+43,喂,wèi,hello (on the phone),Panama Oeste,3,喂
+109,请,qǐng,please; to invite,Panama Oeste,3,请
+111,没关系,méi guānxi,it’s okay / no problem,Panama Oeste,3,没关系
+166,哪个,nǎge,which one,Panama Oeste,4,哪个
+167,哪里,nǎlǐ,where,Panama Oeste,4,哪里
+168,哪些,nǎxiē,which ones,Panama Oeste,4,哪些
+169,那边,nàbiān,over there,Panama Oeste,4,那边
+170,那个,nàge,that one,Panama Oeste,4,那个
+171,那里,nàlǐ,there,Panama Oeste,5,那里
+172,那儿,nàr,there,Panama Oeste,5,那儿
+173,那些,nàxiē,those,Panama Oeste,5,那些
+174,这边,zhèbiān,over here,Panama Oeste,5,这边
+175,这个,zhège,this one,Panama Oeste,5,这个
+176,这里,zhèlǐ,here,Panama Oeste,6,这里
+177,这儿,zhèr,here,Panama Oeste,6,这儿
+178,这些,zhèxiē,these,Panama Oeste,6,这些
+179,请问,qǐngwèn,"excuse me, may I ask",Panama Oeste,6,请问
+180,你好,nǐ hǎo,hello,Panama Oeste,6,你好

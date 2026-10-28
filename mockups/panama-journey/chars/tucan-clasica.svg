@@ -1,0 +1,176 @@
+<svg viewBox="0 0 200 200" class="friend friend-idle" aria-label="Zuǐzuǐ, the toucan" xmlns="http://www.w3.org/2000/svg"><style>.wawa { overflow: visible; }
+.wawa g, .wawa ellipse { transform-box: view-box; }
+.wawa-frog, .wawa-breathe, .wawa-shadow { transform-origin: 100px 186px; }
+.wawa-eye-l { transform-origin: 68px 64px; }
+.wawa-eye-r { transform-origin: 132px 64px; }
+.wawa-arm-l { transform-origin: 50px 112px; }
+.wawa-arm-r { transform-origin: 150px 112px; }
+.wawa-arm-l, .wawa-arm-r, .wawa-pupil { transition: transform 0.25s ease-out; }
+.wawa-breathe { animation: 2.6s ease-in-out 0s infinite normal none running wawa-breathe; }
+.wawa-eye { animation: 4.4s ease 0s infinite normal none running wawa-blink; }
+.wawa-spark { transform-box: fill-box; transform-origin: center center; animation: 1.2s ease-in-out 0s infinite normal none running wawa-twinkle; }
+.wawa-arm-up { display: none; }
+.wawa-happy .wawa-arm-up, .wawa-celebrate .wawa-arm-up, .wawa-fire .wawa-arm-up, .wawa-wave .wawa-arm-r .wawa-arm-up { display: inline; }
+.wawa-happy .wawa-arm-down, .wawa-celebrate .wawa-arm-down, .wawa-fire .wawa-arm-down, .wawa-wave .wawa-arm-r .wawa-arm-down { display: none; }
+.wawa-happy .wawa-frog { animation: 0.6s ease-out 0s 2 normal none running wawa-hop; }
+.wawa-celebrate .wawa-frog { animation: 1.2s cubic-bezier(0.3, 0.7, 0.4, 1) 0s infinite normal none running wawa-jump; }
+.wawa-celebrate .wawa-shadow { animation: 1.2s cubic-bezier(0.3, 0.7, 0.4, 1) 0s infinite normal none running wawa-shadow-jump; }
+.wawa-celebrate .wawa-arm-l { animation: 0.3s ease-in-out 0s infinite alternate none running wawa-cheer-l; }
+.wawa-celebrate .wawa-arm-r { animation: 0.3s ease-in-out 0s infinite alternate none running wawa-cheer-r; }
+.wawa-wave .wawa-arm-r { animation: 0.45s ease-in-out 0s infinite alternate none running wawa-wave; }
+.wawa-sad .wawa-frog { animation: 1.8s ease-in-out 0s infinite normal none running wawa-droop; }
+.wawa-sad .wawa-pupil { transform: translate(-2px, 5px); }
+.wawa-fire .wawa-frog { animation: 0.7s ease-in-out 0s infinite alternate none running wawa-dance; }
+.wawa-fire .wawa-arm-l { animation: 0.35s ease-in-out 0s infinite alternate none running wawa-pump-l; }
+.wawa-fire .wawa-arm-r { animation: 0.35s ease-in-out 0.35s infinite alternate none running wawa-pump-r; }
+@keyframes wawa-breathe { 
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.015, 1.03); }
+}
+@keyframes wawa-blink { 
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.08); }
+}
+@keyframes wawa-twinkle { 
+  0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+@keyframes wawa-hop { 
+  0% { transform: translateY(0px) scale(1, 1); }
+  20% { transform: translateY(3px) scale(1.06, 0.92); }
+  50% { transform: translateY(-24px) scale(0.96, 1.05); }
+  80% { transform: translateY(0px) scale(1.05, 0.94); }
+  100% { transform: translateY(0px) scale(1, 1); }
+}
+@keyframes wawa-jump { 
+  0% { transform: translateY(0px) scale(1, 1); }
+  12% { transform: translateY(4px) scale(1.1, 0.88); }
+  40% { transform: translateY(-52px) scale(0.94, 1.08); }
+  55% { transform: translateY(-54px) scale(1, 1); }
+  78% { transform: translateY(0px) scale(1.1, 0.9); }
+  88% { transform: translateY(0px) scale(0.97, 1.03); }
+  100% { transform: translateY(0px) scale(1, 1); }
+}
+@keyframes wawa-shadow-jump { 
+  0%, 100% { transform: scale(1); opacity: 0.12; }
+  40%, 55% { transform: scale(0.55); opacity: 0.06; }
+}
+@keyframes wawa-cheer-l { 
+  0% { transform: rotate(8deg); }
+  100% { transform: rotate(-14deg); }
+}
+@keyframes wawa-cheer-r { 
+  0% { transform: rotate(-8deg); }
+  100% { transform: rotate(14deg); }
+}
+@keyframes wawa-wave { 
+  0% { transform: rotate(-10deg); }
+  100% { transform: rotate(18deg); }
+}
+@keyframes wawa-droop { 
+  0%, 100% { transform: rotate(0deg) translateY(0px); }
+  50% { transform: rotate(-3deg) translateY(3px); }
+}
+@keyframes wawa-dance { 
+  0% { transform: rotate(-7deg) translateY(0px); }
+  100% { transform: rotate(7deg) translateY(-8px); }
+}
+@keyframes wawa-pump-l { 
+  0% { transform: rotate(-55deg); }
+  100% { transform: rotate(6deg); }
+}
+@keyframes wawa-pump-r { 
+  0% { transform: rotate(55deg); }
+  100% { transform: rotate(-6deg); }
+}
+.wawa * { animation: auto ease 0s 1 normal none running none !important; }
+.friend { overflow: visible; }
+.friend g, .friend path, .friend text { transform-box: view-box; }
+.friend-blink { transform-origin: center center; animation: 4.8s ease 0s infinite normal none running wawa-blink; transform-box: fill-box !important; }
+.friend-locked { filter: grayscale(1); opacity: 0.4; }
+.friend-locked *, .friend-locked { animation-play-state: paused !important; }
+.friend-body { transform-origin: 100px 176px; }
+.friend-happy .friend-body { animation: 0.6s ease-out 0s 2 normal none running wawa-hop; }
+.friend-celebrate .friend-body { animation: 1.2s cubic-bezier(0.3, 0.7, 0.4, 1) 0s infinite normal none running wawa-jump; }
+.friend-sad .friend-body { animation: 1.8s ease-in-out 0s infinite normal none running wawa-droop; }
+.friend-look { transition: transform 0.25s ease-out; }
+.friend-sad .friend-look { transform: translateY(3px); }
+.flag-wave { transform-origin: left center; animation: 1.1s ease-in-out 0s infinite alternate none running flag-wave; transform-box: fill-box !important; }
+.tembleque { transform-origin: center bottom; animation: 0.45s ease-in-out 0s infinite alternate none running tembleque; transform-box: fill-box !important; }
+@keyframes flag-wave { 
+  0% { transform: skewY(-7deg) scaleX(0.94); }
+  100% { transform: skewY(5deg) scaleX(1); }
+}
+@keyframes tembleque { 
+  0% { transform: rotate(-7deg); }
+  100% { transform: rotate(7deg); }
+}
+.harpia-head { transform-origin: 100px 112px; animation: 4s ease-in-out 0s infinite normal none running harpia-look; }
+.harpia-wing-l { transform-origin: 66px 100px; animation: 4s ease-in-out 0s infinite normal none running harpia-flap-l; }
+.harpia-wing-r { transform-origin: 134px 100px; animation: 4s ease-in-out 0s infinite normal none running harpia-flap-r; }
+@keyframes harpia-look { 
+  0%, 18%, 100% { transform: rotate(0deg); }
+  26%, 40% { transform: rotate(-14deg); }
+  50%, 64% { transform: rotate(12deg); }
+}
+@keyframes harpia-flap-l { 
+  0%, 80%, 100% { transform: rotate(0deg); }
+  85%, 93% { transform: rotate(40deg); }
+  89% { transform: rotate(5deg); }
+}
+@keyframes harpia-flap-r { 
+  0%, 80%, 100% { transform: rotate(0deg); }
+  85%, 93% { transform: rotate(-40deg); }
+  89% { transform: rotate(-5deg); }
+}
+.sloth-swing { transform-origin: 100px 30px; animation: 3.6s ease-in-out 0s infinite alternate none running sloth-swing; }
+.sloth-z { opacity: 0; animation: 3s ease-out 0s infinite normal none running sloth-z; transform-box: fill-box !important; }
+@keyframes sloth-swing { 
+  0% { transform: rotate(-8deg); }
+  100% { transform: rotate(8deg); }
+}
+@keyframes sloth-swing-big { 
+  0% { transform: rotate(-16deg); }
+  100% { transform: rotate(16deg); }
+}
+.friend-happy .sloth-swing { animation: 0.35s ease-in-out 0s 4 alternate none running sloth-swing-big; }
+.friend-celebrate .sloth-swing { animation: 0.5s ease-in-out 0s infinite alternate none running sloth-swing-big; }
+.friend-sad .sloth-swing { animation: 4s ease-in-out 0s infinite alternate none running sloth-swing; }
+.friend-celebrate .harpia-wing-l { animation: 0.25s ease-in-out 0s infinite alternate none running harpia-cheer-l; }
+.friend-celebrate .harpia-wing-r { animation: 0.25s ease-in-out 0s infinite alternate none running harpia-cheer-r; }
+.friend-happy .harpia-wing-l { animation: 0.2s ease-in-out 0s 4 alternate none running harpia-cheer-l; }
+.friend-happy .harpia-wing-r { animation: 0.2s ease-in-out 0s 4 alternate none running harpia-cheer-r; }
+@keyframes harpia-cheer-l { 
+  0% { transform: rotate(10deg); }
+  100% { transform: rotate(55deg); }
+}
+@keyframes harpia-cheer-r { 
+  0% { transform: rotate(-10deg); }
+  100% { transform: rotate(-55deg); }
+}
+@keyframes sloth-z { 
+  0% { opacity: 0; transform: translate(0px, 0px); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translate(14px, -26px); }
+}
+.tucan-body { transform-origin: 95px 172px; animation: 2.6s ease-in-out 0s infinite normal none running tucan-hop; }
+.tucan-berry { animation: 2.6s ease-in-out 0s infinite normal none running tucan-berry; }
+.friend-happy .tucan-body { animation: 0.6s ease-out 0s 2 normal none running wawa-hop; }
+.friend-celebrate .tucan-body { animation: 1.2s cubic-bezier(0.3, 0.7, 0.4, 1) 0s infinite normal none running wawa-jump; }
+.friend-sad .tucan-body { animation: 1.8s ease-in-out 0s infinite normal none running wawa-droop; }
+@keyframes tucan-hop { 
+  0%, 60%, 100% { transform: translateY(0px) scale(1, 1); }
+  66% { transform: translateY(2px) scale(1.04, 0.95); }
+  76% { transform: translateY(-10px) scale(0.98, 1.03); }
+  86% { transform: translateY(0px) scale(1.03, 0.97); }
+}
+@keyframes tucan-berry { 
+  0% { transform: translate(0px, 0px); opacity: 1; }
+  30% { transform: translate(-6px, -54px); }
+  55% { transform: translate(-30px, 2px); opacity: 1; }
+  58%, 92% { transform: translate(-30px, 2px); opacity: 0; }
+  100% { transform: translate(0px, 0px); opacity: 1; }
+}
+.friend * { animation: auto ease 0s 1 normal none running none !important; }
+.fly, .fly-tongue, .fly-yum, .tucan-berry { display: none; }
+</style><defs><clipPath id="bill-_r_7_"><path d="M112 64 Q152 52 186 80 Q182 92 168 94 Q140 98 112 94 Q106 80 112 64Z"></path></clipPath></defs><g><rect x="14" y="166" width="154" height="12" rx="6" fill="#8a5a34"></rect><ellipse cx="26" cy="162" rx="10" ry="5" fill="#5b8f3a" transform="rotate(-20 26 162)"></ellipse><ellipse cx="158" cy="164" rx="9" ry="4.5" fill="#6fa64a" transform="rotate(15 158 164)"></ellipse></g><g class="tucan-body"><path d="M70 150 L56 190 L78 186 L86 156Z" fill="#1f1f24"></path><ellipse cx="88" cy="128" rx="32" ry="42" fill="#1f1f24"></ellipse><ellipse cx="84" cy="164" rx="12" ry="6" fill="#e0453a"></ellipse><ellipse cx="80" cy="168" rx="7" ry="5" fill="#3b8fd9"></ellipse><ellipse cx="98" cy="168" rx="7" ry="5" fill="#3b8fd9"></ellipse><ellipse cx="98" cy="104" rx="22" ry="22" fill="#ffd43b"></ellipse><path d="M78 120 Q98 130 116 118" stroke="#e0453a" stroke-width="3" fill="none" stroke-linecap="round"></path><circle cx="92" cy="76" r="28" fill="#1f1f24"></circle><ellipse cx="104" cy="90" rx="14" ry="12" fill="#ffd43b"></ellipse><circle cx="104" cy="72" r="10" fill="#7bd389"></circle><g class="friend-look"><g class="friend-blink"><circle cx="106" cy="73" r="5.5" fill="#2b2420"></circle><circle cx="107.925" cy="71.075" r="1.98" fill="#fff"></circle><circle cx="104.35" cy="75.09" r="0.88" fill="#fff"></circle></g></g><g clip-path="url(#bill-_r_7_)"><rect x="100" y="50" width="36" height="50" fill="#7cc04b"></rect><rect x="136" y="50" width="24" height="50" fill="#f2802a"></rect><rect x="160" y="50" width="30" height="50" fill="#e0453a"></rect><path d="M112 93 Q142 97 176 90" stroke="#3b8fd9" stroke-width="6" fill="none"></path></g><path d="M114 86 Q146 88 180 82" stroke="#1f1f24" stroke-width="1.4" fill="none"></path><path d="M112 64 Q152 52 186 80 Q182 92 168 94 Q140 98 112 94" stroke="#1f1f24" stroke-width="1.5" fill="none"></path></g><g class="tucan-berry"><circle cx="182" cy="76" r="6" fill="#8a3fbf"></circle><circle cx="184" cy="74" r="1.8" fill="#fff" opacity=".8"></circle></g></svg>

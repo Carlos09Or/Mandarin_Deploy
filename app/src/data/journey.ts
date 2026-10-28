@@ -19,6 +19,8 @@ export type Province = {
   story?: { title: string; sub: string }
   landmark?: { name: string; zh: string; py: string; image: string }
   header?: { day: string; night?: string }
+  /** A tall painting for the whole route: scenery down both sides, the middle left clear for the path. */
+  backdrop?: { day: string; night: string }
   stamp?: StampStyle
   postcard?: { image: string; zh: string; py: string; en: string }
 }
@@ -33,7 +35,7 @@ export const PROVINCES: Province[] = [
     stops: ['Tocumen Airport', 'Cinta Costera', 'Casco Viejo', 'Barrio Chino', 'Amador Causeway', 'Panama Viejo'],
     story: { title: 'Story · The railroad', sub: 'Panama & China · 3 min' },
     landmark: { name: 'Panama Canal', zh: '运河', py: 'Bānámǎ Yùnhé', image: 'landmark-canal.webp' },
-    header: { day: 'skyline-day.webp', night: 'skyline-night.webp' },
+    backdrop: { day: 'route-bg-day.webp', night: 'route-bg-night.webp' },
     stamp: { shape: 'round', color: '#0a426d' },
     postcard: { image: 'postcard-panama.webp', zh: '你好！我在巴拿马。', py: 'Nǐ hǎo! Wǒ zài Bānámǎ.', en: "Hello! I'm in Panama." },
   },
@@ -44,7 +46,7 @@ export const PROVINCES: Province[] = [
     py: 'Xī Bānámǎ',
     unit: 2,
     stops: ['Arraijan', 'Vacamonte', 'La Chorrera', 'El Chorro Falls', 'Capira', 'Coronado Beach'],
-    landmark: { name: 'Bridge of the Americas', zh: '大桥', py: 'Měizhōu Dàqiáo', image: 'ride-landscape.webp' },
+    landmark: { name: 'Bridge of the Americas', zh: '大桥', py: 'Měizhōu Dàqiáo', image: 'stops/arch-bridge.webp' },
     header: { day: 'ride-landscape.webp' },
     stamp: { shape: 'box', color: '#206241' },
     postcard: { image: 'ride-landscape.webp', zh: '你好！我在西巴拿马。', py: 'Nǐ hǎo! Wǒ zài Xī Bānámǎ.', en: "Hello! I'm in Panama Oeste." },
@@ -61,6 +63,21 @@ export const PROVINCES: Province[] = [
 export const provinceById = (id: string) => PROVINCES.find((p) => p.id === id)!
 export const provinceOfUnit = (unit: number) => PROVINCES.find((p) => p.unit === unit)
 export const hasContent = (p: Province) => !!p.stops
+
+/** Felt medallion for each stop on a route; stops without one show their key hanzi instead. */
+export const STOP_ICONS: Record<string, string> = {
+  'Tocumen Airport': 'stops/airplane.webp',
+  'Cinta Costera': 'stops/promenade.webp',
+  'Casco Viejo': 'stops/church.webp',
+  'Barrio Chino': 'stops/chinese-gate.webp',
+  'Amador Causeway': 'stops/bicycle.webp',
+  'Panama Viejo': 'stops/ruin-tower.webp',
+  Vacamonte: 'stops/fishing-boat.webp',
+  'El Chorro Falls': 'stops/waterfall.webp',
+  Capira: 'stops/mountain.webp',
+  'Coronado Beach': 'stops/beach-umbrella.webp',
+}
+export const STORY_ICON = 'stops/storybook.webp'
 
 // ---- Map geometry (map-provinces.json comes from tools/build_panama_map.py) ----
 
@@ -84,12 +101,29 @@ export const CLOUDS: Record<string, [string, number, number, number][]> = {
   ],
   'panama-oeste': [['map-cloud-3', -22, -6, 110], ['map-cloud-4', 22, 16, 80], ['map-cloud', 6, -22, 80]],
 }
-/** Boats lifted off the painting by tools/prep_map_boats.py: hull box as map fractions, and heading. */
-export const BOATS = [
-  { src: 'boat-1', box: [0.40191, 0.14665, 0.44976, 0.20404], dir: [-0.92, 0.39], secs: 22 },
-  { src: 'boat-2', box: [0.56938, 0.79915, 0.61842, 0.86291], dir: [-0.88, 0.47], secs: 25 },
-] as const
-
+/**
+ * Sea lanes in map (viewBox) coordinates. Small boats potter along the coasts; big ships sail to
+ * and from the Canal (its Pacific mouth is near 570,135 and its Caribbean one near 520,35).
+ * Sprites face left with the bow down-left; `size` is the boat's width as a share of the map.
+ * A lane whose sprite isn't in public/journey/boats yet is simply skipped.
+ */
+export type SeaLane = { sprite: string; from: [number, number]; to: [number, number]; size: number; secs: number }
+export const SEA_LANES: SeaLane[] = [
+  // big ships, slow, on the Canal routes
+  { sprite: 'boats/cargo-ship', from: [700, 430], to: [585, 145], size: 0.06, secs: 95 },
+  { sprite: 'boats/cargo-ship', from: [560, 150], to: [470, 470], size: 0.06, secs: 110 },
+  { sprite: 'boats/cruise-ship', from: [380, -60], to: [512, 30], size: 0.055, secs: 90 },
+  { sprite: 'boats/tanker', from: [540, 25], to: [660, -75], size: 0.055, secs: 100 },
+  // small boats along the coasts
+  { sprite: 'boat-1', from: [600, 175], to: [690, 300], size: 0.03, secs: 46 },
+  { sprite: 'boat-2', from: [360, 445], to: [545, 455], size: 0.03, secs: 52 },
+  { sprite: 'boats/fishing-boat', from: [60, 295], to: [175, 315], size: 0.026, secs: 44 },
+  { sprite: 'boats/sailboat', from: [260, 32], to: [420, 12], size: 0.026, secs: 50 },
+  { sprite: 'boats/cayuco', from: [700, 12], to: [870, 62], size: 0.024, secs: 56 },
+  { sprite: 'boat-1', from: [600, 262], to: [705, 292], size: 0.026, secs: 40 },
+  { sprite: 'boats/sailboat', from: [100, 445], to: [250, 470], size: 0.026, secs: 58 },
+  { sprite: 'boat-2', from: [700, 425], to: [820, 462], size: 0.028, secs: 48 },
+]
 // ---- Scenes the train races through when a lesson starts ----
 
 /** rail: where the wheels meet the front rail, as a fraction of the image height (measured per painting). */

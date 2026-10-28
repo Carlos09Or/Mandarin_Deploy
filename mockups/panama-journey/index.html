@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Panama Journey · Mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Noto+Sans+SC:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #fbf7f0; --ink: #2b2420; --muted: #8b7f75; --line: #ece2d4;
+    --brand: #e0453a; --brand-dark: #b3322a; --jade: #2f9e7e; --gold: #f2b544; --gold-dark: #c98d1c;
+    --sky: #3b8fd9; --navy: #1c2e5c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #efe9df; color: var(--ink); font-family: Nunito, system-ui, sans-serif; }
+  .han { font-family: 'Noto Sans SC', 'PingFang SC', sans-serif; }
+
+  /* ---------- Gallery ---------- */
+  .page { max-width: 1280px; margin: 0 auto; padding: 40px 24px 80px; }
+  .hero h1 { font-size: 34px; font-weight: 900; margin: 0; }
+  .hero p { max-width: 760px; color: #5d544d; font-size: 16px; line-height: 1.6; }
+  .tag { display: inline-block; background: var(--brand); color: #fff; border-radius: 999px; padding: 4px 12px; font-weight: 800; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  section.group { margin-top: 56px; }
+  section.group h2 { font-size: 24px; font-weight: 900; margin: 0 0 4px; }
+  section.group > p { margin: 0 0 20px; color: #6b6158; max-width: 820px; line-height: 1.55; }
+  .row { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+  figure.shot { margin: 0; cursor: zoom-in; }
+  figure.shot figcaption { margin-top: 10px; font-weight: 800; font-size: 14px; max-width: 233px; }
+  figure.shot figcaption small { display: block; font-weight: 600; color: var(--muted); font-size: 12.5px; margin-top: 2px; line-height: 1.4; }
+  .holder { width: calc(375px * var(--s) + 20px * var(--s)); height: calc(812px * var(--s) + 20px * var(--s)); --s: .62; }
+  .holder.sm { --s: .5; }
+  .phone { width: 395px; height: 832px; padding: 10px; border-radius: 54px; background: #1d1a18; box-shadow: 0 24px 50px -20px rgba(0,0,0,.45); transform: scale(var(--s)); transform-origin: top left; }
+  .screen { width: 375px; height: 812px; border-radius: 44px; overflow: hidden; position: relative; background: var(--paper); display: flex; flex-direction: column; }
+
+  /* Zoom modal */
+  #modal { position: fixed; inset: 0; background: rgba(20,16,14,.72); display: none; align-items: center; justify-content: center; z-index: 50; cursor: zoom-out; }
+  #modal.open { display: flex; }
+  #modal .holder { --s: 1; }
+  #modal .screen .scroll { overflow-y: auto; }
+  #modal .hint { position: fixed; top: 14px; left: 0; right: 0; text-align: center; color: #fff; font-weight: 700; font-size: 13px; opacity: .8; }
+
+  /* ---------- App chrome ---------- */
+  .status { height: 44px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; font-weight: 800; font-size: 15px; }
+  .appbar { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 10px; }
+  .logo { font-weight: 900; font-size: 15px; display: flex; gap: 6px; align-items: center; }
+  .logo b { color: var(--brand); font-family: 'Noto Sans SC'; }
+  .stats { display: flex; gap: 12px; font-weight: 900; font-size: 14px; align-items: center; }
+  .stats span { display: flex; align-items: center; gap: 3px; }
+  .scroll { flex: 1; overflow: hidden; position: relative; }
+  .nav { flex: none; display: flex; justify-content: space-around; padding: 8px 6px 22px; border-top: 2px solid var(--line); background: inherit; }
+  .nav div { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10.5px; font-weight: 800; color: var(--muted); padding: 5px 10px; border-radius: 14px; border: 2px solid transparent; }
+  .nav div.on { color: #2a6fae; background: #e3effb; border-color: #9cc6ee; }
+  .nav svg { width: 22px; height: 22px; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 16px; padding: 13px 16px; font-weight: 900; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; color: #fff; background: var(--brand); box-shadow: 0 4px 0 var(--brand-dark); }
+  .btn.jade { background: var(--jade); box-shadow: 0 4px 0 #1f7a5f; }
+  .btn.ghost { background: #fff; color: var(--muted); border: 2px solid #dccfbd; box-shadow: 0 3px 0 #dccfbd; }
+  .eyebrow { font-size: 11.5px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+
+  /* ---------- Map scenes ---------- */
+  .scene { position: relative; margin: 0 10px; border-radius: 26px; overflow: hidden; height: 250px; }
+  .scene svg.map { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .scene .sea-label { position: absolute; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .55; }
+  .scene .legend { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; gap: 10px; font-size: 10.5px; font-weight: 800; }
+  .scene .legend span { display: flex; align-items: center; gap: 4px; }
+  .scene .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .scene .mini { position: absolute; right: 10px; bottom: 10px; width: 112px; height: 52px; border-radius: 10px; background: rgba(255,255,255,.75); padding: 3px; }
+  .swipe { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); font-size: 11px; font-weight: 800; background: rgba(255,255,255,.8); padding: 3px 10px; border-radius: 999px; color: #5d544d; white-space: nowrap; }
+  .styleA .scene { background: #f3ead9; }
+  .styleA { background: #f7f0e3 !important; }
+  .styleB .scene { background: #9fd6f2; }
+
+  .nextcard { margin: 12px 10px 0; border-radius: 22px; padding: 14px; display: flex; gap: 12px; align-items: center; }
+  .styleA .nextcard { background: #fffaf0; border: 2px solid #eadfca; }
+  .styleB .nextcard { background: #fff; border: 2px solid var(--line); }
+  .nextcard img { width: 76px; height: 76px; flex: none; }
+  .nextcard h3 { margin: 2px 0 2px; font-size: 22px; font-weight: 900; }
+  .nextcard p { margin: 0; font-size: 12.5px; color: var(--muted); font-weight: 700; }
+  .stamps { margin: 12px 10px 0; display: flex; justify-content: space-between; align-items: center; }
+  .stamps .dots { display: flex; gap: 5px; }
+  .stamps .dots i { width: 22px; height: 22px; border-radius: 50%; border: 2px dashed #cdbfab; display: block; }
+  .stamps .dots i.done { border: 2px solid var(--brand); background: #fde8e4; position: relative; }
+  .stamps .dots i.done::after { content: '✓'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; color: var(--brand); font-weight: 900; }
+  .stamps .dots i.cur { border: 2px solid var(--gold); background: #fff4d8; }
+
+  /* Pulses & small animations */
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: .55 } 50% { transform: scale(1.35); opacity: 0 } }
+  .pulse { transform-box: fill-box; transform-origin: center; animation: pulse 1.8s ease-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+  .bob { animation: bob 1.4s ease-in-out infinite; transform-box: fill-box; }
+  @keyframes puff { 0% { transform: translate(0,0) scale(.6); opacity: .85 } 100% { transform: translate(-14px,-26px) scale(1.6); opacity: 0 } }
+  .puff { transform-box: fill-box; transform-origin: center; animation: puff 1.6s ease-out infinite; }
+  @keyframes rain { from { transform: translate(0,-40px) } to { transform: translate(-30px, 340px) } }
+  .rain line { animation: rain .7s linear infinite; }
+  @keyframes twinkle { 0%,100% { opacity: .25 } 50% { opacity: 1 } }
+  .star { animation: twinkle 2.4s ease-in-out infinite; }
+  @keyframes flutter { from { transform: skewY(-6deg) } to { transform: skewY(6deg) } }
+  .bunting path { transform-box: fill-box; transform-origin: top center; animation: flutter .9s ease-in-out infinite alternate; }
+  @keyframes stampIn { 0% { transform: scale(2.4) rotate(-24deg); opacity: 0 } 55% { transform: scale(.92) rotate(-8deg); opacity: 1 } 75% { transform: scale(1.05) rotate(-10deg) } 100% { transform: scale(1) rotate(-9deg) } }
+  .stamp-new { animation: stampIn .9s cubic-bezier(.3,.7,.3,1) both; animation-delay: .4s; }
+  @keyframes fogOut { 0% { opacity: 1 } 100% { opacity: 0 } }
+
+  /* ---------- Route ---------- */
+  .routebar { flex: none; display: flex; align-items: center; gap: 10px; padding: 4px 14px 10px; }
+  .routebar .back { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: #fff; border: 2px solid var(--line); font-weight: 900; }
+  .routebar h2 { margin: 0; font-size: 20px; font-weight: 900; line-height: 1.1; }
+  .routebar small { font-size: 11.5px; font-weight: 800; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+  .route svg { display: block; width: 375px; }
+
+  /* ---------- Passport ---------- */
+  .pp-cover { flex: 1; margin: 6px 22px 30px; border-radius: 10px 26px 26px 10px; background: radial-gradient(120% 80% at 30% 20%, #2a447f 0%, #1c2e5c 55%, #142247 100%); box-shadow: inset 10px 0 0 rgba(0,0,0,.25), 0 18px 30px -12px rgba(0,0,0,.5); color: #f2d48a; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 14px; position: relative; }
+  .pp-cover::before { content: ''; position: absolute; inset: 14px; border: 1.5px solid rgba(242,212,138,.35); border-radius: 6px 18px 18px 6px; }
+  .pp-cover .t1 { font-family: Fraunces, serif; font-weight: 800; font-size: 30px; letter-spacing: .14em; }
+  .pp-cover .t2 { font-size: 13px; font-weight: 800; letter-spacing: .22em; }
+  .pp-cover .t3 { font-size: 22px; letter-spacing: .3em; }
+  .pp-book { flex: 1; margin: 4px 14px 12px; border-radius: 18px; background: #f6efe0; border: 2px solid #e6d9bf; position: relative; overflow: hidden;
+    background-image: repeating-linear-gradient(0deg, rgba(160,130,90,.07) 0 1px, transparent 1px 22px), radial-gradient(circle at 80% 10%, rgba(224,69,58,.05), transparent 40%); }
+  .pp-book .guilloche { position: absolute; inset: 0; opacity: .35; }
+  .pp-head { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 16px 6px; position: relative; }
+  .pp-head b { font-family: Fraunces, serif; font-size: 20px; }
+  .pp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 8px 16px; position: relative; }
+  .slot { height: 150px; border-radius: 16px; border: 2px dashed #d3c4a6; display: grid; place-items: center; text-align: center; color: #b4a385; font-size: 11.5px; font-weight: 800; }
+  .slot.filled { border: none; }
+  .postcard { margin: 6px 14px; border-radius: 18px; background: #fff; box-shadow: 0 16px 30px -18px rgba(0,0,0,.45); overflow: hidden; border: 2px solid #eadfca; }
+  .postcard .back { padding: 14px 16px; display: grid; grid-template-columns: 1fr 1px 92px; gap: 12px; }
+  .postcard .back .div { background: #e6d9bf; }
+  .pc-phrase { display: flex; align-items: center; gap: 10px; margin-top: 10px; background: #fff7e3; border-radius: 14px; padding: 8px 10px; }
+  .spk { width: 34px; height: 34px; border-radius: 11px; background: var(--sky); box-shadow: 0 3px 0 #2a6fae; display: grid; place-items: center; flex: none; }
+
+  /* ---------- Reading ---------- */
+  .rd-top { flex: none; display: flex; align-items: center; gap: 12px; padding: 4px 16px 8px; }
+  .rd-top .bar { flex: 1; height: 12px; background: #e8dcc8; border-radius: 99px; overflow: hidden; }
+  .rd-top .bar i { display: block; height: 100%; background: var(--jade); border-radius: 99px; }
+  .desk { flex: 1; background: #3d5a4c; background-image: radial-gradient(120% 60% at 50% 0%, #4a6b5a 0%, #2f473b 100%); padding: 14px 12px 12px; display: flex; flex-direction: column; }
+  .book { flex: 1; background: #fbf4e4; border-radius: 6px 18px 18px 6px; box-shadow: inset 14px 0 18px -14px rgba(90,60,30,.45), 0 18px 28px -14px rgba(0,0,0,.6), 5px 5px 0 #efe4cc, 9px 9px 0 #e2d4b6; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+  .book .ill { height: 210px; flex: none; position: relative; }
+  .book .txt { padding: 14px 18px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .narr { font-family: Fraunces, serif; font-weight: 600; font-size: 16.5px; line-height: 1.45; color: #3b2f26; }
+  .zh { display: flex; align-items: flex-start; gap: 10px; background: #fff; border: 2px solid #eadfca; border-radius: 16px; padding: 10px 12px; }
+  .zh .h { font-size: 24px; line-height: 1.25; }
+  .zh .p { font-size: 13px; font-weight: 800; color: #2a6fae; }
+  .zh .e { font-size: 12.5px; color: var(--muted); font-weight: 700; }
+  .gloss { position: absolute; background: var(--ink); color: #fff; border-radius: 12px; padding: 7px 10px; font-size: 12px; font-weight: 800; white-space: nowrap; box-shadow: 0 8px 16px -6px rgba(0,0,0,.5); }
+  .gloss::after { content: ''; position: absolute; left: 22px; bottom: -6px; border: 6px solid transparent; border-top-color: var(--ink); border-bottom: 0; }
+  .u { border-bottom: 3px dotted var(--brand); }
+  .chips { display: flex; gap: 6px; }
+  .chip { font-size: 11px; font-weight: 900; padding: 4px 9px; border-radius: 999px; border: 2px solid #dccfbd; color: var(--muted); }
+  .chip.on { border-color: var(--sky); background: #e3effb; color: #2a6fae; }
+  .draft { position: absolute; top: 10px; right: -34px; transform: rotate(35deg); background: #fde68a; color: #7a5a00; font-size: 9.5px; font-weight: 900; letter-spacing: .08em; padding: 3px 40px; text-transform: uppercase; z-index: 3; }
+  .opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .opt { border-radius: 14px; border: 2px solid var(--line); background: #fff; box-shadow: 0 3px 0 var(--line); text-align: center; padding: 8px 4px 6px; }
+  .opt .h { font-size: 22px; }
+  .opt small { display: block; font-size: 11px; font-weight: 800; color: var(--muted); }
+  .opt.ok { border-color: var(--jade); background: #dff3eb; box-shadow: 0 3px 0 #9fd8c3; }
+  .blank { display: inline-block; min-width: 64px; border-bottom: 3px solid var(--jade); color: var(--jade); text-align: center; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hero">
+    <span class="tag">Design exploration · not in the app</span>
+    <h1>A journey across Panama</h1>
+    <p>Learning Mandarin while travelling Panama by train and discovering its history through China. Each of the
+      10 units is a province; finishing one earns a passport stamp and the train carries you to the next. Click any
+      phone to view it full size (scroll inside route screens). Sample content is illustrative and historical text is
+      a draft that needs review.</p>
+  </div>
+
+  <section class="group">
+    <h2>1 · Map overview (home)</h2>
+    <p>Option B layout: a large, swipeable map centered on where you are, plus a mini-map of the whole country.
+      Completed provinces are painted and stamped, the current one glows with the train, locked ones sit under fog.
+      Indigenous comarcas appear with their names as neutral sand-colored regions.</p>
+    <div class="row">
+      <figure class="shot" data-screen="mapA"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>A · Illustrated watercolor<small>Soft paper, painted provinces, drifting fog.</small></figcaption></figure>
+      <figure class="shot" data-screen="mapB"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>B · Flat, bold, geometric<small>Matches the characters; crisp province borders, hatched locks.</small></figcaption></figure>
+      <figure class="shot" data-screen="mapFull"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>Whole-country view (B)<small>Tap the mini-map: the full isthmus with the train route and all 10 stops.</small></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="group">
+    <h2>2 · Train travel</h2>
+    <p>After the province checkpoint: the stamp lands, the train rolls along the route to the next province and the fog
+      lifts. About 3 seconds, skippable. Frame 2 animates in the full-size view.</p>
+    <div class="row">
+      <figure class="shot" data-screen="train1"><div class="holder sm"><div class="phone"><div class="screen"></div></div></div><figcaption>1 · Panamá Oeste stamped</figcaption></figure>
+      <figure class="shot" data-screen="train2"><div class="holder sm"><div class="phone"><div class="screen"></div></div></div><figcaption>2 · All aboard</figcaption></figure>
+      <figure class="shot" data-screen="train3"><div class="holder sm"><div class="phone"><div class="screen"></div></div></div><figcaption>3 · The fog lifts over Coclé</figcaption></figure>
+      <figure class="shot" data-screen="train4"><div class="holder sm"><div class="phone"><div class="screen"></div></div></div><figcaption>4 · Welcome to Coclé</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="group">
+    <h2>3 · Province route</h2>
+    <p>Inside a province the dots become a railway through local scenery: lessons are station stops with real place
+      names, a reading appears as a book stop, and the unit review is the province's landmark.</p>
+    <div class="row">
+      <figure class="shot" data-screen="routePanamaA"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>Panamá · A watercolor<small>Skyline, Cinta Costera, Casco Viejo, Barrio Chino → Canal locks.</small></figcaption></figure>
+      <figure class="shot" data-screen="routePanamaB"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>Panamá · B flat<small>Same route in the bold style.</small></figcaption></figure>
+      <figure class="shot" data-screen="routeChiriqui"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>Chiriquí · B flat<small>Highlands and coffee → Volcán Barú.</small></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="group">
+    <h2>4 · Passport</h2>
+    <p>The passport replaces gems as the big reward: one page per province, a stamp when you finish it, and a postcard
+      with a cultural fact and a bonus phrase in Chinese that you can share.</p>
+    <div class="row">
+      <figure class="shot" data-screen="ppCover"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>Cover</figcaption></figure>
+      <figure class="shot" data-screen="ppPages"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>Pages · just stamped<small>The Coclé stamp lands with an animation.</small></figcaption></figure>
+      <figure class="shot" data-screen="ppPostcard"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>Postcard unlocked<small>Fact + bonus phrase + share.</small></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="group">
+    <h2>5 · Reading (Lectura)</h2>
+    <p>Short illustrated stories about Panama's history seen through China. English narrates; short HSK 1 sentences carry
+      the Chinese, with taps for new words and quick interactions. Sample: "The railroad and the first Chinese in Panama".</p>
+    <div class="row">
+      <figure class="shot" data-screen="read1"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>a · Story page + word gloss</figcaption></figure>
+      <figure class="shot" data-screen="read2"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>b · Fill in the blank</figcaption></figure>
+      <figure class="shot" data-screen="read3"><div class="holder"><div class="phone"><div class="screen"></div></div></div><figcaption>c · Story complete</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="group">
+    <h2>6 · Living map</h2>
+    <p>The same home map follows the real clock and calendar: day, sunset, night with city lights, light rain in the rainy
+      season (May–November), and flags along the line in November, the patriotic month.</p>
+    <div class="row">
+      <figure class="shot" data-screen="liveDay"><div class="holder sm"><div class="phone"><div class="screen"></div></div></div><figcaption>Day</figcaption></figure>
+      <figure class="shot" data-screen="liveSunset"><div class="holder sm"><div class="phone"><div class="screen"></div></div></div><figcaption>Sunset</figcaption></figure>
+      <figure class="shot" data-screen="liveNight"><div class="holder sm"><div class="phone"><div class="screen"></div></div></div><figcaption>Night</figcaption></figure>
+      <figure class="shot" data-screen="liveRain"><div class="holder sm"><div class="phone"><div class="screen"></div></div></div><figcaption>Rainy season</figcaption></figure>
+      <figure class="shot" data-screen="liveNov"><div class="holder sm"><div class="phone"><div class="screen"></div></div></div><figcaption>November · patriotic month</figcaption></figure>
+    </div>
+  </section>
+</div>
+
+<div id="modal"><div class="hint">Click outside to close · scroll inside route screens</div></div>
+
+<script>
+/* ===================== Map data (stylized, projected from lon/lat) ===================== */
+// x = (lon + 83.1) * 170, y = (9.75 - lat) * 170. Shapes are simplified by hand for a mockup;
+// a real build would simplify open boundary data (geoBoundaries / Natural Earth).
+const OUTLINE = [[92,31],[144,56],[160,82],[187,119],[229,136],[263,94],[300,120],[323,153],[382,148],[459,119],[518,94],[544,66],[586,34],[663,29],[705,32],[782,60],[867,102],[935,144],[974,184],[960,263],[909,331],[884,400],[867,430],[833,391],[799,314],[802,284],[824,238],[782,221],[722,196],[690,160],[650,138],[609,133],[595,145],[552,187],[502,221],[442,263],[450,297],[484,323],[527,365],[529,388],[493,425],[442,430],[382,433],[374,430],[366,382],[348,340],[340,297],[312,330],[280,348],[229,365],[187,289],[136,272],[70,262],[40,300],[28,255],[40,170],[32,110],[85,42]];
+const ISLANDS = [ [229,391,14,20], [697,232,9,12], [150,48,10,6], [176,62,7,5] ];
+const PROV = {
+  1: { name: 'Panamá', theme: 'People & identity', place: 'Panama City', c: [705,172], pts: [[605,112],[650,90],[715,45],[740,70],[790,85],[800,140],[790,190],[760,250],[690,250],[592,205],[606,150]] },
+  2: { name: 'Panamá Oeste', theme: 'Questions & conversation', place: 'La Chorrera', c: [568,165], pts: [[548,175],[560,122],[605,112],[606,150],[592,205],[525,215]] },
+  3: { name: 'Coclé', theme: 'Numbers & quantities', place: 'El Valle de Antón', c: [495,188], pts: [[455,140],[520,112],[560,122],[548,175],[525,215],[478,250],[430,255]] },
+  4: { name: 'Herrera', theme: 'Core sentence building', place: 'Chitré', c: [448,292], pts: [[400,300],[430,255],[478,250],[488,320],[445,345],[398,335]] },
+  5: { name: 'Los Santos', theme: 'Places & getting around', place: 'Las Tablas', c: [478,385], pts: [[398,335],[445,345],[488,320],[600,340],[600,460],[392,460]] },
+  6: { name: 'Veraguas', theme: 'Time & weather', place: 'Santiago', c: [315,322], pts: [[300,0],[440,0],[440,60],[455,140],[430,255],[400,300],[392,460],[240,460],[230,260],[240,245],[300,250],[365,225],[385,150],[340,90],[300,100]] },
+  7: { name: 'Chiriquí', theme: 'Food, shopping & daily things', place: 'Boquete', c: [112,250], pts: [[0,175],[60,170],[120,150],[205,140],[225,190],[230,260],[240,460],[0,460]] },
+  8: { name: 'Bocas del Toro', theme: 'Language & communication', place: 'Isla Colón', c: [168,100], pts: [[0,0],[300,0],[300,100],[255,120],[205,140],[120,150],[60,170],[0,175]] },
+  9: { name: 'Colón', theme: 'Actions & routines', place: 'Portobelo', c: [585,76], pts: [[440,0],[715,0],[715,45],[650,90],[605,112],[560,122],[520,112],[455,140],[440,60]] },
+  10: { name: 'Darién', theme: 'Describing people & things', place: 'Darién jungle', c: [882,318], pts: [[790,85],[860,120],[935,160],[1010,170],[1010,460],[780,460],[760,250],[790,190],[800,140]] },
+};
+const COMARCAS = [
+  { name: 'Guna Yala', c: [850,88], parts: [[[715,0],[1010,0],[1010,170],[935,160],[860,120],[790,85],[740,70],[715,45]]] },
+  { name: 'Ngäbe-Buglé', c: [305,182], parts: [[[205,140],[255,120],[300,100],[340,90],[385,150],[365,225],[300,250],[240,245],[230,260],[225,190]]] },
+  { name: 'Emberá-Wounaan', c: [850,226], parts: [[[820,190],[875,180],[895,240],[850,265],[815,235]], [[900,300],[940,290],[950,340],[915,360]]] },
+];
+const ACCENT = { 1:'#e0453a', 2:'#2f9e7e', 3:'#e9a23b', 4:'#3b82c4', 5:'#8a5cc2', 6:'#d9577f', 7:'#3a9aa8', 8:'#c46a3b', 9:'#5b8f3a', 10:'#6b6fd0' };
+const WATER = { 1:'#e8857b', 2:'#7fc4a9', 3:'#efc47c', 4:'#8fb6df', 5:'#b79ad8', 6:'#e8a0b6', 7:'#89c7cf', 8:'#d9a07f', 9:'#9cc382', 10:'#a5a8e3' };
+const ORDER = [1,2,3,4,5,6,7,8,9,10];
+const pts = (a) => a.map(p => p.join(',')).join(' ');
+let uidN = 0;
+
+function smooth(points) {
+  let d = `M${points[0][0]} ${points[0][1]}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1] || points[i], p1 = points[i], p2 = points[i + 1], p3 = points[i + 2] || p2;
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0]} ${p2[1]}`;
+  }
+  return d;
+}
+
+// Closed, rounded outline through the coast points (Catmull-Rom), so the country looks drawn, not blocky.
+function smoothClosed(p) {
+  const n = p.length;
+  let d = `M${p[0][0]} ${p[0][1]}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = p[(i - 1 + n) % n], p1 = p[i], p2 = p[(i + 1) % n], p3 = p[(i + 2) % n];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0]} ${p2[1]}`;
+  }
+  return d + 'Z';
+}
+const COAST = smoothClosed(OUTLINE);
+
+const TRAIN = (scale = 1, flip = false) => `
+  <g transform="scale(${flip ? -scale : scale} ${scale})">
+    <circle class="puff" cx="-20" cy="-38" r="7" fill="#fff" opacity=".85"/>
+    <circle class="puff" cx="-20" cy="-38" r="6" fill="#fff" opacity=".85" style="animation-delay:.8s"/>
+    <rect x="-40" y="-20" width="44" height="22" rx="5" fill="#b3322a"/>
+    <rect x="-34" y="-16" width="12" height="9" rx="2" fill="#fde8e4"/>
+    <rect x="2" y="-30" width="26" height="32" rx="6" fill="#e0453a"/>
+    <rect x="7" y="-25" width="16" height="11" rx="3" fill="#fde8e4"/>
+    <rect x="-26" y="-34" width="8" height="15" rx="2" fill="#2b2420"/>
+    <rect x="-44" y="0" width="76" height="6" rx="3" fill="#2b2420"/>
+    <circle cx="-30" cy="8" r="7" fill="#2b2420"/><circle cx="-30" cy="8" r="2.5" fill="#f2b544"/>
+    <circle cx="-8" cy="8" r="7" fill="#2b2420"/><circle cx="-8" cy="8" r="2.5" fill="#f2b544"/>
+    <circle cx="18" cy="8" r="7" fill="#2b2420"/><circle cx="18" cy="8" r="2.5" fill="#f2b544"/>
+    <path d="M28 2 L40 8 L28 8Z" fill="#f2b544"/>
+  </g>`;
+
+/* Builds the map SVG. o: { style:'A'|'B', done:[], current, viewBox, train:[x,y]|null, trainAnim, fog:{unit:opacity}, labels, ambience } */
+function mapSVG(o) {
+  const id = 'm' + (++uidN);
+  const A = o.style === 'A';
+  const done = new Set(o.done || []);
+  const state = (u) => done.has(u) ? 'done' : u === o.current ? 'cur' : 'lock';
+  const fill = (u) => {
+    const s = state(u);
+    if (s === 'lock') return A ? '#ece5d8' : '#e7ddd0';
+    return A ? WATER[u] : ACCENT[u];
+  };
+  const route = ORDER.map(u => PROV[u].c);
+  const curIdx = ORDER.indexOf(o.current);
+  const doneRoute = route.slice(0, Math.max(1, curIdx + 1));
+  const night = o.ambience === 'night';
+  let s = `<svg class="map" viewBox="${o.viewBox || '0 0 1010 460'}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="${id}ol"><path d="${COAST}"/>${ISLANDS.map(([x,y,rx,ry]) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}"/>`).join('')}</clipPath>
+    <filter id="${id}wc" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7"/><feDisplacementMap in="SourceGraphic" scale="12"/><feGaussianBlur stdDeviation="1.1"/></filter>
+    <filter id="${id}fog" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="4" seed="3" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.6 -0.35" result="c"/><feComposite in="c" in2="SourceGraphic" operator="in"/><feGaussianBlur stdDeviation="3.5"/></filter>
+    <pattern id="${id}hatch" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="18" height="18" fill="#e7ddd0"/><line x1="0" y1="0" x2="0" y2="18" stroke="#d6c8b5" stroke-width="6"/></pattern>
+    <filter id="${id}glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>`;
+  // Land base + provinces
+  s += `<g clip-path="url(#${id}ol)">`;
+  s += `<rect x="-20" y="-20" width="1060" height="500" fill="${A ? '#f1e8d6' : '#f4ede2'}"/>`;
+  s += `<g ${A ? `filter="url(#${id}wc)"` : ''}>`;
+  for (const u of ORDER) {
+    const st = state(u);
+    const f = st === 'lock' && !A ? `url(#${id}hatch)` : fill(u);
+    s += `<polygon points="${pts(PROV[u].pts)}" fill="${f}" ${A ? `opacity="${st === 'lock' ? 1 : .92}"` : ''} stroke="${A ? 'rgba(120,90,60,.25)' : '#fff'}" stroke-width="${A ? 2 : 6}" stroke-linejoin="round"/>`;
+  }
+  for (const cm of COMARCAS) for (const part of cm.parts) s += `<polygon points="${pts(part)}" fill="${A ? '#e9dcc3' : '#efe2c9'}" stroke="${A ? 'rgba(120,90,60,.3)' : '#fff'}" stroke-width="${A ? 2 : 6}" stroke-dasharray="${A ? '6 6' : ''}" stroke-linejoin="round"/>`;
+  s += `</g>`;
+  if (A) s += `<path d="${COAST}" fill="none" stroke="rgba(110,80,50,.45)" stroke-width="3" filter="url(#${id}wc)"/>`;
+  // Fog over locked provinces (watercolor) / soft veil
+  if (A || o.fog) {
+    s += `<g filter="url(#${id}fog)">`;
+    for (const u of ORDER) if (state(u) === 'lock' || (o.fog && o.fog[u] != null)) {
+      const op = o.fog && o.fog[u] != null ? o.fog[u] : 1;
+      if (op <= 0) continue;
+      s += `<polygon points="${pts(PROV[u].pts)}" fill="#fff" opacity="${op * .85}"/>`;
+    }
+    s += `</g>`;
+  }
+  if (night) s += `<rect x="-20" y="-20" width="1060" height="500" fill="#0c1633" opacity=".45"/>`;
+  s += `</g>`;
+  if (!A) s += `<path d="${COAST}" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>`;
+  // Comarca labels (only when labels requested)
+  if (o.labels) for (const cm of COMARCAS) s += `<text x="${cm.c[0]}" y="${cm.c[1]}" text-anchor="middle" font-size="26" font-style="italic" font-weight="700" fill="#9c8a6b">${cm.name}</text>`;
+  // Route
+  s += `<path d="${smooth(route)}" fill="none" stroke="${night ? '#6f7aa8' : '#8a7a68'}" stroke-width="7" stroke-dasharray="4 14" stroke-linecap="round" opacity=".8"/>`;
+  s += `<path id="${id}rt" d="${smooth(doneRoute)}" fill="none" stroke="${A ? '#7a4e2a' : '#2b2420'}" stroke-width="9" stroke-linecap="round"/>`;
+  s += `<path d="${smooth(doneRoute)}" fill="none" stroke="${A ? '#f6e7c8' : '#fff'}" stroke-width="3" stroke-dasharray="10 10" stroke-linecap="round"/>`;
+  // City lights at night
+  if (night) for (const [x,y,r] of [[640,132,22],[548,70,14],[112,240,12],[470,300,10],[315,315,10]]) s += `<circle cx="${x}" cy="${y}" r="${r}" fill="#ffd36b" opacity=".85" filter="url(#${id}glow)"/><circle cx="${x}" cy="${y}" r="${r/3}" fill="#fff4c2"/>`;
+  // Province badges
+  for (const u of ORDER) {
+    const [x, y] = PROV[u].c; const st = state(u);
+    if (st === 'cur') s += `<circle class="pulse" cx="${x}" cy="${y}" r="40" fill="${ACCENT[u]}"/>`;
+    const bg = st === 'lock' ? (night ? '#59627f' : '#cfc3b2') : ACCENT[u];
+    s += `<circle cx="${x}" cy="${y}" r="31" fill="${bg}" stroke="#fff" stroke-width="6"/>`;
+    s += st === 'done'
+      ? `<path d="M${x-12} ${y+1} l9 9 l16 -18" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`
+      : `<text x="${x}" y="${y+11}" text-anchor="middle" font-size="31" font-weight="900" fill="#fff">${u}</text>`;
+    if (o.labels || (o.names && st === 'cur')) {
+      s += `<text x="${x}" y="${y+64}" text-anchor="middle" font-size="27" font-weight="900" fill="${night ? '#e8e9f5' : '#2b2420'}" stroke="${night ? '#0c1633' : '#fff'}" stroke-width="7" paint-order="stroke">${PROV[u].name}</text>`;
+    }
+  }
+  // Train
+  if (o.train) {
+    const [tx, ty] = o.train;
+    if (o.trainAnim) {
+      s += `<g>${TRAIN(1.5)}<animateMotion dur="3.2s" repeatCount="indefinite" rotate="0" keyPoints="0;1;1" keyTimes="0;.7;1" calcMode="linear"><mpath href="#${o.trainAnim}"/></animateMotion></g>`;
+    } else {
+      s += `<g transform="translate(${tx - 40} ${ty - 58})"><g class="bob">${TRAIN(1.35)}</g></g>`;
+    }
+  }
+  s += o.extra || '';
+  s += `</svg>`;
+  return s;
+}
+
+/* ===================== Shared chrome ===================== */
+const ICON = {
+  map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>',
+  review: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="6" width="14" height="14" rx="3"/><path d="M7 3h11a3 3 0 0 1 3 3v11"/></svg>',
+  write: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5l5 5L10 19H5v-5z"/></svg>',
+  passport: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="10" r="3"/><path d="M9 16h6"/></svg>',
+  profile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+};
+const status = (dark) => `<div class="status" style="color:${dark ? '#fff' : 'var(--ink)'}"><span>9:41</span><span style="letter-spacing:2px">▂▄▆ ◔ ▮</span></div>`;
+const appbar = () => `<div class="appbar"><div class="logo"><b>汉</b> Mandarin Hub</div><div class="stats">
+  <span style="color:#e0453a">🔥 5</span><span style="color:#c98d1c">⭐ 60</span><span style="color:#2a6fae">🛂 2/10</span></div></div>`;
+const nav = (on = 'map') => `<div class="nav">${[['map','Map'],['review','Review'],['write','Write'],['passport','Passport'],['profile','Profile']].map(([k,l]) => `<div class="${k === on ? 'on' : ''}">${ICON[k]}${l}</div>`).join('')}</div>`;
+const char = (name, size) => `<img src="chars/${name}.svg" width="${size}" height="${size}" alt="">`;
+
+/* ===================== Screens ===================== */
+const HOME_VIEW = '15 20 975 425';   // the whole isthmus
+function homeScreen(style, ambience = 'day', opts = {}) {
+  const A = style === 'A';
+  const sky = {
+    day: A ? 'linear-gradient(#f6ecd8,#f3ead9)' : 'linear-gradient(#bfe6fb,#9fd6f2)',
+    sunset: 'linear-gradient(#ffb48a 0%,#f7a3a8 45%,#c9a7d8 100%)',
+    night: 'linear-gradient(#0c1633 0%,#1c2b55 100%)',
+    rain: 'linear-gradient(#a8b6c4,#c7d2dc)',
+    nov: 'linear-gradient(#bfe6fb,#9fd6f2)',
+  }[ambience];
+  const dark = ambience === 'night';
+  let extraTop = '';
+  if (ambience === 'day' && !A) extraTop = `<div style="position:absolute;top:14px;left:18px;width:38px;height:38px;border-radius:50%;background:#ffd36b;box-shadow:0 0 0 8px rgba(255,211,107,.3)"></div>`;
+  if (ambience === 'sunset') extraTop = `<div style="position:absolute;top:120px;left:40px;width:70px;height:70px;border-radius:50%;background:#ffdf8a;opacity:.85;filter:blur(1px)"></div>`;
+  if (ambience === 'night') extraTop = `<div style="position:absolute;top:16px;right:22px;width:30px;height:30px;border-radius:50%;box-shadow:-8px 4px 0 0 #f4f0d6"></div>` +
+    Array.from({length: 26}, (_, i) => `<i class="star" style="position:absolute;left:${(i*37)%340}px;top:${(i*53)%120 + 6}px;width:3px;height:3px;border-radius:50%;background:#fff;animation-delay:${(i%7)*.3}s"></i>`).join('');
+  if (ambience === 'rain') extraTop = `<svg class="rain" style="position:absolute;inset:0;width:100%;height:100%;z-index:2" viewBox="0 0 355 300">${Array.from({length: 40}, (_, i) => `<line x1="${(i*29)%380}" y1="${(i*41)%300 - 40}" x2="${(i*29)%380 - 6}" y2="${(i*41)%300 - 22}" stroke="#eef4fa" stroke-width="2" stroke-linecap="round" style="animation-delay:${(i%9)*.08}s"/>`).join('')}</svg>`;
+  const bunting = ambience === 'nov' ? (() => {
+    const route = ORDER.map(u => PROV[u].c).slice(0, 4);
+    let b = `<g class="bunting">`;
+    route.forEach(([x, y], i) => { const cols = ['#d21034','#fff','#005293']; for (let k = 0; k < 3; k++) b += `<path d="M${x - 30 + k*22} ${y - 64} l10 22 l10 -22z" fill="${cols[(i+k)%3]}" stroke="#c9c2b8" stroke-width="1.5" style="animation-delay:${k*.15}s"/>`; b += `<path d="M${x-34} ${y-64} Q${x} ${y-56} ${x+36} ${y-64}" fill="none" stroke="#8a7a68" stroke-width="2"/>`; });
+    return b + `</g>`;
+  })() : '';
+  const map = mapSVG({ style, done: [1,2], current: 3, viewBox: HOME_VIEW, train: PROV[3].c, ambience: dark ? 'night' : ambience, extra: bunting, names: true }).replace('xMidYMid slice', 'xMidYMid meet');
+  const banner = ambience === 'nov' ? `<div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#fff;border-radius:999px;padding:4px 12px;font-weight:900;font-size:12px;white-space:nowrap;z-index:3;box-shadow:0 3px 0 #dccfbd">🇵🇦 November · ¡Viva Panamá!</div>` : '';
+  return `<div class="${A ? 'styleA' : 'styleB'}" style="display:flex;flex-direction:column;height:100%;background:${dark ? '#13203f' : 'var(--paper)'};color:${dark ? '#eef' : 'inherit'}">
+    ${status(dark)}${appbar()}
+    <div style="padding:0 18px 8px"><div class="eyebrow" style="color:${dark ? '#aab4dd' : 'var(--muted)'}">HSK 1 · province 3 of 10</div>
+      <div style="font-size:22px;font-weight:900;${A ? "font-family:Fraunces,serif;" : ''}">Your journey across Panama</div></div>
+    <div class="scene" style="background:${sky}">
+      ${extraTop}${banner}
+      <span class="sea-label" style="top:${ambience === 'nov' ? 44 : 16}px;left:${ambience === 'night' || ambience === 'day' && !A ? 70 : 18}px;color:${dark ? '#cfd6f5' : '#2a6fae'}">Caribbean Sea</span>
+      ${map}
+      <span class="sea-label" style="bottom:40px;right:18px;color:${dark ? '#cfd6f5' : '#2a6fae'}">Pacific Ocean</span>
+      <div class="legend" style="color:${dark ? '#dfe3f7' : '#5d544d'}"><span><i style="background:#e0453a"></i>Stamped</span><span><i style="background:#e9a23b"></i>You are here</span><span><i style="background:${A ? '#fff' : '#d6c8b5'};border:1px solid #c9bba6"></i>${A ? 'Under fog' : 'Locked'}</span><span><i style="background:#efe2c9;border:1px dashed #b9a682"></i>Comarca</span></div>
+    </div>
+    <div class="nextcard" style="${dark ? 'background:#1e2c55;border-color:#2c3c6c' : ''}">
+      ${char(dark ? 'wawa-sombrero' : 'wawa-wave', 76)}
+      <div style="flex:1"><div class="eyebrow" style="color:${ACCENT[3]}">Next stop · Unit 3</div>
+        <h3>Coclé</h3><p>${PROV[3].theme} · ${PROV[3].place}</p>
+        <div style="margin-top:8px;height:8px;background:${dark ? '#2c3c6c' : '#efe6d6'};border-radius:9px;overflow:hidden"><i style="display:block;width:28%;height:100%;background:${ACCENT[3]};border-radius:9px"></i></div>
+      </div>
+    </div>
+    <div style="padding:12px 10px 0"><div class="btn">Continue journey →</div></div>
+    <div class="stamps"><span style="font-weight:900;font-size:13px">🛂 Passport</span><span class="dots">${ORDER.map(u => `<i class="${u <= 2 ? 'done' : u === 3 ? 'cur' : ''}"></i>`).join('')}</span></div>
+    <div style="flex:1"></div>
+    ${nav('map')}
+  </div>`;
+}
+
+function fullMapScreen() {
+  const map = mapSVG({ style: 'B', done: [1,2], current: 3, train: PROV[3].c, labels: true });
+  return `<div class="styleB" style="display:flex;flex-direction:column;height:100%">${status()}${appbar()}
+    <div style="padding:0 18px 8px"><div class="eyebrow" style="color:var(--muted)">The whole route</div><div style="font-size:22px;font-weight:900">Panama, coast to coast</div></div>
+    <div class="scene" style="background:#9fd6f2;height:200px">${map.replace('preserveAspectRatio="xMidYMid slice"', 'preserveAspectRatio="xMidYMid meet"')}</div>
+    <div style="padding:12px 14px;display:flex;flex-direction:column;gap:6px;overflow:hidden">
+      ${ORDER.map(u => `<div style="display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:6px 10px;opacity:${u > 3 ? .55 : 1}">
+        <span style="width:26px;height:26px;border-radius:50%;background:${u > 3 ? '#cfc3b2' : ACCENT[u]};color:#fff;font-weight:900;font-size:13px;display:grid;place-items:center">${u <= 2 ? '✓' : u}</span>
+        <span style="flex:1"><b style="font-size:14px">${PROV[u].name}</b><br><small style="color:var(--muted);font-weight:700">${PROV[u].theme}</small></span>
+        <span style="font-size:11px;font-weight:900;color:${u <= 2 ? 'var(--brand)' : u === 3 ? '#c98d1c' : 'var(--muted)'}">${u <= 2 ? 'STAMPED' : u === 3 ? 'HERE' : '🔒'}</span></div>`).join('')}
+    </div>
+    <div style="flex:1"></div>${nav('map')}</div>`;
+}
+
+/* Train storyboard frames */
+function trainFrame(n) {
+  const view = '360 10 360 320';
+  let o = { style: 'B', viewBox: view, names: true };
+  let overlay = '';
+  if (n === 1) { o = { ...o, done: [1,2], current: 3, train: PROV[2].c, fog: { 3: 1 } };
+    overlay = `<div style="position:absolute;top:24px;left:50%;transform:translateX(-50%) rotate(-9deg);width:120px;height:120px;border-radius:50%;border:5px solid #2f9e7e;color:#2f9e7e;display:grid;place-items:center;text-align:center;font-weight:900;background:rgba(255,255,255,.75)" class="stamp-new"><div style="font-size:12px;letter-spacing:.1em">PANAMÁ OESTE</div></div>`; }
+  if (n === 2) { o = { ...o, done: [1,2], current: 3, fog: { 3: 1 } };
+    const rid = 'tr' + (++uidN);
+    o.extra = `<path id="${rid}" d="M${PROV[2].c[0]} ${PROV[2].c[1]-52} C540 150 520 160 ${PROV[3].c[0]} ${PROV[3].c[1]-52}" fill="none"/>` + `<g>${TRAIN(1.5, true)}<animateMotion dur="3s" repeatCount="indefinite"><mpath href="#${rid}"/></animateMotion></g>`;
+    overlay = `<div style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:#2b2420;color:#fff;padding:6px 14px;border-radius:999px;font-weight:900;font-size:13px;white-space:nowrap">🚂 All aboard! Next: Coclé</div>`; }
+  if (n === 3) { o = { ...o, done: [1,2], current: 3, train: PROV[3].c, fog: { 3: .45 } };
+    overlay = `<div style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:#fff;padding:6px 14px;border-radius:999px;font-weight:900;font-size:13px;white-space:nowrap;box-shadow:0 3px 0 #dccfbd">The fog is lifting…</div>`; }
+  if (n === 4) { o = { ...o, done: [1,2], current: 3, train: PROV[3].c }; }
+  const welcome = n === 4 ? `<div style="margin:14px 14px 0;background:#fff;border:2px solid var(--line);border-radius:22px;padding:16px;display:flex;gap:12px;align-items:center">${char('wawa-celebrate', 92)}<div><div class="han" style="font-size:26px;font-weight:700;color:var(--brand)">欢迎！</div><div style="font-weight:800;color:#2a6fae;font-size:13px">huānyíng · welcome</div><div style="font-weight:900;font-size:18px;margin-top:4px">Welcome to Coclé!</div><div style="color:var(--muted);font-weight:700;font-size:12.5px">Wāwa's home, El Valle de Antón</div></div></div><div style="padding:14px"><div class="btn jade">Start Unit 3</div></div>` : '';
+  return `<div class="styleB" style="display:flex;flex-direction:column;height:100%">${status()}
+    <div style="padding:4px 18px 10px;font-weight:900;font-size:18px">${['', 'Province complete!', 'Travelling…', 'Arriving…', 'New province'][n]}</div>
+    <div class="scene" style="height:${n === 4 ? 330 : 470}px;background:#9fd6f2">${mapSVG(o).replace('xMidYMid slice', 'xMidYMid meet')}${overlay}</div>${welcome}<div style="flex:1"></div></div>`;
+}
+
+/* ===================== Province routes ===================== */
+const ROUTE_TOP = 150, STEP = 150;
+function routePoints(n) {
+  return Array.from({ length: n }, (_, i) => { const y = ROUTE_TOP + i * STEP; return [187 + Math.sin(i * 1.15) * 78, y]; });
+}
+function stationSVG(x, y, stop, A, i) {
+  const left = x > 187;
+  const col = stop.state === 'done' ? '#f2b544' : stop.state === 'cur' ? stop.color : '#d8ccbb';
+  const dark = stop.state === 'done' ? '#c98d1c' : stop.state === 'cur' ? '#b3322a' : '#bfb2a0';
+  const icon = stop.kind === 'reading' ? '📖' : stop.kind === 'landmark' ? '🏁' : stop.state === 'done' ? '✓' : stop.state === 'cur' ? '★' : '🔒';
+  const r = stop.kind === 'landmark' ? 38 : 30;
+  let g = '';
+  if (stop.state === 'cur') g += `<circle class="pulse" cx="${x}" cy="${y}" r="${r + 10}" fill="${col}"/>`;
+  g += `<circle cx="${x}" cy="${y + 6}" r="${r}" fill="${dark}"/><circle cx="${x}" cy="${y}" r="${r}" fill="${col}" stroke="#fff" stroke-width="4"/>`;
+  g += `<text x="${x}" y="${y + (icon.length > 1 ? 9 : 10)}" text-anchor="middle" font-size="${icon.length > 1 ? 24 : 28}" font-weight="900" fill="#fff">${icon}</text>`;
+  // Station sign
+  const sw = 146;
+  const sx = Math.max(8, Math.min(375 - 8 - sw, left ? x - r - 12 - sw : x + r + 12));
+  g += `<g><rect x="${sx}" y="${y - 30}" width="${sw}" height="60" rx="12" fill="${A ? '#fffaf0' : '#fff'}" stroke="${A ? '#d9c8a6' : '#2b2420'}" stroke-width="${A ? 2 : 3}"/>
+    <rect x="${sx}" y="${y - 30}" width="${sw}" height="18" rx="9" fill="${stop.state === 'lock' ? '#cfc3b2' : stop.color}"/><rect x="${sx}" y="${y - 21}" width="${sw}" height="9" fill="${stop.state === 'lock' ? '#cfc3b2' : stop.color}"/>
+    <text x="${sx + 10}" y="${y - 17}" font-size="10.5" font-weight="900" fill="#fff" letter-spacing="1">${stop.label.toUpperCase()}</text>
+    <text x="${sx + 10}" y="${y + 6}" font-size="14.5" font-weight="900" fill="#2b2420" ${A ? 'font-family="Fraunces, serif"' : ''}>${stop.name}</text>
+    <text x="${sx + 10}" y="${y + 22}" font-size="11" font-weight="700" fill="#8b7f75">${stop.sub}</text></g>`;
+  return g;
+}
+function routeScreen(cfg) {
+  const A = cfg.style === 'A';
+  const P = routePoints(cfg.stops.length);
+  const H = ROUTE_TOP + (cfg.stops.length - 1) * STEP + 170;
+  const track = smooth([[187, 40], ...P, [187, H]]);
+  let svg = `<svg viewBox="0 0 375 ${H}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
+  svg += `<defs><filter id="rwc${cfg.id}" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="5"/><feDisplacementMap in="SourceGraphic" scale="9"/><feGaussianBlur stdDeviation=".9"/></filter></defs>`;
+  svg += `<g ${A ? `filter="url(#rwc${cfg.id})"` : ''}>${cfg.scenery(H)}</g>`;
+  // Rail: sleepers, then two rails
+  svg += `<path d="${track}" fill="none" stroke="${A ? '#a98a63' : '#8a6a4a'}" stroke-width="26" stroke-dasharray="5 11"/>`;
+  svg += `<path d="${track}" fill="none" stroke="${A ? '#6e5640' : '#3b2f26'}" stroke-width="16"/>`;
+  svg += `<path d="${track}" fill="none" stroke="${A ? '#efe2c8' : cfg.ground}" stroke-width="9"/>`;
+  P.forEach(([x, y], i) => { svg += stationSVG(x, y, cfg.stops[i], A, i); });
+  // Train at the current stop
+  const ci = cfg.stops.findIndex(s => s.state === 'cur');
+  if (ci >= 0) { const [x, y] = P[ci]; svg += `<g transform="translate(${x + (x > 187 ? 58 : -58)} ${y - 44}) scale(.62)"><g class="bob">${TRAIN(1, x > 187)}</g></g>`; }
+  svg += `</svg>`;
+  const friend = cfg.friend ? `<div style="position:absolute;${cfg.friend.side}:4px;top:${cfg.friend.top}px;pointer-events:none">${char(cfg.friend.name, cfg.friend.size || 120)}</div>` : '';
+  return `<div class="${A ? 'styleA' : 'styleB'}" style="display:flex;flex-direction:column;height:100%;background:${cfg.bg}">
+    ${status()}
+    <div class="routebar"><div class="back">←</div><div style="flex:1"><small>Unit ${cfg.unit} · ${cfg.theme}</small><h2 ${A ? 'style="font-family:Fraunces,serif"' : ''}>${cfg.title}</h2></div>
+      <div style="font-weight:900;font-size:13px;color:var(--muted)">${cfg.progress}</div></div>
+    <div class="scroll route"><div style="position:relative">${svg}${friend}</div></div>
+    ${nav('map')}
+  </div>`;
+}
+
+/* Scenery helpers (simple shapes, placed by y) */
+const sceneryPanama = (A) => (H) => {
+  const sea = A ? '#bcd9e6' : '#7cc7ee', sand = A ? '#efe2c8' : '#f6e7c4', grass = A ? '#cfe2b8' : '#9fd27a';
+  let s = `<rect width="375" height="${H}" fill="${A ? '#f7f0e3' : '#f4ede2'}"/>`;
+  // Sky + skyline at the top
+  s += `<rect width="375" height="170" fill="${A ? '#e7eef0' : '#cdebfb'}"/>`;
+  const towers = [[8,70,26],[38,40,22],[64,88,30],[98,30,20],[122,60,28],[154,20,24],[182,74,22],[210,46,30],[244,92,20],[268,36,26],[298,66,24],[326,28,22],[350,80,22]];
+  towers.forEach(([x, h, w], i) => { s += `<rect x="${x}" y="${120 - h}" width="${w}" height="${h + 50}" fill="${A ? ['#9fb3c2','#b6c7d2','#8aa1b3'][i % 3] : ['#2a6fae','#3b8fd9','#1f4f86'][i % 3]}" rx="${A ? 2 : 3}"/>`;
+    if (!A) for (let k = 0; k < 4; k++) s += `<rect x="${x + 5}" y="${130 - h + k * 14}" width="${w - 10}" height="4" fill="#cdebfb" opacity=".6"/>`; });
+  s += `<rect x="0" y="160" width="375" height="40" fill="${sea}"/>`;
+  // Cinta Costera bay on the left
+  s += `<path d="M0 230 Q90 250 60 330 Q30 380 0 390Z" fill="${sea}"/>`;
+  // Casco Viejo colonial houses
+  const houses = [[250,420,'#f2b544'],[282,410,'#e8857b'],[314,424,'#89c7cf'],[340,414,'#b79ad8']];
+  houses.forEach(([x, y, c]) => { s += `<rect x="${x}" y="${y}" width="30" height="40" fill="${c}"/><path d="M${x - 3} ${y} L${x + 15} ${y - 12} L${x + 33} ${y}Z" fill="#b3322a"/><rect x="${x + 6}" y="${y + 8}" width="7" height="10" fill="#fff" opacity=".8"/><rect x="${x + 17}" y="${y + 8}" width="7" height="10" fill="#fff" opacity=".8"/>`; });
+  // Barrio Chino gate (paifang)
+  const gy = 712, gx = 36;
+  s += `<rect x="${gx}" y="${gy}" width="10" height="70" fill="#c8352b"/><rect x="${gx + 84}" y="${gy}" width="10" height="70" fill="#c8352b"/>
+    <path d="M${gx - 16} ${gy - 4} Q${gx + 47} ${gy - 30} ${gx + 110} ${gy - 4} L${gx + 100} ${gy + 8} L${gx - 6} ${gy + 8}Z" fill="#2f9e7e"/>
+    <rect x="${gx - 6}" y="${gy + 8}" width="106" height="12" fill="#e0453a"/><rect x="${gx + 30}" y="${gy + 22}" width="34" height="18" fill="#f2b544"/>
+    <text x="${gx + 47}" y="${gy + 36}" text-anchor="middle" font-size="12" font-weight="900" fill="#b3322a" font-family="Noto Sans SC">唐人街</text>
+    <circle cx="${gx + 22}" cy="${gy + 32}" r="7" fill="#e0453a"/><circle cx="${gx + 72}" cy="${gy + 32}" r="7" fill="#e0453a"/>`;
+  // Panamá Viejo tower ruins
+  s += `<rect x="300" y="830" width="34" height="80" fill="${A ? '#c9b8a0' : '#b8a48a'}"/><rect x="306" y="845" width="8" height="12" fill="${A ? '#8b7a63' : '#6e5c46'}"/><rect x="320" y="845" width="8" height="12" fill="${A ? '#8b7a63' : '#6e5c46'}"/><path d="M296 830 h42 v-8 h-6 v6 h-6 v-6 h-6 v6 h-6 v-6 h-6 v6 h-6 v-6 h-6z" fill="${A ? '#c9b8a0' : '#b8a48a'}"/>`;
+  // Cerro Ancón with the big flag
+  s += `<path d="M0 1080 Q70 960 160 1080Z" fill="${grass}"/><line x1="80" y1="1000" x2="80" y2="944" stroke="#5a4636" stroke-width="3"/><g transform="translate(80 944)">${flagRect(0, 0, 40, 26)}</g>`;
+  // Canal locks + ship at the bottom
+  const ly = H - 150;
+  s += `<rect x="0" y="${ly}" width="375" height="150" fill="${grass}"/><rect x="40" y="${ly + 30}" width="300" height="90" fill="${A ? '#9fb8c2' : '#5a6f7c'}"/>
+    <rect x="52" y="${ly + 42}" width="276" height="66" fill="${sea}"/><rect x="186" y="${ly + 42}" width="8" height="66" fill="${A ? '#7d8f97' : '#3b4a54'}"/>
+    <g transform="translate(70 ${ly + 50})"><path d="M0 26 L100 26 L92 46 L8 46Z" fill="#e0453a"/><rect x="14" y="8" width="70" height="18" fill="#f6efe0"/><rect x="20" y="-6" width="16" height="14" fill="#3b82c4"/><rect x="42" y="-2" width="16" height="10" fill="#f2b544"/><rect x="64" y="4" width="14" height="4" fill="#2b2420"/></g>`;
+  return s;
+};
+const flagRect = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff" stroke="#c9c2b8"/><rect x="${x + w/2}" y="${y}" width="${w/2}" height="${h/2}" fill="#d21034"/><rect x="${x}" y="${y + h/2}" width="${w/2}" height="${h/2}" fill="#005293"/><circle cx="${x + w/4}" cy="${y + h/4}" r="${h/9}" fill="#005293"/><circle cx="${x + 3*w/4}" cy="${y + 3*h/4}" r="${h/9}" fill="#d21034"/>`;
+
+const sceneryChiriqui = (H) => {
+  let s = `<rect width="375" height="${H}" fill="#eef5e6"/>`;
+  // Highland mountains and clouds at the top
+  s += `<rect width="375" height="200" fill="#d6eefb"/>`;
+  s += `<path d="M-20 200 L60 90 L120 150 L190 60 L260 140 L320 80 L400 200Z" fill="#6aa86f"/><path d="M-20 200 L40 140 L110 190 L170 120 L250 190 L330 130 L400 200Z" fill="#4f8f5a"/>`;
+  s += `<ellipse cx="80" cy="70" rx="40" ry="14" fill="#fff"/><ellipse cx="290" cy="50" rx="34" ry="12" fill="#fff"/>`;
+  // Coffee rows with red cherries
+  for (let row = 0; row < 4; row++) for (let k = 0; k < 6; k++) {
+    const x = 20 + k * 60 + (row % 2) * 28, y = 380 + row * 52;
+    if ((x > 120 && x < 260)) continue;
+    s += `<ellipse cx="${x}" cy="${y}" rx="22" ry="16" fill="#3f7d48"/><circle cx="${x - 6}" cy="${y - 2}" r="3.5" fill="#d33a2c"/><circle cx="${x + 5}" cy="${y + 3}" r="3.5" fill="#d33a2c"/><circle cx="${x + 9}" cy="${y - 6}" r="3" fill="#d33a2c"/>`;
+  }
+  // Cerro Punta patchwork fields
+  const cols = ['#9fd27a', '#c9e3a1', '#7fb85c', '#e5d58a'];
+  for (let i = 0; i < 8; i++) s += `<path d="M${(i % 4) * 95 - 10} ${700 + Math.floor(i / 4) * 60} l95 -10 l0 60 l-95 10z" fill="${cols[i % 4]}" opacity=".9"/>`;
+  // Flowers of Boquete
+  for (let i = 0; i < 10; i++) s += `<circle cx="${(i * 71) % 360 + 10}" cy="${250 + (i * 37) % 70}" r="5" fill="${['#ff6fae', '#ffd23f', '#fff'][i % 3]}"/>`;
+  // Las Lajas beach
+  s += `<path d="M0 1040 Q190 1000 375 1060 L375 1130 L0 1130Z" fill="#f6e7c4"/><path d="M0 1100 Q190 1070 375 1120 L375 1160 L0 1160Z" fill="#7cc7ee"/>`;
+  s += `<line x1="320" y1="1060" x2="330" y2="1000" stroke="#8a5a34" stroke-width="5"/><path d="M330 1000 q-28 2 -40 16 M330 1000 q26 -4 40 10 M330 1000 q-10 -18 -30 -22 M330 1000 q14 -16 34 -16" stroke="#3f7d48" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+  // Volcán Barú at the bottom
+  const vy = H - 160;
+  s += `<rect x="0" y="${vy + 40}" width="375" height="130" fill="#6aa86f"/><path d="M40 ${vy + 150} L170 ${vy + 10} L210 ${vy + 10} L340 ${vy + 150}Z" fill="#7b6a5a"/><path d="M150 ${vy + 34} L170 ${vy + 10} L210 ${vy + 10} L230 ${vy + 34} L210 ${vy + 28} L190 ${vy + 40} L172 ${vy + 28}Z" fill="#fff"/>`;
+  s += `<ellipse cx="200" cy="${vy - 10}" rx="26" ry="12" fill="#fff" opacity=".9"/><ellipse cx="220" cy="${vy - 30}" rx="20" ry="9" fill="#fff" opacity=".7"/>`;
+  return s;
+};
+
+const PANAMA_STOPS = (col) => [
+  { label: 'Lesson 1', name: 'Tocumen Airport', sub: 'Arrive · say hello', state: 'done', color: col },
+  { label: 'Lesson 2', name: 'Cinta Costera', sub: 'Family & friends', state: 'done', color: col },
+  { label: 'Lesson 3', name: 'Casco Viejo', sub: 'Who is who', state: 'done', color: col },
+  { label: 'New story', name: 'The railroad', sub: 'Reading · 3 min', state: 'cur', color: '#3b82c4', kind: 'reading' },
+  { label: 'Lesson 4', name: 'Barrio Chino', sub: '唐人街 Tángrénjiē', state: 'lock', color: col },
+  { label: 'Lesson 5', name: 'Panamá Viejo', sub: 'Pronouns', state: 'lock', color: col },
+  { label: 'Lesson 6', name: 'Cerro Ancón', sub: 'People around you', state: 'lock', color: col },
+  { label: 'Unit review', name: 'Miraflores Locks', sub: 'The Panama Canal', state: 'lock', color: col, kind: 'landmark' },
+];
+const CHIRIQUI_STOPS = [
+  { label: 'Lesson 1', name: 'David', sub: 'Market day', state: 'done', color: '#3a9aa8' },
+  { label: 'Lesson 2', name: 'Boquete', sub: 'Flowers & weather', state: 'done', color: '#3a9aa8' },
+  { label: 'Lesson 3', name: 'Coffee farm', sub: 'Buy & order', state: 'cur', color: '#3a9aa8' },
+  { label: 'Lesson 4', name: 'Cerro Punta', sub: 'Vegetables', state: 'lock', color: '#3a9aa8' },
+  { label: 'Lesson 5', name: 'Bambito', sub: 'Cooking', state: 'lock', color: '#3a9aa8' },
+  { label: 'Lesson 6', name: 'Las Lajas', sub: 'At the beach', state: 'lock', color: '#3a9aa8' },
+  { label: 'Unit review', name: 'Volcán Barú', sub: 'The highest point', state: 'lock', color: '#3a9aa8', kind: 'landmark' },
+];
+
+/* ===================== Passport ===================== */
+function stampSVG(u, cls = '') {
+  const c = ACCENT[u];
+  const shapes = {
+    1: `<circle cx="70" cy="70" r="62" fill="none" stroke="${c}" stroke-width="5"/><circle cx="70" cy="70" r="52" fill="none" stroke="${c}" stroke-width="2"/>`,
+    2: `<rect x="10" y="20" width="120" height="100" rx="14" fill="none" stroke="${c}" stroke-width="5"/><rect x="18" y="28" width="104" height="84" rx="8" fill="none" stroke="${c}" stroke-width="2"/>`,
+    3: `<path d="M70 6 L130 70 L70 134 L10 70Z" fill="none" stroke="${c}" stroke-width="5"/><path d="M70 18 L118 70 L70 122 L22 70Z" fill="none" stroke="${c}" stroke-width="2"/>`,
+  };
+  const zh = { 1: '巴拿马', 2: '西巴拿马', 3: '科克莱' }[u] || '';
+  return `<svg class="${cls}" viewBox="0 0 140 140" width="132" height="132" style="transform:rotate(-9deg);opacity:.92">${shapes[u] || shapes[1]}
+    <text x="70" y="52" text-anchor="middle" font-size="12" font-weight="900" fill="${c}" letter-spacing="1.5">${PROV[u].name.toUpperCase()}</text>
+    <text x="70" y="80" text-anchor="middle" font-size="22" font-weight="700" fill="${c}" font-family="Noto Sans SC">${zh}</text>
+    <text x="70" y="98" text-anchor="middle" font-size="9.5" font-weight="900" fill="${c}" letter-spacing="1">UNIT ${u} · ${['', '21', '24', '27'][u] || '27'} OCT 2026</text></svg>`;
+}
+
+/* ===================== Render ===================== */
+const SCREENS = {
+  mapA: () => homeScreen('A'),
+  mapB: () => homeScreen('B'),
+  mapFull: () => fullMapScreen(),
+  train1: () => trainFrame(1), train2: () => trainFrame(2), train3: () => trainFrame(3), train4: () => trainFrame(4),
+  routePanamaA: () => routeScreen({ id: 'pa', style: 'A', unit: 1, theme: 'People & identity', title: 'Panamá', progress: '3/7', bg: '#f7f0e3', ground: '#efe2c8',
+    stops: PANAMA_STOPS('#c8655a'), scenery: sceneryPanama(true), friend: { name: 'harpia-bandera', side: 'right', top: 960, size: 120 } }),
+  routePanamaB: () => routeScreen({ id: 'pb', style: 'B', unit: 1, theme: 'People & identity', title: 'Panamá', progress: '3/7', bg: '#f4ede2', ground: '#f4ede2',
+    stops: PANAMA_STOPS('#e0453a'), scenery: sceneryPanama(false), friend: { name: 'tucan-banderas', side: 'right', top: 620, size: 130 } }),
+  routeChiriqui: () => routeScreen({ id: 'ch', style: 'B', unit: 7, theme: 'Food, shopping & daily things', title: 'Chiriquí', progress: '2/7', bg: '#eef5e6', ground: '#eef5e6',
+    stops: CHIRIQUI_STOPS, scenery: sceneryChiriqui, friend: { name: 'sloth-montuno', side: 'left', top: 450, size: 120 } }),
+
+  ppCover: () => `<div style="display:flex;flex-direction:column;height:100%;background:#efe7d8">${status()}
+    <div class="pp-cover"><div class="t2">MANDARIN HUB · HSK 1</div>
+      <svg viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="54" fill="none" stroke="#f2d48a" stroke-width="2.5"/><circle cx="60" cy="60" r="46" fill="none" stroke="#f2d48a" stroke-width="1" stroke-dasharray="3 3"/>
+        <g transform="translate(60 64) scale(.32) translate(-100 -110)" fill="#f2d48a"><circle cx="68" cy="66" r="28"/><circle cx="132" cy="66" r="28"/><path d="M100 54 C150 54 168 88 166 122 C164 160 138 180 100 180 C62 180 36 160 34 122 C32 88 50 54 100 54Z"/></g>
+        <g transform="translate(60 64) scale(.32) translate(-100 -110)" fill="#1c2e5c"><circle cx="68" cy="64" r="11"/><circle cx="132" cy="64" r="11"/></g></svg>
+      <div class="t1">PASSPORT</div><div class="t3 han">护照</div><div class="t2">PASAPORTE DE VIAJE</div>
+      <div style="position:absolute;bottom:34px;font-size:12px;letter-spacing:.2em;opacity:.8">PANAMÁ · 巴拿马</div></div>
+    <div style="padding:0 22px 30px"><div class="btn" style="background:#c98d1c;box-shadow:0 4px 0 #8a6114">Open passport</div></div></div>`,
+
+  ppPages: () => `<div style="display:flex;flex-direction:column;height:100%;background:#efe7d8">${status()}${appbar()}
+    <div class="pp-book"><div class="pp-head"><b>Stamps</b><span style="font-weight:900;color:var(--muted);font-size:12px">3 of 10 · page 1/3</span></div>
+      <div class="pp-grid">
+        <div class="slot filled">${stampSVG(1)}</div>
+        <div class="slot filled">${stampSVG(2)}</div>
+        <div class="slot filled" style="position:relative">${stampSVG(3, 'stamp-new')}<span style="position:absolute;top:-6px;right:-4px;background:var(--brand);color:#fff;font-size:10px;font-weight:900;padding:3px 7px;border-radius:999px">NEW</span></div>
+        <div class="slot">4 · Herrera<br>Not visited yet</div>
+        <div class="slot">5 · Los Santos<br>Not visited yet</div>
+        <div class="slot">6 · Veraguas<br>Not visited yet</div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-top:6px"><i style="width:8px;height:8px;border-radius:50%;background:var(--ink)"></i><i style="width:8px;height:8px;border-radius:50%;background:#d3c4a6"></i><i style="width:8px;height:8px;border-radius:50%;background:#d3c4a6"></i></div>
+    </div>
+    <div style="padding:0 14px 10px"><div class="btn jade">See Coclé postcard</div></div>${nav('passport')}</div>`,
+
+  ppPostcard: () => `<div style="display:flex;flex-direction:column;height:100%;background:#efe7d8">${status()}
+    <div style="padding:4px 18px 8px;display:flex;justify-content:space-between;align-items:center"><b style="font-size:18px">Postcard unlocked</b><span style="font-size:22px">✕</span></div>
+    <div class="postcard"><svg viewBox="0 0 345 210" width="100%" style="display:block">
+        <rect width="345" height="210" fill="#cdebfb"/><circle cx="290" cy="46" r="24" fill="#ffd36b"/>
+        <path d="M0 120 L80 80 L150 112 L230 70 L345 118 L345 210 L0 210Z" fill="#7fb85c"/>
+        <rect x="20" y="128" width="305" height="70" fill="#5a6f7c"/><rect x="30" y="138" width="285" height="50" fill="#7cc7ee"/><rect x="170" y="138" width="6" height="50" fill="#3b4a54"/>
+        <g transform="translate(46 126)"><path d="M0 26 L104 26 L96 46 L8 46Z" fill="#e0453a"/><rect x="14" y="8" width="74" height="18" fill="#f6efe0"/><rect x="20" y="-8" width="18" height="16" fill="#3b82c4"/><rect x="44" y="-4" width="18" height="12" fill="#f2b544"/></g>
+        <text x="18" y="40" font-family="Fraunces, serif" font-weight="800" font-size="15" fill="#1c2e5c" letter-spacing="2">GREETINGS FROM</text>
+        <text x="16" y="78" font-family="Fraunces, serif" font-weight="800" font-size="40" fill="#e0453a" stroke="#fff" stroke-width="6" paint-order="stroke">PANAMÁ</text>
+      </svg>
+      <div class="back"><div>
+          <div class="eyebrow" style="color:var(--brand)">Did you know?</div>
+          <p style="margin:6px 0 0;font-size:13.5px;line-height:1.45;font-weight:700">The Panama Canal opened in 1914. A ship crosses from the Atlantic to the Pacific in about 8 to 10 hours.</p>
+          <div class="pc-phrase"><div class="spk"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M4 10v4h4l5 4V6L8 10z"/></svg></div>
+            <div><div class="han" style="font-size:22px;line-height:1.1">巴拿马运河</div><div style="font-size:12px;font-weight:800;color:#2a6fae">Bānámǎ yùnhé · the Panama Canal</div></div></div>
+        </div><div class="div"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">${flagSVG()}<div style="font-size:10px;font-weight:900;color:var(--muted);text-align:center">STAMP<br>UNIT 1</div>${char('harpia-banda', 70)}</div></div>
+    </div>
+    <div style="padding:14px;display:flex;gap:10px"><div class="btn ghost" style="flex:1">↗ Share</div><div class="btn" style="flex:1">Keep</div></div>
+    <p style="margin:0 18px;font-size:11.5px;color:var(--muted);font-weight:700">Draft fact — needs review before publishing.</p></div>`,
+
+  read1: () => readingFrame(3, `
+      <div class="narr">In the 1850s, a railroad was built across Panama, from the Caribbean to the Pacific. Workers came from many countries.</div>
+      <div class="zh" style="position:relative"><div class="spk"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M4 10v4h4l5 4V6L8 10z"/></svg></div>
+        <div><div class="h han">很多中国人来<span class="u">巴拿马</span>工作。</div><div class="p">Hěn duō Zhōngguó rén lái Bānámǎ gōngzuò.</div><div class="e">Many Chinese people came to Panama to work.</div></div>
+        <div class="gloss" style="left:120px;top:-46px"><span class="han" style="font-size:15px">巴拿马</span> Bānámǎ · Panama <span style="color:#f2b544">· new word</span></div></div>
+      <div class="chips"><span class="chip on">Pinyin</span><span class="chip on">Translation</span><span class="chip">Slow audio</span></div>`, illRailroad()),
+  read2: () => readingFrame(5, `
+      <div class="narr">Today, a train still runs between Panama City and Colón, along the same old route.</div>
+      <div class="zh"><div><div class="h han">今天你还可以坐<span class="blank">火车</span>去科隆。</div><div class="p">Jīntiān nǐ hái kěyǐ zuò <b>huǒchē</b> qù Kēlóng.</div><div class="e">Today you can still take the train to Colón.</div></div></div>
+      <div class="eyebrow" style="color:var(--muted)">Choose the missing word</div>
+      <div class="opts"><div class="opt ok"><div class="h han">火车</div><small>huǒchē</small></div><div class="opt"><div class="h han">飞机</div><small>fēijī</small></div><div class="opt"><div class="h han">出租车</div><small>chūzūchē</small></div></div>
+      <div style="background:#dff3eb;border-radius:14px;padding:8px 12px;font-weight:900;color:#1f7a5f;font-size:13.5px">✓ Correct! 火车 huǒchē · train</div>`, illTrainToday()),
+  read3: () => `<div style="display:flex;flex-direction:column;height:100%">${status(true)}<div class="desk" style="padding-top:20px">
+      <div class="book" style="align-items:center;text-align:center;padding:26px 18px 18px;gap:10px"><span class="draft">Draft · needs review</span>
+        <div class="eyebrow" style="color:var(--brand)">Story complete</div>
+        <div style="font-family:Fraunces,serif;font-weight:800;font-size:24px;line-height:1.15">The railroad and the<br>first Chinese in Panama</div>
+        ${char('wawa-celebrate', 150)}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%">
+          <div style="border-radius:14px;background:#f2b544;padding:3px"><div style="font-size:10px;font-weight:900;color:#fff;letter-spacing:.1em">XP</div><div style="background:#fff;border-radius:11px;padding:6px;font-weight:900;font-size:22px;color:#c98d1c">+15</div></div>
+          <div style="border-radius:14px;background:#2f9e7e;padding:3px"><div style="font-size:10px;font-weight:900;color:#fff;letter-spacing:.1em">ANSWERS</div><div style="background:#fff;border-radius:11px;padding:6px;font-weight:900;font-size:22px;color:#1f7a5f">3/3</div></div></div>
+        <div style="width:100%;text-align:left"><div class="eyebrow" style="color:var(--muted);margin-bottom:6px">New words</div>
+          <div style="display:flex;gap:8px"><span style="border:2px solid var(--line);border-radius:12px;padding:5px 9px;background:#fff"><b class="han" style="font-size:17px">巴拿马</b> <small style="color:var(--muted);font-weight:700">Panama</small></span><span style="border:2px solid var(--line);border-radius:12px;padding:5px 9px;background:#fff"><b class="han" style="font-size:17px">铁路</b> <small style="color:var(--muted);font-weight:700">railroad</small></span></div></div>
+        <div style="font-size:12px;font-weight:800;color:var(--muted)">📖 Story 1 of 3 in Panamá</div>
+        <div class="btn" style="width:100%">Back to the route</div>
+      </div></div></div>`,
+
+  liveDay: () => homeScreen('B', 'day'), liveSunset: () => homeScreen('B', 'sunset'), liveNight: () => homeScreen('B', 'night'),
+  liveRain: () => homeScreen('B', 'rain'), liveNov: () => homeScreen('B', 'nov'),
+};
+
+function flagSVG() { return `<svg viewBox="0 0 60 40" width="60" height="40">${flagRect(0, 0, 60, 40)}</svg>`; }
+function readingFrame(page, body, ill) {
+  return `<div style="display:flex;flex-direction:column;height:100%;background:#3d5a4c">${status(true)}
+    <div class="rd-top" style="color:#fff"><span style="font-size:22px">✕</span><div class="bar"><i style="width:${page / 8 * 100}%"></i></div><span style="font-weight:900;font-size:13px">${page}/8</span></div>
+    <div class="desk"><div class="book"><span class="draft">Draft · needs review</span><div class="ill">${ill}</div><div class="txt">${body}</div>
+      <div style="display:flex;justify-content:space-between;padding:0 18px 14px;font-weight:900;color:#b4a385;font-size:12px"><span>‹ page ${page - 1}</span><span>📖 Panamá</span><span>page ${page + 1} ›</span></div></div></div>
+    <div style="background:#2f473b;padding:12px 14px 26px"><div class="btn ${page === 5 ? 'jade' : ''}">${page === 5 ? 'Continue' : 'Next page'}</div></div></div>`;
+}
+function illRailroad() {
+  return `<svg viewBox="0 0 351 210" width="100%" height="210" style="display:block">
+    <rect width="351" height="210" fill="#f3e3c3"/><circle cx="290" cy="50" r="30" fill="#f6c16a" opacity=".8"/>
+    <path d="M0 120 Q60 80 120 110 T240 100 T351 110 L351 210 L0 210Z" fill="#9cc382"/>
+    ${[20, 70, 300, 335].map((x, i) => `<line x1="${x}" y1="150" x2="${x + 6}" y2="${90 + i * 5}" stroke="#7a5230" stroke-width="5"/><path d="M${x + 6} ${90 + i * 5} q-24 2 -34 14 M${x + 6} ${90 + i * 5} q22 -4 34 10 M${x + 6} ${90 + i * 5} q-8 -16 -26 -20 M${x + 6} ${90 + i * 5} q12 -14 30 -14" stroke="#4f8f5a" stroke-width="6" fill="none" stroke-linecap="round"/>`).join('')}
+    <rect x="0" y="168" width="351" height="10" fill="#8a6a4a"/>${Array.from({length: 18}, (_, i) => `<rect x="${i * 20 + 4}" y="164" width="6" height="18" fill="#6e5640"/>`).join('')}
+    <g transform="translate(150 158) scale(1.6)">${TRAIN(1, true)}</g>
+    ${[60, 96, 250].map((x, i) => `<g transform="translate(${x} 128)"><circle cx="0" cy="0" r="7" fill="#7a5230"/><path d="M-9 0 Q0 -16 9 0Z" fill="#e9d8a6"/><rect x="-6" y="7" width="12" height="20" rx="4" fill="${['#3b82c4','#c8655a','#5b8f3a'][i]}"/><line x1="6" y1="12" x2="${i === 1 ? 16 : -14}" y2="2" stroke="#7a5230" stroke-width="3"/></g>`).join('')}
+    <text x="14" y="28" font-family="Fraunces, serif" font-weight="800" font-size="13" fill="#7a5230" letter-spacing="2">PANAMÁ · 1850s</text></svg>`;
+}
+function illTrainToday() {
+  return `<svg viewBox="0 0 351 210" width="100%" height="210" style="display:block">
+    <rect width="351" height="210" fill="#d6eefb"/><rect x="0" y="150" width="351" height="60" fill="#7cc7ee"/>
+    ${[[16,60],[44,90],[70,40],[96,80]].map(([x, h]) => `<rect x="${x}" y="${150 - h}" width="24" height="${h}" fill="#3b8fd9" opacity=".7"/>`).join('')}
+    <path d="M140 150 Q240 110 351 140 L351 160 L140 160Z" fill="#9fd27a"/>
+    <rect x="120" y="132" width="231" height="8" fill="#5a4636"/>
+    <g transform="translate(250 128) scale(1.3)"><rect x="-90" y="-26" width="60" height="26" rx="6" fill="#f2b544"/><rect x="-26" y="-26" width="60" height="26" rx="6" fill="#f2b544"/><rect x="38" y="-30" width="40" height="30" rx="8" fill="#e0453a"/>${[-82,-66,-50,-18,-2,14].map(x => `<rect x="${x}" y="-20" width="10" height="9" rx="2" fill="#fff"/>`).join('')}</g>
+    <text x="14" y="28" font-family="Fraunces, serif" font-weight="800" font-size="13" fill="#1c2e5c" letter-spacing="2">PANAMÁ → COLÓN · TODAY</text></svg>`;
+}
+
+/* ?screen=<name> shows a single phone at full size (handy for reviewing or sharing one screen) */
+const only = new URLSearchParams(location.search).get('screen');
+if (only && SCREENS[only]) {
+  document.body.innerHTML = `<div style="padding:20px;display:flex;justify-content:center"><div class="holder" style="--s:1"><div class="phone"><div class="screen">${SCREENS[only]()}</div></div></div></div>`;
+  document.querySelectorAll('.screen .scroll').forEach((el) => (el.style.overflowY = 'auto'));
+}
+
+/* Fill every phone, wire the zoom modal */
+document.querySelectorAll('figure.shot').forEach((fig) => {
+  fig.querySelector('.screen').innerHTML = SCREENS[fig.dataset.screen]();
+  fig.addEventListener('click', () => {
+    const m = document.getElementById('modal');
+    m.querySelectorAll('.holder').forEach(h => h.remove());
+    const holder = document.createElement('div');
+    holder.className = 'holder';
+    holder.innerHTML = `<div class="phone"><div class="screen">${SCREENS[fig.dataset.screen]()}</div></div>`;
+    const fit = Math.min(1, (innerHeight - 50) / 832);
+    holder.style.setProperty('--s', fit);
+    holder.addEventListener('click', (e) => e.stopPropagation());
+    m.appendChild(holder);
+    m.classList.add('open');
+  });
+});
+document.getElementById('modal').addEventListener('click', (e) => e.currentTarget.classList.remove('open'));
+</script>
+</body>
+</html>

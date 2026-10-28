@@ -1,208 +1,189 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useRef, type UIEvent } from 'react'
+import { Buddy } from '../components/Friends'
 import { UNITS } from '../data/course'
-import { PORTRAITS, asset, type Province } from '../data/journey'
+import { FRIEND_IDS } from '../data/friends'
+import { STOP_ICONS, STORY_ICON, asset, type Province } from '../data/journey'
 import { isNight, useProgress } from '../lib/progress'
-import { BookIcon, Knot } from './parts'
+import { TitleCard } from './parts'
 import { nextStop, stopsOf, type Stop } from './stops'
 import { toast } from './toast'
 import './journey.css'
 
 type Props = {
   province: Province
-  /** Node just finished, so its knot can pop. */
+  /** Node just finished, so its medallion can pop. */
   justDone: string | null
   onBack: () => void
   onBoard: (stop: Extract<Stop, { node: unknown }>) => void
 }
 
-/** Characters the split-flap tiles spin through before they settle. */
-const FLAP = '你好我是谁他她们中国人朋友上车大小天日月水火山口'.split('')
+/** Sideways offsets (px) that give the path its gentle zig-zag. */
+const ZIGZAG = [0, 54, 76, 54, 0, -54, -76, -54]
+/** At the widest bends of the path, a friend stands on a little island on the other side. */
+const FRIEND_AT = new Set([2, 6])
 
+/**
+ * Friends who live in a backdrop's scenery instead of on islands beside the path. `x`, `y` and `w`
+ * are percentages of the painting (its left edge to the right, top down, and its width), so they
+ * stay on the same spot of the picture at any screen size. (x, y) is the top-left of the friend.
+ */
+const SCENERY_FRIENDS: { id: (typeof FRIEND_IDS)[number]; x: number; y: number; w: number }[] = [
+  { id: 'harpia', x: 2, y: 80, w: 19 },
+  { id: 'sloth', x: 78, y: 36, w: 17 },
+]
+
+/** The painted backdrop of a route: the day and night paintings, with the friends living in the scenery. */
+function Backdrop({ day, night, dark }: { day: string; night: string; dark: boolean }) {
+  return (
+    <div className="j-backdrop" aria-hidden="true">
+      <div className="j-bd-art">
+        <i style={{ backgroundImage: `url(${asset(day)})` }} />
+        <i style={{ backgroundImage: `url(${asset(night)})`, opacity: dark ? 1 : 0 }} />
+        {SCENERY_FRIENDS.map((f) => (
+          <div key={f.id} className="j-scenery-friend" style={{ left: `${f.x}%`, top: `${f.y}%`, width: `${f.w}%` }}>
+            <Buddy id={f.id} size={100} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** A mascot standing on a small round patch of grass beside the path. */
+function FriendSpot({ index, unit, x }: { index: number; unit: number; x: number }) {
+  if (!FRIEND_AT.has(index % ZIGZAG.length)) return null
+  const id = FRIEND_IDS[(Math.floor(index / 4) + unit) % FRIEND_IDS.length]
+  return (
+    <div className="j-friend-spot" style={{ [x > 0 ? 'right' : 'left']: 'calc(100% + 18px)' }} aria-hidden="true">
+      <i className="j-ground" />
+      <Buddy id={id} size={92} />
+    </div>
+  )
+}
+
+/**
+ * A province's route, kept minimal: one felt medallion per stop on a winding path, no labels.
+ * The next stop is bigger, with a small gold "开始 kāishǐ" under it to start.
+ */
 export function Route({ province, justDone, onBack, onBoard }: Props) {
   const progress = useProgress()
   const stops = stopsOf(province)
   const at = nextStop(stops, progress)
   const lessons = stops.filter((s) => s.kind === 'lesson').length
   const doneLessons = stops.filter((s) => s.kind === 'lesson' && progress.nodes[s.node.id]).length
-  const lineRef = useRef<HTMLDivElement>(null)
-  const tilesRef = useRef<HTMLDivElement>(null)
-  const current = stops[at]
-  const boardChars = current?.kind === 'lesson' ? [...current.key.hanzi] : current?.kind === 'goal' ? [...province.landmark!.zh] : []
-
-  // The rail is red up to the current stop and dashed after it.
-  useLayoutEffect(() => {
-    const line = lineRef.current!
-    const rows = [...line.querySelectorAll<HTMLElement>('.j-row')]
-    const mid = (r: HTMLElement) => r.offsetTop + r.offsetHeight / 2
-    const first = mid(rows[0])
-    const last = mid(rows[rows.length - 1])
-    const cur = mid(rows[Math.min(at, rows.length - 1)])
-    Object.assign(line.querySelector<HTMLElement>('.j-rail.done')!.style, { top: `${first}px`, height: `${cur - first}px` })
-    Object.assign(line.querySelector<HTMLElement>('.j-rail.todo')!.style, { top: `${cur}px`, height: `${last - cur}px` })
-  })
+  const pathRef = useRef<HTMLDivElement>(null)
+  const shellRef = useRef<HTMLDivElement>(null)
+  // The backdrop glides with the route: how far down the route you are (0 to 1).
+  const glide = (el: HTMLElement) => {
+    const max = el.scrollHeight - el.clientHeight
+    shellRef.current?.style.setProperty('--bd-p', String(max > 0 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0))
+  }
+  const night = isNight(progress)
+  const { backdrop } = province
 
   useEffect(() => {
-    lineRef.current?.querySelector('.current')?.scrollIntoView({ block: 'nearest', behavior: justDone ? 'smooth' : 'auto' })
-    if (boardChars.length) flipTo(tilesRef.current!, boardChars)
-    // The board spins once per stop, when it changes.
+    pathRef.current?.querySelector('.current')?.scrollIntoView({ block: 'center', behavior: justDone ? 'smooth' : 'auto' })
+    // Only when the next stop changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [at])
 
-  const board = async (s: Extract<Stop, { node: unknown }>) => {
-    await flipTo(tilesRef.current!, ['上', '车'])
-    setTimeout(() => onBoard(s), 200)
-  }
-
   return (
-    <div className="j-route">
-      {/* Provinces without a night painting just dim their day one. */}
-      <div className={`j-sky ${isNight(progress) && !province.header?.night ? 'dim' : ''}`}>
-        <i style={{ backgroundImage: `url(${asset(province.header!.day)})` }} />
-        {province.header?.night && (
-          <i style={{ backgroundImage: `url(${asset(province.header.night)})`, opacity: isNight(progress) ? 1 : 0 }} />
-        )}
-        <div className="j-head">
-          <button type="button" className="j-back" onClick={onBack} aria-label="Back to the map">
-            ←
-          </button>
-          <div>
-            <small>
-              UNIT {province.unit} · {UNITS.find((u) => u.id === province.unit)?.title.toUpperCase()}
-            </small>
-            <h1>
-              {province.name}
-              <span className="j-han">{province.zh}</span>
-            </h1>
-            <div className="j-prog">
-              <b>
-                <i style={{ width: `${(doneLessons / lessons) * 100}%` }} />
-              </b>
-              <span>
-                {doneLessons}/{lessons}
-              </span>
+    <div ref={shellRef} className={`j-route-shell ${backdrop ? 'painted' : ''} ${night ? 'night' : ''}`}>
+      {backdrop && <Backdrop day={backdrop.day} night={backdrop.night} dark={night} />}
+      <div
+        className="j-route"
+        onScroll={(e: UIEvent<HTMLDivElement>) => glide(e.currentTarget)}
+        style={backdrop ? undefined : { backgroundImage: `url(${asset('route-pattern.webp')})` }}
+      >
+        {backdrop ? (
+          <div className="j-head solo">
+            <TitleCard
+              lead={
+                <button type="button" className="j-round" onClick={onBack} aria-label="Back to the map">
+                  ←
+                </button>
+              }
+              kicker={`Unit ${province.unit} · ${UNITS.find((u) => u.id === province.unit)?.title ?? ''}`}
+              name={province.name}
+              zh={province.zh}
+              progress={[doneLessons, lessons]}
+              night={night}
+              paper
+            />
+          </div>
+        ) : (
+          // Provinces without a night painting just dim their day one.
+          <div className={`j-sky small ${night && !province.header?.night ? 'dim' : ''}`}>
+            <i style={{ backgroundImage: `url(${asset(province.header!.day)})` }} />
+            {province.header?.night && (
+              <i style={{ backgroundImage: `url(${asset(province.header.night)})`, opacity: night ? 1 : 0 }} />
+            )}
+            <div className="j-head">
+              <TitleCard
+                lead={
+                  <button type="button" className="j-round" onClick={onBack} aria-label="Back to the map">
+                    ←
+                  </button>
+                }
+                kicker={`Unit ${province.unit} · ${UNITS.find((u) => u.id === province.unit)?.title ?? ''}`}
+                name={province.name}
+                zh={province.zh}
+                progress={[doneLessons, lessons]}
+                night={night}
+              />
             </div>
           </div>
+        )}
+
+        <div className="j-path" ref={pathRef}>
+          {stops.map((s, i) => {
+            const x = ZIGZAG[i % ZIGZAG.length]
+            if (s.kind === 'story') {
+              return (
+                <div key="story" className="j-stop-wrap" style={{ translate: `${x}px 0` }}>
+                  {!backdrop && <FriendSpot index={i} unit={province.unit} x={x} />}
+                  <button
+                    type="button"
+                    className="j-stop"
+                    onClick={() => toast('Story · The railroad — coming soon')}
+                    aria-label={s.title}
+                  >
+                    <img className="j-medal" src={asset(STORY_ICON)} alt="" draggable={false} />
+                  </button>
+                </div>
+              )
+            }
+            const state = i < at ? 'done' : i === at ? 'current' : 'locked'
+            const go = () => (state === 'locked' ? toast('Finish the stops before this one first') : onBoard(s))
+            const icon = s.kind === 'goal' ? province.landmark!.image : STOP_ICONS[s.place]
+            const label = s.kind === 'goal' ? `${s.place} · checkpoint` : `${s.place} · ${s.key.en}`
+            return (
+              <div key={s.node.id} className={`j-stop-wrap ${state}`} style={{ translate: `${x}px 0` }}>
+                {!backdrop && <FriendSpot index={i} unit={province.unit} x={x} />}
+                <button
+                  type="button"
+                  className={`j-stop ${state} ${s.kind} ${s.node.id === justDone ? 'pop' : ''}`}
+                  onClick={go}
+                  aria-label={label}
+                >
+                  {icon ? (
+                    <img className={`j-medal ${icon.startsWith('stops/') ? '' : 'photo'}`} src={asset(icon)} alt="" draggable={false} />
+                  ) : (
+                    <span className="j-medal plain j-han">{s.kind === 'lesson' ? s.key.hanzi : province.landmark!.zh}</span>
+                  )}
+                  {state === 'done' && <span className="j-tick">✓</span>}
+                  {state === 'locked' && <span className="j-lock">🔒</span>}
+                </button>
+                {state === 'current' && (
+                  <button type="button" className="j-start" onClick={go}>
+                    <span className="j-han">开始</span> kāishǐ
+                  </button>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
-
-      <div className="j-line" ref={lineRef}>
-        <div className="j-rail done" />
-        <div className="j-rail todo" />
-        {stops.map((s, i) => {
-          const state = i < at ? 'done' : i === at ? 'current' : 'locked'
-          if (s.kind === 'story') {
-            return (
-              <button key="story" type="button" className="j-row story" onClick={() => toast('Story · The railroad — coming soon')}>
-                <div className="j-ic">
-                  <BookIcon />
-                </div>
-                <div>
-                  <b>{s.title}</b>
-                  <small>{s.sub}</small>
-                </div>
-              </button>
-            )
-          }
-          const replay = () => (state === 'locked' ? toast('Finish the stops before this one first') : onBoard(s))
-          if (state === 'current') {
-            const title = s.kind === 'lesson' ? s.key.en : 'Checkpoint'
-            const py = s.kind === 'lesson' ? s.key.pinyin : province.landmark!.py
-            return (
-              <div key={s.node.id} className="j-row current">
-                <div className="j-rider">
-                  <img src={asset(PORTRAITS[progress.traveler].file)} alt="" />
-                </div>
-                <div className="j-ic">
-                  <div className="j-ring" />
-                </div>
-                <button type="button" className="j-board" onClick={() => board(s)} aria-label={`Board: ${s.place}`}>
-                  <div className="j-bd-head">{s.kind === 'goal' ? 'CHECKPOINT · ALL WORDS' : `NEXT DEPARTURE · ${s.node.words.length} WORDS`}</div>
-                  <div className="j-tiles" ref={tilesRef} />
-                  <div className="j-bd-foot">
-                    <span>
-                      <span className="py">{py}</span> · {title}
-                    </span>
-                    <span className="place">{s.place}</span>
-                  </div>
-                </button>
-              </div>
-            )
-          }
-          if (s.kind === 'goal') {
-            return (
-              <button key={s.node.id} type="button" className={`j-row goal ${state}`} onClick={replay}>
-                <div className="j-ic">
-                  <div className="j-goal-ic" style={{ backgroundImage: `url(${asset(province.landmark!.image)})` }} />
-                </div>
-                <div>
-                  <b>
-                    {s.place} · {province.landmark!.py}
-                  </b>
-                  <small>Checkpoint · earns the stamp</small>
-                </div>
-              </button>
-            )
-          }
-          return (
-            <button key={s.node.id} type="button" className={`j-row ${state}`} onClick={replay}>
-              <div className="j-ic">
-                <Knot on={state === 'done'} className={s.node.id === justDone ? 'pop' : ''} />
-              </div>
-              <div>
-                <b>
-                  {s.key.en} · {s.key.pinyin}
-                </b>
-                <small>{s.place}</small>
-              </div>
-            </button>
-          )
-        })}
-      </div>
     </div>
-  )
-}
-
-// ---- Split-flap board ----
-
-let clickCtx: AudioContext | null = null
-function click() {
-  try {
-    clickCtx ??= new AudioContext()
-    const buf = clickCtx.createBuffer(1, 600, clickCtx.sampleRate)
-    const d = buf.getChannelData(0)
-    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 6)
-    const src = clickCtx.createBufferSource()
-    const g = clickCtx.createGain()
-    g.gain.value = 0.18
-    src.buffer = buf
-    src.connect(g).connect(clickCtx.destination)
-    src.start()
-  } catch {
-    /* no audio: the board still flips */
-  }
-}
-
-/** Spins each tile through a few characters, left to right, until it shows its own. */
-function flipTo(box: HTMLElement, chars: string[]) {
-  if (box.children.length !== chars.length) box.innerHTML = chars.map(() => '<span class="j-tile"><i></i></span>').join('')
-  const tiles = [...box.children] as HTMLElement[]
-  return Promise.all(
-    tiles.map(
-      (t, i) =>
-        new Promise<void>((resolve) => {
-          let n = 5 + i * 3
-          const step = () => {
-            const last = n-- <= 0
-            t.querySelector('i')!.textContent = last ? chars[i] : FLAP[Math.floor(Math.random() * FLAP.length)]
-            t.classList.remove('flap')
-            void t.offsetWidth
-            t.classList.add('flap')
-            click()
-            if (last) resolve()
-            else setTimeout(step, 70)
-          }
-          step()
-        }),
-    ),
   )
 }

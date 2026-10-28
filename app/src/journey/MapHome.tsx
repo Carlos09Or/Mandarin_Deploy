@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { FRIENDS, FRIEND_IDS } from '../data/friends'
 import {
-  BADGE_AT, BOATS, CLOUDS, EXTRA_HOLE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province,
+  BADGE_AT, SEA_LANES, CLOUDS, EXTRA_HOLE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province,
 } from '../data/journey'
-import { isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
-import { Face } from './parts'
+import { getProgress, isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
+import { Face, TitleCard } from './parts'
 import { currentProvince, isUnlocked, openProvinces, provinceDone } from './stops'
 import { toast } from './toast'
 import './journey.css'
@@ -12,14 +12,19 @@ import './journey.css'
 /** Something the map should play when it opens: a hop from one province to the next. */
 export type MapEvent = { hopFrom: string; hopTo: string }
 
-type Props = { onOpen: (p: Province) => void; event: MapEvent | null; onEventDone: () => void }
+/**
+ * `active` is false while the map is hidden behind another tab, a route or the loading screen.
+ * The map stays mounted all the time, so its artwork never loads twice; it only replays what
+ * changed (newly unlocked provinces, a hop after a trip) when it becomes visible again.
+ */
+type Props = { active: boolean; onOpen: (p: Province) => void; event: MapEvent | null; onEventDone: () => void }
 
 const pct = ([x, y]: readonly [number, number]) => ({ left: `${((x - VB.x) / VB.w) * 100}%`, top: `${((y - VB.y) / VB.h) * 100}%` })
 const regionById = new Map(REGIONS.map((r) => [r.id, r]))
 const badgeAt = (id: string) => BADGE_AT[id] ?? regionById.get(id)!.c
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-export function MapHome({ onOpen, event, onEventDone }: Props) {
+export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   const progress = useProgress()
   const scrollRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
@@ -32,17 +37,32 @@ export function MapHome({ onOpen, event, onEventDone }: Props) {
   const [pinAt, setPinAt] = useState(() => event?.hopFrom ?? currentProvince(progress).id)
   const [picking, setPicking] = useState(false)
   const busy = useRef(false)
+  const activeRef = useRef(active)
+  useLayoutEffect(() => {
+    activeRef.current = active
+  }, [active])
 
   const placePin = ([x, y]: readonly [number, number]) => {
     if (pinRef.current) Object.assign(pinRef.current.style, pct([x, y - 9]))
   }
-  const centerOn = ([x]: readonly [number, number], smooth = true) => {
-    const sc = scrollRef.current
+  // The camera: the map is zoomed in and follows the traveller; it can't be dragged around.
+  // `zoom` below 1 pulls the camera back a little (used for the first approach).
+  const centerOn = ([x, y]: readonly [number, number], smooth = true, zoom = 1, ms = 1200) => {
+    const box = scrollRef.current
     const stage = stageRef.current
-    if (!sc || !stage) return
-    const px = ((x - VB.x) / VB.w) * stage.clientWidth
-    sc.scrollTo({ left: px - sc.clientWidth / 2, behavior: smooth ? 'smooth' : 'auto' })
+    if (!box || !stage) return
+    const sw = stage.offsetWidth * zoom
+    const sh = stage.offsetHeight * zoom
+    const px = ((x - VB.x) / VB.w) * sw
+    const py = ((y - VB.y) / VB.h) * sh
+    const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
+    const tx = clamp(box.clientWidth / 2 - px, box.clientWidth - sw, 0)
+    const ty = clamp(box.clientHeight * 0.55 - py, box.clientHeight - sh, 0)
+    stage.style.transition = smooth ? `transform ${ms}ms cubic-bezier(.4,0,.2,1)` : 'none'
+    stage.style.transform = `translate(${tx}px, ${ty}px) scale(${zoom})`
   }
+  const pinAtRef = useRef(pinAt)
+  pinAtRef.current = pinAt
 
   // Opening a province: the fog clears in a circle from its origin and its clouds fly away.
   const reveal = (id: string) =>
@@ -104,16 +124,35 @@ export function MapHome({ onOpen, event, onEventDone }: Props) {
       requestAnimationFrame(step)
     })
 
-  // First paint: open the fog that was already cleared, then play anything new.
+  // Before anything shows (even behind the loading screen) the camera already looks at the
+  // traveller, a little zoomed out; the first time the map shows it glides in from there.
+  const approached = useRef(false)
+  useLayoutEffect(() => {
+    centerOn(badgeAt(pinAtRef.current), false, 0.82)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // First paint: open the fog that was already cleared.
   useEffect(() => {
     const svg = svgRef.current!
-    for (const id of progress.revealed) {
+    for (const id of getProgress().revealed) {
       svg.querySelector(`#j-clip-${id} circle`)?.setAttribute('r', '2000')
       layerRef.current!.querySelectorAll<HTMLElement>(`[data-cloud="${id}"]`).forEach((c) => (c.style.opacity = '0'))
     }
-    placePin(badgeAt(pinAt))
-    centerOn(badgeAt(pinAt), false)
-    const pending = openProvinces(progress).filter((p) => !progress.revealed.includes(p.id))
+  }, [])
+
+  // Each time the map shows: centre on the traveller, then play anything new.
+  useEffect(() => {
+    if (!active) return
+    const now = getProgress()
+    const from = event?.hopFrom ?? pinAt
+    placePin(badgeAt(from))
+    if (!approached.current) {
+      approached.current = true
+      requestAnimationFrame(() => centerOn(badgeAt(from), true, 1, 1600))
+    } else centerOn(badgeAt(from), false)
+    const pending = openProvinces(now).filter((p) => !now.revealed.includes(p.id))
+    if (!pending.length && !event) return
     let alive = true
     ;(async () => {
       busy.current = true
@@ -131,14 +170,20 @@ export function MapHome({ onOpen, event, onEventDone }: Props) {
     })()
     return () => {
       alive = false
+      busy.current = false
     }
-    // Runs once per visit to the map; later progress changes don't replay it.
+    // Replays when the map becomes visible or a trip ends, not on every progress change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [active, event])
 
   useEffect(() => placePin(badgeAt(pinAt)), [pinAt])
-  useEffect(() => startSea(layerRef.current!, svgRef.current!, stageRef.current!), [])
-  useEffect(() => dragToPan(scrollRef.current!), [])
+  useEffect(() => startSea(layerRef.current!, svgRef.current!, activeRef), [])
+  useEffect(() => {
+    const keep = () => centerOn(badgeAt(pinAtRef.current), false)
+    window.addEventListener('resize', keep)
+    return () => window.removeEventListener('resize', keep)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const tap = (id: string) => {
     const p = provinceById(id)
@@ -253,15 +298,17 @@ export function MapHome({ onOpen, event, onEventDone }: Props) {
       </div>
 
       <div className="j-map-bar">
-        <button type="button" className="j-me" onClick={() => setPicking(true)} aria-label="Choose your traveller">
-          <Face id={progress.traveler} />
-        </button>
-        <div className="j-map-title">
-          <small>Mandarin journey</small>
-          <b>
-            {here?.name} <span className="j-han" style={{ color: '#d21034' }}>{here?.zh}</span>
-          </b>
-        </div>
+        <TitleCard
+          lead={
+            <button type="button" className="j-round" onClick={() => setPicking(true)} aria-label="Choose your traveller">
+              <Face id={progress.traveler} />
+            </button>
+          }
+          kicker="Mandarin journey"
+          name={here?.name ?? ''}
+          zh={here?.zh ?? ''}
+          night={isNight(progress)}
+        />
       </div>
 
       {picking && (
@@ -296,41 +343,62 @@ export function MapHome({ onOpen, event, onEventDone }: Props) {
 
 // ---- The living sea: sailing boats with foam, and ripples on open water ----
 
-function startSea(layer: HTMLElement, svg: SVGSVGElement, stage: HTMLElement) {
+function startSea(layer: HTMLElement, svg: SVGSVGElement, active: { current: boolean }) {
   let alive = true
-  const SAIL = 0.09
-  for (const b of BOATS) {
+  for (const lane of SEA_LANES) sailLane(lane)
+
+  // One boat per lane, crossing it again and again; it fades in and out at the ends.
+  function sailLane(lane: (typeof SEA_LANES)[number]) {
+    const img = new Image()
+    img.onload = () => alive && launch(lane, img.src)
+    img.src = asset(`${lane.sprite}.webp`)
+  }
+  function launch(lane: (typeof SEA_LANES)[number], src: string) {
     const el = document.createElement('div')
     el.className = 'j-boat'
-    el.innerHTML = `<img src="${asset(`${b.src}.webp`)}" alt="" draggable="false">`
-    const [x0, y0, x1, y1] = b.box
-    const w = x1 - x0
-    const h = y1 - y0
-    el.style.width = `${w * 100}%`
+    el.innerHTML = `<img src="${src}" alt="" draggable="false">`
+    el.style.width = `${lane.size * 100}%`
+    const [ax, ay] = lane.from
+    const [bx, by] = lane.to
+    // Sprites face left; flip the ones heading right.
+    if (bx > ax) el.style.transform = 'translate(-50%, -60%) scaleX(-1)'
     layer.appendChild(el)
-    const t0 = performance.now() - Math.random() * b.secs * 1000
+    const len = Math.hypot(bx - ax, by - ay) || 1
+    const dir = [(bx - ax) / len, (by - ay) / len]
+    const t0 = performance.now() - Math.random() * lane.secs * 1000
     let lastFoam = 0
     const sail = (now: number) => {
       if (!alive) return
-      const aspect = stage.clientWidth / Math.max(1, stage.clientHeight)
-      const k = ((now - t0) / (b.secs * 1000)) % 1
-      const d = (k - 0.35) * SAIL
-      const x = x0 + b.dir[0] * d
-      const y = y0 + b.dir[1] * d * aspect
-      el.style.left = `${x * 100}%`
-      el.style.top = `${y * 100}%`
-      el.style.opacity = String(Math.min(1, k * 8, (1 - k) * 8))
-      if (now - lastFoam > 160) {
-        foam(layer, x + w * 0.5 - b.dir[0] * w * 0.42, y + h * 0.55 - b.dir[1] * h * 0.42, b.dir)
+      // While the map is hidden, keep the loop alive but skip the work.
+      if (!active.current) {
+        requestAnimationFrame(sail)
+        return
+      }
+      const k = ((now - t0) / (lane.secs * 1000)) % 1
+      const x = ax + (bx - ax) * k
+      const y = ay + (by - ay) * k
+      Object.assign(el.style, pct([x, y]))
+      el.style.opacity = String(Math.min(1, k * 10, (1 - k) * 10))
+      if (now - lastFoam > 170) {
+        // Foam peels off the stern, a little behind the hull.
+        const back = (lane.size * VB.w) / 2
+        const fx = (x - dir[0] * back - VB.x) / VB.w
+        const fy = (y - dir[1] * back * 0.6 - VB.y) / VB.h
+        foam(layer, fx, fy, dir)
         lastFoam = now
       }
       requestAnimationFrame(sail)
     }
     requestAnimationFrame(sail)
   }
+
   const land = [...svg.querySelectorAll<SVGPathElement>('#j-fog path')]
   const ripple = () => {
     if (!alive) return
+    if (!active.current) {
+      setTimeout(ripple, 1000)
+      return
+    }
     const w = document.createElement('div')
     w.className = 'j-wave'
     w.innerHTML =
@@ -390,24 +458,4 @@ function seaPoint(svg: SVGSVGElement, land: SVGPathElement[]): [number, number] 
     if (!near) return [x, y]
   }
   return [VB.x + 40, VB.y + 40]
-}
-
-/** Lets a mouse drag the map sideways, like a finger does on a phone. */
-function dragToPan(sc: HTMLElement) {
-  let down: { x: number; l: number } | null = null
-  const start = (e: PointerEvent) => {
-    if (e.pointerType === 'mouse' && !(e.target as HTMLElement).closest('button')) down = { x: e.clientX, l: sc.scrollLeft }
-  }
-  const move = (e: PointerEvent) => {
-    if (down) sc.scrollLeft = down.l - (e.clientX - down.x)
-  }
-  const end = () => (down = null)
-  sc.addEventListener('pointerdown', start)
-  window.addEventListener('pointermove', move)
-  window.addEventListener('pointerup', end)
-  return () => {
-    sc.removeEventListener('pointerdown', start)
-    window.removeEventListener('pointermove', move)
-    window.removeEventListener('pointerup', end)
-  }
 }

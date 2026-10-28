@@ -28,8 +28,8 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,jpg,json}'],
-        globIgnores: ['journey/**'],
+        // The journey artwork is precached too, so after the first visit everything opens from the device.
+        globPatterns: ['**/*.{js,css,html,svg,png,jpg,json,webp}'],
         runtimeCaching: [
           {
             // Voice clips are cached as they are played, so lessons already heard work offline.
@@ -41,7 +41,7 @@ export default defineConfig({
             // Journey artwork (map, train, passport) is cached the first time it is shown.
             urlPattern: ({ url }) => url.pathname.includes('/journey/'),
             handler: 'CacheFirst',
-            options: { cacheName: 'journey', expiration: { maxEntries: 80 } },
+            options: { cacheName: 'journey', expiration: { maxEntries: 200 } },
           },
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/,

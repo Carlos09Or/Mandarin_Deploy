@@ -7,6 +7,7 @@ import { AllAboard } from './journey/AllAboard'
 import { MapHome, type MapEvent } from './journey/MapHome'
 import { Passport } from './journey/Passport'
 import { Route } from './journey/Route'
+import { Splash } from './journey/Splash'
 import { TrainRide } from './journey/TrainRide'
 import { nextProvince } from './journey/stops'
 import { toast } from './journey/toast'
@@ -48,6 +49,9 @@ export default function App() {
   const [stamp, setStamp] = useState<Province | null>(null)
   const [aboard, setAboard] = useState<{ from: Province; to: Province } | null>(null)
   const [mapEvent, setMapEvent] = useState<MapEvent | null>(null)
+  // The loading screen preloads every picture once; the app is mounted behind it meanwhile.
+  const [loaded, setLoaded] = useState(false)
+  const mapVisible = tab === 'map' && !province
 
   const start = (exercises: Exercise[], nodeId: string | null = null, newWords: number[] = [], journey?: Ride) =>
     setSession({ exercises, nodeId, newWords, key: Date.now(), buddy: nextBuddy(), station: journey?.place, province: journey?.province })
@@ -107,25 +111,27 @@ export default function App() {
   return (
     <>
       <Shell tab={tab} onTab={onTab} bleed={tab === 'map'}>
-        {tab === 'map' &&
-          (province ? (
-            <Route
-              key={province.id}
-              province={province}
-              justDone={justDone}
-              onBack={() => setProvince(null)}
-              onBoard={(s) => setRide({ node: s.node, place: s.place, province })}
-            />
-          ) : (
-            <MapHome
-              onOpen={(p) => {
-                setJustDone(null)
-                setProvince(p)
-              }}
-              event={mapEvent}
-              onEventDone={() => setMapEvent(null)}
-            />
-          ))}
+        {/* The map stays mounted behind every other screen, so it never loads twice. */}
+        <div className={mapVisible ? 'contents' : 'hidden'}>
+          <MapHome
+            active={loaded && mapVisible}
+            onOpen={(p) => {
+              setJustDone(null)
+              setProvince(p)
+            }}
+            event={mapEvent}
+            onEventDone={() => setMapEvent(null)}
+          />
+        </div>
+        {tab === 'map' && province && (
+          <Route
+            key={province.id}
+            province={province}
+            justDone={justDone}
+            onBack={() => setProvince(null)}
+            onBoard={(s) => setRide({ node: s.node, place: s.place, province })}
+          />
+        )}
         {tab === 'review' && (
           <Review onReview={(pool) => start(buildReview(pool, getProgress()))} onWrite={(c, n) => start(buildWriting(c, n))} />
         )}
@@ -174,6 +180,7 @@ export default function App() {
         </div>
       )}
       {aboard && <AllAboard from={aboard.from} to={aboard.to} traveler={progress.traveler} onDone={arrive} />}
+      {!loaded && <Splash onDone={() => setLoaded(true)} />}
     </>
   )
 }

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Preview · New word reveal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.3/dist/hanzi-writer.min.js"></script>
+<style>
+  :root { --navy: #0a426d; --red: #d21034; --cream: #fbf3dc; --muted: #8b7f75; --ink: #2b2420; --line: #ece2d4; --jade: #2f9e7e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; gap: 36px; flex-wrap: wrap; padding: 24px;
+    background: #e6ecf1; font-family: Nunito, system-ui, sans-serif; color: var(--ink); }
+  .han { font-family: 'Noto Sans SC', sans-serif; }
+  .phone { width: 375px; height: 760px; border-radius: 40px; background: #fbf7f0; box-shadow: 0 30px 60px -25px rgba(0,0,0,.45), 0 0 0 10px #1d1a18; position: relative; overflow: hidden; }
+  .top { display: flex; align-items: center; gap: 14px; padding: 26px 18px 0; }
+  .x { font-size: 24px; color: #9a8f86; font-weight: 900; }
+  .bar { flex: 1; height: 14px; border-radius: 9px; background: var(--line); overflow: hidden; }
+  .bar i { display: block; width: 18%; height: 100%; border-radius: 9px; background: var(--jade); }
+  .kicker { margin: 22px 20px 0; font-size: 13px; font-weight: 900; letter-spacing: .14em; color: #e0453a; }
+  .card { position: relative; width: 300px; height: 300px; margin: 18px auto 0; }
+  .picto { position: absolute; inset: 0; border-radius: 24px; overflow: hidden; transition: filter .8s ease, opacity .8s ease, transform .9s cubic-bezier(.5,0,.2,1); }
+  .picto img { width: 100%; height: 100%; display: block; }
+  .picto.dark { filter: brightness(0) saturate(0); opacity: .14; }
+  .picto.gone { opacity: 0; }
+  .writer { position: absolute; inset: 0; pointer-events: none; }
+  .info { text-align: center; margin-top: 16px; opacity: 0; transform: translateY(8px); transition: .5s ease; }
+  .info.on { opacity: 1; transform: none; }
+  .info .py { font-size: 26px; font-weight: 900; color: #2a6fae; }
+  .info .en { font-size: 20px; font-weight: 900; margin-top: 2px; }
+  .info .story { margin: 8px 26px 0; font-size: 14px; font-weight: 700; color: var(--muted); }
+  .parts { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; font-weight: 900; }
+  .parts span { padding: 4px 10px; border-radius: 10px; background: #fff; border: 2px solid var(--line); }
+  .parts .han { font-size: 20px; margin-right: 4px; }
+  .duo { position: absolute; inset: 0; }
+  .duo .picto { width: 140px; height: 140px; inset: auto; top: 80px; }
+  .duo .picto:first-child { transform-origin: left center; }
+  .duo .picto:last-child { transform-origin: right center; }
+  .btn { position: absolute; left: 18px; right: 18px; bottom: 22px; padding: 15px; border: 0; border-radius: 16px; background: #e0453a; box-shadow: 0 4px 0 #b3322a;
+    color: #fff; font: 900 15px Nunito, sans-serif; letter-spacing: .06em; }
+  .panel { max-width: 320px; font-size: 14.5px; line-height: 1.55; color: #3d4e5c; }
+  .panel h2 { margin: 0 0 6px; font-size: 22px; color: var(--navy); }
+  .panel .row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+  .panel button { border: 0; border-radius: 12px; padding: 9px 14px; font: 900 15px Nunito, sans-serif; color: var(--navy); background: #fff; box-shadow: 0 3px 0 #c9d6e1; cursor: pointer; }
+  .panel button.on { background: var(--navy); color: #fff; }
+  .panel #pick button { font-family: 'Noto Sans SC', sans-serif; font-size: 18px; padding: 6px 10px; border-bottom: 4px solid var(--fit); }
+  .panel .legend { font-size: 12.5px; font-weight: 800; }
+  .panel { max-width: 380px; }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="top"><span class="x">✕</span><div class="bar"><i></i></div></div>
+    <div class="kicker">NEW WORD</div>
+    <div class="card" id="card"></div>
+    <div class="info" id="info"></div>
+    <button class="btn">CONTINUE</button>
+  </div>
+
+  <div class="panel">
+    <h2>Palabra nueva · prueba</h2>
+    Las 33 partes de Panama y Panama Oeste. La figura aparece a color, se oscurece hasta quedar como sombra y encima se dibuja la parte trazo a trazo. La raya de color debajo de cada botón dice qué tan bien calza la figura con los trazos.
+    <div class="row" id="pick"></div>
+    <p class="legend"><b style="color:#2f9e7e">●</b> calza bien &nbsp; <b style="color:#c98d1c">●</b> regular &nbsp; <b style="color:#d21034">●</b> no calza</p>
+    <p style="font-size:12.5px;color:#8b7f75">En 好 se usan dos figuras ya aprendidas: se juntan y el carácter sale con 女 en rojo y 子 en azul.</p>
+  </div>
+
+<script>
+// Every part with a pictogram: file, pinyin, meaning, memory line and how well the figure fits the strokes.
+const PARTS = {"人": {"file": "ren", "py": "rén", "en": "person", "story": "Two legs walking.", "fit": "good"}, "子": {"file": "zi", "py": "zǐ", "en": "child", "story": "A baby wrapped up, arms wide open.", "fit": "good"}, "女": {"file": "nu", "py": "nǚ", "en": "woman", "story": "A woman kneeling, arms wide.", "fit": "good"}, "口": {"file": "kou", "py": "kǒu", "en": "mouth", "story": "A wide open mouth.", "fit": "good"}, "亻": {"file": "ren-side", "py": "rén", "en": "person (side)", "story": "A person standing tall.", "fit": "ok"}, "宀": {"file": "mian", "py": "mián", "en": "roof", "story": "A roof with a chimney.", "fit": "good"}, "讠": {"file": "yan", "py": "yán", "en": "speech", "story": "Words coming out of a mouth.", "fit": "ok"}, "辶": {"file": "chuo", "py": "chuò", "en": "walk", "story": "A winding path.", "fit": "good"}, "月": {"file": "yue", "py": "yuè", "en": "moon", "story": "A crescent moon behind two clouds.", "fit": "good"}, "心": {"file": "xin", "py": "xīn", "en": "heart", "story": "A heart with three drops.", "fit": "ok"}, "马": {"file": "ma", "py": "mǎ", "en": "horse", "story": "A horse bent into its own shape.", "fit": "good"}, "门": {"file": "men", "py": "mén", "en": "door", "story": "An open gate.", "fit": "good"}, "田": {"file": "tian", "py": "tián", "en": "field", "story": "Four rice fields.", "fit": "good"}, "力": {"file": "li", "py": "lì", "en": "strength", "story": "A strong arm.", "fit": "good"}, "夕": {"file": "xi", "py": "xī", "en": "evening", "story": "A moon at dusk.", "fit": "ok"}, "木": {"file": "mu", "py": "mù", "en": "tree", "story": "A tree with its roots.", "fit": "good"}, "羊": {"file": "yang", "py": "yáng", "en": "sheep", "story": "A sheep with horns.", "fit": "ok"}, "大": {"file": "da", "py": "dà", "en": "big", "story": "Arms and legs stretched wide.", "fit": "good"}, "儿": {"file": "er", "py": "ér", "en": "child (legs)", "story": "Little legs running.", "fit": "good"}, "豕": {"file": "shi", "py": "shǐ", "en": "pig", "story": "A pig.", "fit": "good"}, "手": {"file": "shou", "py": "shǒu", "en": "hand", "story": "An open hand.", "fit": "ok"}, "戈": {"file": "ge", "py": "gē", "en": "halberd", "story": "An ancient halberd.", "fit": "ok"}, "氵": {"file": "shui", "py": "shuǐ", "en": "water", "story": "Three drops of water.", "fit": "good"}, "糸": {"file": "mi", "py": "mì", "en": "silk", "story": "A twisted skein of silk.", "fit": "ok"}, "矢": {"file": "shi-arrow", "py": "shǐ", "en": "arrow", "story": "An arrow with feathers.", "fit": "good"}, "隹": {"file": "zhui", "py": "zhuī", "en": "bird", "story": "A short-tailed bird.", "fit": "good"}, "小": {"file": "xiao", "py": "xiǎo", "en": "small", "story": "A tiny sprout and two seeds.", "fit": "good"}, "土": {"file": "tu", "py": "tǔ", "en": "earth", "story": "A plant in a mound of earth.", "fit": "good"}, "生": {"file": "sheng", "py": "shēng", "en": "life, to grow", "story": "A sprout with its leaves.", "fit": "good"}, "几": {"file": "ji", "py": "jǐ", "en": "small table", "story": "A little table.", "fit": "good"}, "又": {"file": "you", "py": "yòu", "en": "hand, again", "story": "A hand reaching out.", "fit": "ok"}, "耂": {"file": "lao", "py": "lǎo", "en": "old", "story": "An old man with long hair.", "fit": "good"}, "父": {"file": "fu", "py": "fù", "en": "father", "story": "A hand holding a stone axe.", "fit": "good"}};
+const PICTO = Object.fromEntries(Object.entries(PARTS).map(([c, p]) => [c, `../word-art/pictos/${p.file}.webp`]));
+const WORDS = { ...Object.fromEntries(Object.entries(PARTS).map(([c, p]) => [c, p])), 好: { py: 'hǎo', en: 'good', story: 'A woman with her child: good.' } };
+const card = document.getElementById('card'), info = document.getElementById('info');
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+let run = 0;
+
+function writer(el, char, opts = {}) {
+  return HanziWriter.create(el, char, {
+    width: 300, height: 300, padding: 18, showOutline: false, showCharacter: false,
+    strokeColor: '#d21034', strokeAnimationSpeed: 1.4, delayBetweenStrokes: 140, ...opts,
+  });
+}
+
+async function reveal(char) {
+  const id = ++run;
+  info.className = 'info'; info.innerHTML = '';
+  if (char === '好') return compound(id);
+  card.innerHTML = `<div class="picto"><img src="${PICTO[char]}" alt=""></div><div class="writer"></div>`;
+  const picto = card.querySelector('.picto');
+  await wait(1100); if (id !== run) return;
+  picto.classList.add('dark');
+  await wait(700); if (id !== run) return;
+  const w = writer(card.querySelector('.writer'), char);
+  await new Promise((r) => w.animateCharacter({ onComplete: r }));
+  if (id !== run) return;
+  await wait(300);
+  picto.classList.add('gone');
+  w.updateColor('strokeColor', '#2b2420', { duration: 600 });
+  showInfo(char);
+}
+
+async function compound(id) {
+  card.innerHTML = `<div class="duo"><div class="picto" style="left:-6px"><img src="${PICTO['女']}" alt=""></div><div class="picto" style="right:-6px"><img src="${PICTO['子']}" alt=""></div></div><div class="writer"></div>`;
+  const [a, b] = card.querySelectorAll('.picto');
+  await wait(1200); if (id !== run) return;
+  // Each known part grows into its half of the new character: 女 on the left, 子 on the right.
+  a.style.transform = 'translateX(18px) scale(1.3)'; b.style.transform = 'translateX(-14px) scale(1.4)';
+  a.classList.add('dark'); b.classList.add('dark');
+  await wait(900); if (id !== run) return;
+  const w = writer(card.querySelector('.writer'), '好', { strokeColor: '#2f88d3', radicalColor: '#d21034' });
+  await new Promise((r) => w.animateCharacter({ onComplete: r }));
+  if (id !== run) return;
+  a.classList.add('gone'); b.classList.add('gone');
+  showInfo('好', '<div class="parts"><span><span class="han" style="color:#d21034">女</span>woman</span>+<span><span class="han" style="color:#2f88d3">子</span>child</span></div>');
+}
+
+function showInfo(char, extra = '') {
+  const w = WORDS[char];
+  info.innerHTML = `<div class="py">${w.py} 🔊</div><div class="en">${w.en}</div>${extra}<div class="story">${w.story}</div>`;
+  requestAnimationFrame(() => info.classList.add('on'));
+}
+
+document.getElementById('pick').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#pick button').forEach((x) => x.classList.toggle('on', x === b));
+  reveal(b.dataset.c);
+});
+const FIT = { good: '#2f9e7e', ok: '#c98d1c', weak: '#d21034' };
+document.getElementById('pick').innerHTML = Object.entries(PARTS).map(([c, p]) => `<button data-c="${c}" style="--fit:${FIT[p.fit]}" title="${p.en}">${c}</button>`).join('') + '<button data-c="好" style="--fit:#0a426d">好 = 女 + 子</button>';
+document.querySelector('#pick button').click();
+</script>
+</body>
+</html>
