@@ -12,8 +12,8 @@ type Shown = { src: string; place: RevealStep['place'] | 'center'; look: Look }
 
 const PLACE = {
   center: { left: '6%', width: '88%' },
-  left: { left: '0%', width: '48%' },
-  right: { left: '52%', width: '48%' },
+  left: { left: '0%', width: '46%' },
+  right: { left: '54%', width: '46%' },
 }
 const LOOK: Record<Look, { opacity: number; filter: string }> = {
   hidden: { opacity: 0, filter: 'brightness(0)' },
@@ -46,8 +46,13 @@ export function Reveal({ data }: { data: RevealData }) {
 
 function RevealRun({ data }: { data: RevealData }) {
   const box = useRef<HTMLDivElement>(null)
+  // With several pictures each one stays on its own side, so they never overlap; a single
+  // picture starts in the middle and then slides under its part.
+  const several = data.steps.filter((s) => s.image).length > 1
   const [pictures, setPictures] = useState<Shown[]>(() => [
-    ...data.steps.filter((s) => s.image).map((s): Shown => ({ src: s.image!, place: 'center', look: 'hidden' })),
+    ...data.steps
+      .filter((s) => s.image)
+      .map((s): Shown => ({ src: s.image!, place: several ? s.place : 'center', look: 'hidden' })),
     ...(data.together ? [{ src: data.together, place: 'center' as const, look: 'hidden' as Look }] : []),
   ])
   const show = (i: number, change: Partial<Shown>) =>
