@@ -35,7 +35,23 @@ export default defineConfig({
         clientsClaim: true,
         // The journey artwork is precached too, so after the first visit everything opens from the device.
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,json,webp}'],
+        // Opening or reloading the app asks the network for the page first, so a deploy shows up on the next
+        // reload; the stored copy of index.html is only the offline fallback. Scripts and styles have hashed
+        // names, so the page it returns always points at files that match it.
+        navigateFallback: null,
+        directoryIndex: null,
         runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages',
+              networkTimeoutSeconds: 3,
+              // Skip the browser's own HTTP cache too (GitHub Pages sends max-age=600).
+              fetchOptions: { cache: 'no-cache' },
+              precacheFallback: { fallbackURL: 'index.html' },
+            },
+          },
           {
             // Voice clips are cached as they are played, so lessons already heard work offline.
             urlPattern: ({ url }) => url.pathname.includes('/audio/'),
