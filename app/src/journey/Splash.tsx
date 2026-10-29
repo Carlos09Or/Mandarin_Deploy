@@ -7,7 +7,7 @@ import './journey.css'
 /** Never block the app for longer than this, even on a very slow connection. */
 const MAX_WAIT = 25000
 /** The bar always takes at least this long to fill, so the screen never just flashes by. */
-const MIN_SHOW = 900
+const MIN_SHOW = 1600
 
 /**
  * The loading screen: a still painting of the four friends watching the train cross the bay, at
