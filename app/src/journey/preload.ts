@@ -1,4 +1,5 @@
 import { asset } from '../data/journey'
+import { WORD_FRIEND_FILES } from '../lesson/friends'
 
 // The pictures of the journey, fetched and decoded once so that no screen pops in later. The ones the
 // map needs are loaded behind the loading screen; the rest follow in the background once the app is
@@ -17,6 +18,8 @@ const NOW = [
   'route-bg-day.webp', 'route-bg-night.webp', 'route-pattern.webp', 'landmark-canal.webp',
 ]
 const LATER = [
+  // the friends who bring each new word (lesson/Intro.tsx)
+  ...WORD_FRIEND_FILES,
   // other routes
   'ride-landscape.webp',
   // trains

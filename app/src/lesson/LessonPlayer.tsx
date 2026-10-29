@@ -63,6 +63,9 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
   useEffect(() => unpinVoice, [])
 
   const ex = queue[pos]
+  // The lesson's new words, in order: each one is brought in by a different friend (see Intro).
+  const intros = queue.filter((e): e is Extract<Exercise, { kind: 'intro' }> => e.kind === 'intro')
+  const introStep = intros.indexOf(ex as (typeof intros)[number])
   const total = exercises.length
   // Lets browser tests read the current exercise or jump to the end; stripped from production builds.
   if (import.meta.env.DEV)
@@ -242,7 +245,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.18 }}
             >
-              {ex.kind === 'intro' && <Intro n={ex.word} />}
+              {ex.kind === 'intro' && <Intro n={ex.word} step={introStep} count={intros.length} lead={intros[0].word} />}
               {ex.kind === 'choice' && (
                 <Choice ex={ex} selected={selected} onSelect={setSelected} revealed={!!feedback} />
               )}
