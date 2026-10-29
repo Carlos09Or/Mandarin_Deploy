@@ -215,6 +215,94 @@
     transform: translateY(-4px);
   }
 }
+/* The traveller waiting in the corner of the map, who flies into a badge when it is tapped (Flyer.tsx). */
+.j-flight {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.j-flyer {
+  /* The picture is a big square (room for the wings); the standing traveller fills its middle, so the square hangs
+     partly outside the corner to put the feet just above the dock. */
+  --s: clamp(170px, 46vw, 220px);
+  position: absolute;
+  left: calc(14px - var(--s) * 0.4);
+  bottom: calc(10px - var(--s) * 0.41);
+  width: var(--s);
+  aspect-ratio: 1;
+  will-change: transform, opacity;
+}
+.j-flyer.arrive {
+  animation: j-arrive 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+@keyframes j-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.7);
+  }
+}
+.j-flyer-bob {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 85%;
+  animation: j-idle 3.4s ease-in-out infinite;
+}
+.j-flyer.go .j-flyer-bob {
+  animation: none;
+}
+.j-flyer-bob img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+  max-width: none;
+  filter: drop-shadow(0 4px 5px rgba(10, 40, 70, 0.35));
+}
+.j-flyer[data-pose='rest'] .f-rest,
+.j-flyer[data-pose='crouch'] .f-crouch,
+.j-flyer[data-pose='up'] .f-up,
+.j-flyer[data-pose='mid'] .f-mid,
+.j-flyer[data-pose='down'] .f-down,
+.j-flyer[data-pose='bank'] .f-bank,
+.j-flyer[data-pose='tuck'] .f-tuck {
+  visibility: visible;
+}
+/* Barely moving while it waits: a slow breath, a tiny sway. */
+@keyframes j-idle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0) scale(1, 1);
+  }
+  35% {
+    transform: translateY(-2px) rotate(-1deg) scale(1.012, 1.02);
+  }
+  70% {
+    transform: translateY(0) rotate(1deg) scale(1, 0.992);
+  }
+}
+.j-trail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.j-ring {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 233, 160, 0.95);
+  box-shadow: 0 0 6px rgba(255, 214, 90, 0.7);
+}
+@media (prefers-reduced-motion: reduce) {
+  .j-flyer-bob,
+  .j-flyer.arrive {
+    animation: none;
+  }
+}
 .j-map-bar {
   position: absolute;
   z-index: 6;

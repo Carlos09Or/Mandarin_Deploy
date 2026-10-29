@@ -111,12 +111,25 @@ const doorPictures = (name: string) => DOOR_STATES.map((st) => `door/${name}-${s
  */
 export const WALK_POSES = ['look', 'search', 'jump', 'rest', 'step-l', 'step-r'] as const
 export const walkerFiles = (walker: string) => WALK_POSES.map((p) => `door/${walker}-${p}.webp`)
-/** The pictures a door page needs: the door, its path and the walker's poses. */
+/**
+ * The traveller's flight from the corner of the map to a province's badge: the standing pose, then crouch, wings up,
+ * level, wings down, bank and tuck. All seven share one square canvas with the backpack at its centre (tools/cut_flight.py),
+ * so swapping them never moves or resizes the traveller.
+ */
+export const FLIGHT_POSES = ['rest', 'crouch', 'up', 'mid', 'down', 'bank', 'tuck'] as const
+export type FlightPose = (typeof FLIGHT_POSES)[number]
+export const flightFiles = (friend: string) => FLIGHT_POSES.map((p) => `flight/${friend}-${p}.webp`)
+/**
+ * The pictures a door page needs to show: the closed doors, their paths and the walker's poses. The half open and
+ * open pictures only matter for the walk through the door, so they come after (`doorOpening`).
+ */
 export const doorFiles = (door: DoorArt, walker: string) => [
-  ...doorPictures(door.name),
+  `door/${door.name}-closed.webp`,
   `door/path-${door.path}.webp`,
   ...walkerFiles(walker),
 ]
+/** The pictures of a door opening, fetched once the page is showing. */
+export const doorOpening = (door: DoorArt) => DOOR_STATES.filter((st) => st !== 'closed').map((st) => `door/${door.name}-${st}.webp`)
 /** Every door and path picture, for the preloader (the walker's own poses are added by whoever is travelling). */
 export const DOOR_FILES = [
   ...[...PANAMA_DOORS, 'door-7-canal', DEFAULT_DOOR].flatMap(doorPictures),

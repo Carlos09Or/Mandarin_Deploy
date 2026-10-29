@@ -33,8 +33,11 @@ export default defineConfig({
         // A new service worker takes over at once instead of waiting for every tab to close.
         skipWaiting: true,
         clientsClaim: true,
-        // The journey artwork is precached too, so after the first visit everything opens from the device.
-        globPatterns: ['**/*.{js,css,html,svg,png,jpg,json,webp}'],
+        // The install only fetches the app itself and what the first view of the map is made of, so it never competes
+        // with the loading screen on a slow connection. Everything else (doors, friends, train, passport, stroke data)
+        // is kept the first time it is fetched: src/journey/preload.ts warms it in the background when the connection
+        // allows, and a screen that needs it sooner just asks for it.
+        globPatterns: ['**/*.{js,css,html,svg,png}', 'brand/*.webp', 'journey/{map-illustrated-clean,map-fog-clean,splash-day,splash-night,nav-*}.webp'],
         // Opening or reloading the app asks the network for the page first, so a deploy shows up on the next
         // reload; the stored copy of index.html is only the offline fallback. Scripts and styles have hashed
         // names, so the page it returns always points at files that match it.
@@ -59,10 +62,16 @@ export default defineConfig({
             options: { cacheName: 'audio', expiration: { maxEntries: 4000 } },
           },
           {
-            // Journey artwork (map, train, passport) is cached the first time it is shown.
+            // Journey artwork (doors, friends, train, passport) is cached the first time it is shown or warmed.
             urlPattern: ({ url }) => url.pathname.includes('/journey/'),
             handler: 'CacheFirst',
-            options: { cacheName: 'journey', expiration: { maxEntries: 200 } },
+            options: { cacheName: 'journey', expiration: { maxEntries: 400 } },
+          },
+          {
+            // Stroke data for the writing trainer, so writing works offline once it has been fetched or warmed.
+            urlPattern: ({ url }) => url.pathname.includes('/hanzi/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'hanzi', expiration: { maxEntries: 400 } },
           },
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/,

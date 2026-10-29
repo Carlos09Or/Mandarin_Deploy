@@ -4,6 +4,7 @@ import {
   BADGE_AT, BOAT_SIZE, SEA_BOATS, CLOUDS, EXTRA_HOLE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province, type SeaBoat,
 } from '../data/journey'
 import { getProgress, isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
+import { Flyer, type FlyerHandle } from './Flyer'
 import { Face } from './parts'
 import { currentProvince, isUnlocked, openProvinces, provinceDone } from './stops'
 import { toast } from './toast'
@@ -32,6 +33,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   const layerRef = useRef<HTMLDivElement>(null)
   const pinRef = useRef<HTMLDivElement>(null)
   const railRef = useRef<SVGPathElement>(null)
+  const flyerRef = useRef<FlyerHandle>(null)
   // Provinces whose fog is gone on screen (revealed before, or just animated).
   const [shown, setShown] = useState(() => new Set(progress.revealed))
   const [pinAt, setPinAt] = useState(() => event?.hopFrom ?? currentProvince(progress).id)
@@ -179,7 +181,12 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   }, [active, event])
 
   useEffect(() => placePin(badgeAt(pinAt)), [pinAt])
-  useEffect(() => startSea(layerRef.current!, svgRef.current!, activeRef, shownRef), [])
+  // The boats start sailing the first time the map shows, not while the loading screen is still fetching the map.
+  const seaStop = useRef<(() => void) | null>(null)
+  useEffect(() => {
+    if (active && !seaStop.current) seaStop.current = startSea(layerRef.current!, svgRef.current!, activeRef, shownRef)
+  }, [active])
+  useEffect(() => () => seaStop.current?.(), [])
   useEffect(() => {
     const keep = () => centerOn(badgeAt(pinAtRef.current), false)
     window.addEventListener('resize', keep)
@@ -187,19 +194,20 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const tap = (id: string) => {
+  // Tapping a badge sends the traveller flying into it; the province's door page opens once it has gone in.
+  const tap = (id: string, badge: HTMLElement) => {
     const p = provinceById(id)
     if (!p || busy.current) return
     if (!isUnlocked(p, progress) || !shown.has(id)) {
       toast(hasContent(p) ? `${p.name} · finish the province before it` : `${p.name} · coming soon`)
       return
     }
-    if (pinAt !== id) {
-      busy.current = true
-      hop(pinAt, id).then(() => (busy.current = false))
-      return
-    }
-    onOpen(p)
+    busy.current = true
+    void flyerRef.current!.fly(badge).then(() => {
+      setPinAt(id)
+      busy.current = false
+      onOpen(p)
+    })
   }
 
   return (
@@ -259,7 +267,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
                     data-dy={dy}
                     style={{ ...pct([c[0] + dx, c[1] + dy]), width: w }}
                   >
-                    <img src={asset(`${img}.webp`)} alt="" draggable={false} />
+                    <img src={asset(`${img}.webp`)} alt="" draggable={false} loading="lazy" decoding="async" />
                   </div>
                 )
               }),
@@ -275,7 +283,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
                     type="button"
                     className={`j-badge ${done ? 'done' : open ? 'open' : 'locked'}`}
                     style={pct(at)}
-                    onClick={() => tap(r.id)}
+                    onClick={(e) => tap(r.id, e.currentTarget)}
                     aria-label={`${p.name}${open ? '' : ' (locked)'}`}
                   >
                     {done ? '✓' : r.unit}
@@ -297,6 +305,8 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
           </div>
         </div>
       </div>
+
+      <Flyer ref={flyerRef} friend={progress.traveler} active={active} />
 
       <div className="j-map-bar">
         <div className={`j-titlebar ${isNight(progress) ? 'night' : ''}`}>

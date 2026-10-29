@@ -1,26 +1,39 @@
-import { DOOR_FILES, asset, walkerFiles } from '../data/journey'
+import { FRIEND_IDS } from '../data/friends'
+import vocab from '../data/hsk1.json'
+import { DOOR_FILES, asset, flightFiles, walkerFiles } from '../data/journey'
 import { getProgress } from '../lib/progress'
 import { WORD_FRIEND_FILES } from '../lesson/friends'
 
-// The pictures of the journey, fetched and decoded once so that no screen pops in later. The ones the
-// map needs are loaded behind the loading screen; the rest follow in the background once the app is
-// open. The service worker also keeps them on the device (vite.config.ts).
+// The pictures of the journey, fetched and decoded once so that no screen pops in later, in two steps so a slow
+// connection is never kept waiting for things nobody can see yet:
+//  - NOW: only what the first view of the map is made of. It loads behind the loading screen.
+//  - LATER: everything the next screens use (doors, friends, train, passport, stroke data), fetched quietly in the
+//    background once the map is up, and only when the connection can afford it (see `canWarm`).
+// Whatever LATER has not fetched yet loads when its screen asks for it. The service worker keeps every picture it
+// has fetched on the device (vite.config.ts); its install only fetches the app itself and the NOW pictures.
 // Keep these lists in step with public/journey.
 const NOW = [
   // map
   'map-illustrated-clean.webp', 'map-fog-clean.webp',
-  // the boats at sea, sailing and at anchor
-  ...['sailboat', 'fishing-boat', 'cayuco', 'ferry', 'container-ship', 'tanker', 'bulk-carrier', 'cruise-ship'].flatMap((b) => [`boats/${b}-sail.webp`, `boats/${b}-anchor.webp`]),
-  'map-cloud.webp', 'map-cloud-2.webp', 'map-cloud-3.webp', 'map-cloud-4.webp',
+  // the traveller waiting in the corner of the map, who flies to a badge when it is tapped (journey/Flyer.tsx)
+  ...flightFiles(getProgress().traveler),
   'characters/wawa-sombrero.svg', 'characters/harpia-banda.svg', 'characters/sloth-montuno.svg', 'characters/tucan-pollera.svg',
   'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-passport.webp', 'nav-profile.webp',
 ]
+/** Hanzi that need stroke data for the writing trainer. */
+const CHARS = [...new Set(vocab.words.flatMap((w) => [...w.hanzi, ...w.example.hanzi]).filter((c) => /\p{Script=Han}/u.test(c)))]
+/** In the order the learner is likely to need them. */
 const LATER = [
-  // a province's door page: the doors, and each friend's walk up to them (journey/LessonDoor.tsx)
-  ...DOOR_FILES,
+  // the first thing after the map: a province's door page, closed doors first (journey/LessonDoor.tsx)
+  ...DOOR_FILES.filter((f) => f.endsWith('-closed.webp') || f.includes('/path-')),
   ...walkerFiles(getProgress().traveler),
   // the friends who bring each new word (lesson/Intro.tsx)
   ...WORD_FRIEND_FILES,
+  // the sea's boats, clouds, the other friends' flights (journey/MapHome.tsx, Flyer.tsx)
+  ...['sailboat', 'fishing-boat', 'cayuco', 'ferry', 'container-ship', 'tanker', 'bulk-carrier', 'cruise-ship'].flatMap((b) => [`boats/${b}-sail.webp`, `boats/${b}-anchor.webp`]),
+  'map-cloud.webp', 'map-cloud-2.webp', 'map-cloud-3.webp', 'map-cloud-4.webp',
+  ...DOOR_FILES.filter((f) => !f.endsWith('-closed.webp') && !f.includes('/path-')),
+  ...FRIEND_IDS.flatMap(flightFiles),
   // other routes
   'ride-landscape.webp',
   // the train that takes you on to the next province (AllAboard)
@@ -60,6 +73,29 @@ export function whenLoaded(files: string[], cap = 4000): Promise<void> {
   return Promise.race([all, new Promise<void>((resolve) => setTimeout(resolve, cap))])
 }
 
+type Connection = { saveData?: boolean; effectiveType?: string }
+/** Set when the map's pictures took long to arrive: this connection is slow whatever the browser says about it. */
+let slow = false
+/** Background downloads nobody asked for are only fine when the learner has not asked to save data and the line is not slow. */
+const canWarm = () => {
+  const c = (navigator as Navigator & { connection?: Connection }).connection
+  return !slow && !c?.saveData && (!c?.effectiveType || c.effectiveType === '4g')
+}
+
+/** Fetches the rest of the pictures a few at a time, then the stroke data, stopping if the connection turns out poor. */
+async function warm() {
+  const urls = [...LATER.map(asset), ...CHARS.map((c) => `${import.meta.env.BASE_URL}hanzi/${c}.json`)]
+  let next = 0
+  const worker = async () => {
+    while (next < urls.length && canWarm()) {
+      const url = urls[next++]
+      if (url.endsWith('.json')) await fetch(url).then((r) => r.arrayBuffer()).catch(() => undefined)
+      else await load(url)
+    }
+  }
+  await Promise.all([worker(), worker(), worker()])
+}
+
 /** Loads the map's pictures once per session; later calls return the same promise. The rest then load when the browser is idle. */
 export function preloadJourney(onProgress: (share: number) => void): Promise<void> {
   if (done) {
@@ -67,6 +103,7 @@ export function preloadJourney(onProgress: (share: number) => void): Promise<voi
     return done
   }
   let count = 0
+  const t0 = performance.now()
   done = Promise.all(
     NOW.map((f) =>
       load(asset(f)).then(() => {
@@ -75,8 +112,9 @@ export function preloadJourney(onProgress: (share: number) => void): Promise<voi
       }),
     ),
   ).then(() => {
+    slow = performance.now() - t0 > 9000
     const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 300))
-    idle(() => void LATER.reduce((p, f) => p.then(() => load(asset(f))), Promise.resolve()), { timeout: 800 })
+    idle(() => void warm(), { timeout: 2500 })
   })
   return done
 }

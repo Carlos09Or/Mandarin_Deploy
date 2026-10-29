@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import type { PathNode } from '../data/course'
 import type { FriendId } from '../data/friends'
-import { DOOR_FRAME, DOOR_STATES, WALK_POSES, asset, doorFiles, doorFor, lessonTitle, type Province } from '../data/journey'
+import { DOOR_FRAME, DOOR_STATES, WALK_POSES, asset, doorFiles, doorFor, doorOpening, lessonTitle, type Province } from '../data/journey'
 import { useProgress } from '../lib/progress'
 import { whenLoaded } from './preload'
 import { stopsOf, type Stop } from './stops'
@@ -59,6 +59,13 @@ export function LessonDoor({ province, traveler, onBack, onDone }: Props) {
     }
   }, [doors, traveler])
 
+  // Once the page shows, the door in view gets its opening pictures (the others when they come into view), so a slow
+  // connection only ever waits for the closed doors.
+  const [opening, setOpening] = useState(() => new Set([at]))
+  useEffect(() => {
+    if (phase !== 'loading') void whenLoaded(doorOpening(doors[view]))
+  }, [phase, view, doors])
+
   useEffect(() => {
     if (phase !== 'walk') return
     const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -91,6 +98,7 @@ export function LessonDoor({ province, traveler, onBack, onDone }: Props) {
   const onScroll = () => {
     const i = Math.max(0, Math.min(stops.length - 1, Math.round((track.current?.scrollLeft ?? 0) / slideWidth())))
     setView((v) => (v === i ? v : i))
+    setOpening((o) => (o.has(i) ? o : new Set(o).add(i)))
   }
   // A mouse cannot swipe, so it drags the track by hand (snapping is paused meanwhile).
   const down = (e: PointerEvent) => {
@@ -117,10 +125,16 @@ export function LessonDoor({ province, traveler, onBack, onDone }: Props) {
     } else drag.current = null
   }
 
+  // The walk waits (briefly) for the door's opening pictures, which only a slow connection will not have yet.
+  const going = useRef(false)
   const go = () => {
-    if (drag.current?.moved || phase !== 'wait') return
-    if (locked) toast(LOCKED)
-    else setPhase('walk')
+    if (drag.current?.moved || phase !== 'wait' || going.current) return
+    if (locked) return toast(LOCKED)
+    going.current = true
+    void whenLoaded(doorOpening(doors[view]), 2500).then(() => {
+      going.current = false
+      setPhase('walk')
+    })
   }
 
   const { plaque } = DOOR_FRAME
@@ -170,7 +184,7 @@ export function LessonDoor({ province, traveler, onBack, onDone }: Props) {
                 <img className="j-door-path" src={asset(`door/path-${door.path}.webp`)} alt="" draggable={false} />
                 <button type="button" className="j-door-frame" onClick={go} tabIndex={i === view ? 0 : -1} aria-label={`${s.place}: ${closed ? 'locked' : 'start'}`}>
                   {/* Closed, half open and wide open are laid on top of each other; the walk fades them in. */}
-                  {DOOR_STATES.map((st) => (
+                  {DOOR_STATES.filter((st) => st === 'closed' || (phase !== 'loading' && opening.has(i))).map((st) => (
                     <img key={st} className={`j-door-art ${st}`} src={asset(`door/${door.name}-${st}.webp`)} alt="" draggable={false} />
                   ))}
                   <span
