@@ -9,13 +9,56 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fonts load without blocking the first paint: the print media trick swaps in the sheet once it arrives. -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&family=Fredoka:wght@600;700&family=ZCOOL+KuaiLe&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&family=Fredoka:wght@600;700&family=ZCOOL+KuaiLe&display=swap"
+      />
+    </noscript>
+    <style>
+      #boot {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        overflow: hidden;
+      }
+      #boot-art {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        translate: -50% 0;
+        width: min(100vw, calc(100dvh * 941 / 1672));
+        height: auto;
+        mask-image: linear-gradient(to bottom, transparent 0, #000 9%);
+      }
+    </style>
     <title>Mandarin Journey · HSK 1</title>
   </head>
   <body>
+    <!-- Shown the moment the page arrives, before any script is downloaded: the same painting and sky as the
+         loading screen (src/journey/Splash.tsx), which takes over from it and then removes this. -->
+    <div id="boot" aria-hidden="true">
+      <img id="boot-art" alt="" />
+    </div>
+    <script>
+      (function () {
+        var night = new Date().getHours() < 6 || new Date().getHours() >= 19
+        try {
+          var scenery = JSON.parse(localStorage.getItem('mlh.progress.v1') || '{}').scenery
+          if (scenery === 'night' || scenery === 'day') night = scenery === 'night'
+        } catch (e) {}
+        var boot = document.getElementById('boot')
+        boot.style.background = night ? '#013379' : '#46acf9'
+        document.getElementById('boot-art').src = '%BASE_URL%journey/splash-' + (night ? 'night' : 'day') + '.webp'
+      })()
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

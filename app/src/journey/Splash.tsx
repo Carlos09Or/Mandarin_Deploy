@@ -7,7 +7,7 @@ import './journey.css'
 /** Never block the app for longer than this, even on a very slow connection. */
 const MAX_WAIT = 25000
 /** The bar always takes at least this long to fill, so the screen never just flashes by. */
-const MIN_SHOW = 3200
+const MIN_SHOW = 900
 
 /**
  * The loading screen: a still painting of the four friends watching the train cross the bay, at
@@ -23,6 +23,8 @@ export function Splash({ onDone }: { onDone: () => void }) {
   const pct = Math.round(shown * 100)
 
   useEffect(() => {
+    // The plain copy from index.html did its job: this screen is now on top of it.
+    document.getElementById('boot')?.remove()
     let alive = true
     const t0 = performance.now()
     const give = setTimeout(() => (loaded.current = 1), MAX_WAIT)
@@ -34,7 +36,7 @@ export function Splash({ onDone }: { onDone: () => void }) {
       setShown(share)
       if (share < 1) return void requestAnimationFrame(step)
       setLeaving(true)
-      setTimeout(() => alive && onDone(), 1000)
+      setTimeout(() => alive && onDone(), 500)
     }
     requestAnimationFrame(step)
     return () => {

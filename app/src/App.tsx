@@ -1,24 +1,42 @@
-import { useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { Shell, type Tab } from './components/Shell'
 import type { PathNode } from './data/course'
 import { FRIEND_IDS, type FriendId } from './data/friends'
 import type { Province } from './data/journey'
-import { AllAboard } from './journey/AllAboard'
 import { MapHome, type MapEvent } from './journey/MapHome'
-import { Passport } from './journey/Passport'
-import { Route } from './journey/Route'
 import { Splash } from './journey/Splash'
-import { TrainRide } from './journey/TrainRide'
 import { nextProvince } from './journey/stops'
 import { holdUpdates } from './lib/updates'
 import { toast } from './journey/toast'
-import { LessonComplete } from './lesson/LessonComplete'
-import { LessonPlayer, type LessonSummary } from './lesson/LessonPlayer'
+import type { LessonSummary } from './lesson/LessonPlayer'
 import { buildNode, buildReview, buildWriting, type Exercise } from './lib/lesson'
 import { completeNode, getProgress, isNight, useProgress, type Reward } from './lib/progress'
-import { Profile } from './screens/Profile'
-import { Review } from './screens/Review'
-import { Write } from './screens/Write'
+
+// Everything but the map is loaded as its own file, so the app opens on the map without downloading the
+// lessons, the writing trainer or the passport first. They are fetched in the background once it is open.
+const screens = {
+  AllAboard: () => import('./journey/AllAboard').then((m) => ({ default: m.AllAboard })),
+  Passport: () => import('./journey/Passport').then((m) => ({ default: m.Passport })),
+  Route: () => import('./journey/Route').then((m) => ({ default: m.Route })),
+  TrainRide: () => import('./journey/TrainRide').then((m) => ({ default: m.TrainRide })),
+  LessonComplete: () => import('./lesson/LessonComplete').then((m) => ({ default: m.LessonComplete })),
+  LessonPlayer: () => import('./lesson/LessonPlayer').then((m) => ({ default: m.LessonPlayer })),
+  Profile: () => import('./screens/Profile').then((m) => ({ default: m.Profile })),
+  Review: () => import('./screens/Review').then((m) => ({ default: m.Review })),
+  Write: () => import('./screens/Write').then((m) => ({ default: m.Write })),
+}
+const AllAboard = lazy(screens.AllAboard)
+const Passport = lazy(screens.Passport)
+const Route = lazy(screens.Route)
+const TrainRide = lazy(screens.TrainRide)
+const LessonComplete = lazy(screens.LessonComplete)
+const LessonPlayer = lazy(screens.LessonPlayer)
+const Profile = lazy(screens.Profile)
+const Review = lazy(screens.Review)
+const Write = lazy(screens.Write)
+
+/** Each lazy screen waits on its own, so a slow download never blanks the rest of the app. */
+const Later = ({ children }: { children: React.ReactNode }) => <Suspense fallback={null}>{children}</Suspense>
 
 type Session = {
   exercises: Exercise[]
@@ -53,6 +71,13 @@ export default function App() {
   // The loading screen preloads every picture once; the app is mounted behind it meanwhile.
   const [loaded, setLoaded] = useState(false)
   const mapVisible = tab === 'map' && !province
+
+  // Once the app is open, fetch the other screens while the browser is idle, so they open at once.
+  useEffect(() => {
+    if (!loaded) return
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1000))
+    idle(() => Object.values(screens).forEach((load) => void load()))
+  }, [loaded])
 
   // A new version of the app reloads the page, so it waits until the learner isn't mid-lesson.
   const busy = !!(ride || session || result || stamp || aboard)
@@ -129,62 +154,90 @@ export default function App() {
           />
         </div>
         {tab === 'map' && province && (
-          <Route
-            key={province.id}
-            province={province}
-            justDone={justDone}
-            onBack={() => setProvince(null)}
-            onBoard={(s) => setRide({ node: s.node, place: s.place, province })}
-          />
+          <Later>
+            <Route
+              key={province.id}
+              province={province}
+              justDone={justDone}
+              onBack={() => setProvince(null)}
+              onBoard={(s) => setRide({ node: s.node, place: s.place, province })}
+            />
+          </Later>
         )}
         {tab === 'review' && (
-          <Review onReview={(pool) => start(buildReview(pool, getProgress()))} onWrite={(c, n) => start(buildWriting(c, n))} />
+          <Later>
+            <Review onReview={(pool) => start(buildReview(pool, getProgress()))} onWrite={(c, n) => start(buildWriting(c, n))} />
+          </Later>
         )}
-        {tab === 'write' && <Write onWrite={(c, n) => start(buildWriting(c, n))} />}
-        {tab === 'passport' && <Passport />}
-        {tab === 'profile' && <Profile />}
+        {tab === 'write' && (
+          <Later>
+            <Write onWrite={(c, n) => start(buildWriting(c, n))} />
+          </Later>
+        )}
+        {tab === 'passport' && (
+          <Later>
+            <Passport />
+          </Later>
+        )}
+        {tab === 'profile' && (
+          <Later>
+            <Profile />
+          </Later>
+        )}
       </Shell>
 
       {ride && (
-        <TrainRide
-          place={ride.place}
-          traveler={progress.traveler}
-          night={isNight(progress)}
-          onDone={() => {
-            startRide(ride)
-            setRide(null)
-          }}
-        />
+        <Later>
+          <TrainRide
+            place={ride.place}
+            traveler={progress.traveler}
+            night={isNight(progress)}
+            onDone={() => {
+              startRide(ride)
+              setRide(null)
+            }}
+          />
+        </Later>
       )}
       {session && (
-        <LessonPlayer
-          key={session.key}
-          exercises={session.exercises}
-          buddy={session.buddy}
-          station={session.station}
-          onExit={() => setSession(null)}
-          onFinish={finish}
-        />
+        <Later>
+          <LessonPlayer
+            key={session.key}
+            exercises={session.exercises}
+            buddy={session.buddy}
+            station={session.station}
+            onExit={() => setSession(null)}
+            onFinish={finish}
+          />
+        </Later>
       )}
       {result && (
-        <LessonComplete
-          summary={result.summary}
-          reward={result.reward}
-          buddy={result.buddy}
-          newWords={result.newWords}
-          onContinue={afterResult}
-        />
+        <Later>
+          <LessonComplete
+            summary={result.summary}
+            reward={result.reward}
+            buddy={result.buddy}
+            newWords={result.newWords}
+            onContinue={afterResult}
+          />
+        </Later>
       )}
       {stamp && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <Passport
-            fresh={stamp}
-            onNext={afterStamp}
-            nextLabel={nextProvince(stamp) ? `Next stop: ${nextProvince(stamp)!.name} 🚂` : 'Back to the map'}
-          />
+          <Later>
+            <Passport
+              fresh={stamp}
+              onNext={afterStamp}
+              nextLabel={nextProvince(stamp) ? `Next stop: ${nextProvince(stamp)!.name} 🚂` : 'Back to the map'}
+            />
+          </Later>
         </div>
       )}
-      {aboard && <AllAboard from={aboard.from} to={aboard.to} traveler={progress.traveler} onDone={arrive} />}
+      {aboard && (
+        <Later>
+          <AllAboard from={aboard.from} to={aboard.to} traveler={progress.traveler} onDone={arrive} />
+        </Later>
+      )}
       {!loaded && <Splash onDone={() => setLoaded(true)} />}
     </>
   )
