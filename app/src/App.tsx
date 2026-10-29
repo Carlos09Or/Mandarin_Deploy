@@ -38,7 +38,9 @@ const Review = lazy(screens.Review)
 const Write = lazy(screens.Write)
 
 /** Each lazy screen waits on its own, so a slow download never blanks the rest of the app. */
-const Later = ({ children }: { children: React.ReactNode }) => <Suspense fallback={null}>{children}</Suspense>
+const Later = ({ children, cover }: { children: React.ReactNode; cover?: boolean }) => (
+  <Suspense fallback={cover ? <div className="fixed inset-0 z-50 bg-paper" /> : null}>{children}</Suspense>
+)
 
 type Session = {
   exercises: Exercise[]
@@ -162,7 +164,7 @@ export default function App() {
               province={province}
               justDone={justDone}
               onBack={() => setProvince(null)}
-              onBoard={(s) => setRide({ node: s.node, place: s.place, province })}
+              onBoard={(s) => !busy && setRide({ node: s.node, place: s.place, province })}
             />
           </Later>
         )}
@@ -194,15 +196,22 @@ export default function App() {
             place={ride.place}
             traveler={progress.traveler}
             night={isNight(progress)}
-            onDone={() => {
-              startRide(ride)
-              setRide(null)
-            }}
+            // The ride stays on screen until the lesson's code is here, so the route never shows (and
+            // can't be tapped again) between the train and the first card.
+            onDone={() =>
+              void screens
+                .LessonPlayer()
+                .catch(() => undefined)
+                .then(() => {
+                  startRide(ride)
+                  setRide(null)
+                })
+            }
           />
         </Later>
       )}
       {session && (
-        <Later>
+        <Later cover>
           <LessonPlayer
             key={session.key}
             exercises={session.exercises}
