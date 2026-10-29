@@ -7,7 +7,12 @@ export type FlyerHandle = {
   /** Flies the traveller from the corner of the map into `badge`; resolves once the badge has taken them in. */
   fly: (badge: HTMLElement) => Promise<void>
 }
-type Props = { friend: FriendId; active: boolean }
+type Props = {
+  friend: FriendId
+  active: boolean
+  /** Called with true when a flight starts and false when it ends, so the rest of the map can stand still meanwhile. */
+  onFlight?: (on: boolean) => void
+}
 
 /** The crouch before take-off, the flight itself (as long as the distance asks) and the slip into the badge. */
 const CROUCH = 230
@@ -16,7 +21,7 @@ const flightMs = (dist: number) => Math.min(1450, Math.max(1000, 900 + dist * 0.
 const WING_MS = 105
 /** Size of the traveller when it reaches the badge, relative to the corner. */
 const FAR = 0.42
-const TRAIL = 12
+const TRAIL = 10
 
 const calm = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 const smooth = (t: number) => t * t * (3 - 2 * t)
@@ -52,7 +57,7 @@ function ring(layer: HTMLElement, x: number, y: number) {
  * window is resized or the map camera moves. All the pictures share one canvas centred on the backpack
  * (data/journey.ts FLIGHT_POSES), so changing pose never makes the traveller jump.
  */
-export const Flyer = forwardRef<FlyerHandle, Props>(function Flyer({ friend, active }, ref) {
+export const Flyer = forwardRef<FlyerHandle, Props>(function Flyer({ friend, active, onFlight }, ref) {
   const layerRef = useRef<HTMLDivElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
   const trailRef = useRef<SVGSVGElement>(null)
@@ -65,24 +70,11 @@ export const Flyer = forwardRef<FlyerHandle, Props>(function Flyer({ friend, act
     if (el && el.dataset.pose !== p) el.dataset.pose = p
   }
   const drawTrail = (pts: [number, number][], fade: number) => {
-    const lines = trailRef.current?.children
-    if (!lines) return
-    for (let i = 0; i < lines.length; i++) {
-      const a = pts[pts.length - 1 - (i + 1)]
-      const b = pts[pts.length - 1 - i]
-      const l = lines[i] as SVGLineElement
-      if (!a || !b) {
-        l.setAttribute('stroke-opacity', '0')
-        continue
-      }
-      const k = 1 - i / lines.length
-      l.setAttribute('x1', a[0].toFixed(1))
-      l.setAttribute('y1', a[1].toFixed(1))
-      l.setAttribute('x2', b[0].toFixed(1))
-      l.setAttribute('y2', b[1].toFixed(1))
-      l.setAttribute('stroke-width', (1 + k * 3.2).toFixed(1))
-      l.setAttribute('stroke-opacity', (k * 0.5 * fade).toFixed(2))
-    }
+    const path = trailRef.current?.firstElementChild
+    if (!path) return
+    if (pts.length < 2 || fade <= 0) return path.setAttribute('stroke-opacity', '0')
+    path.setAttribute('d', `M${pts.map((p) => `${p[0].toFixed(0)} ${p[1].toFixed(0)}`).join('L')}`)
+    path.setAttribute('stroke-opacity', (0.45 * fade).toFixed(2))
   }
 
   /** Back in the corner, standing; a small hop in when the map shows again. */
@@ -91,6 +83,7 @@ export const Flyer = forwardRef<FlyerHandle, Props>(function Flyer({ friend, act
     timers.current.forEach(clearTimeout)
     timers.current = []
     flying.current = false
+    onFlight?.(false)
     const el = bodyRef.current
     if (!el) return
     el.classList.remove('go', 'arrive')
@@ -101,6 +94,10 @@ export const Flyer = forwardRef<FlyerHandle, Props>(function Flyer({ friend, act
     void el.offsetWidth
     el.classList.add('arrive')
   }
+  // Decode every pose ahead of time: a picture first shown in mid-flight would otherwise stall that frame.
+  useEffect(() => {
+    bodyRef.current?.querySelectorAll('img').forEach((img) => void img.decode().catch(() => undefined))
+  }, [friend])
   useEffect(() => {
     if (active) settle()
     else cancelAnimationFrame(raf.current)
@@ -135,12 +132,16 @@ export const Flyer = forwardRef<FlyerHandle, Props>(function Flyer({ friend, act
           return
         }
 
-        const home = () => {
-          const l = layer.getBoundingClientRect()
-          return [l.left + el.offsetLeft + el.offsetWidth / 2, l.top + el.offsetTop + el.offsetHeight / 2]
-        }
-        const [s0, e0] = [home(), centre()]
-        const FLY = flightMs(Math.hypot(e0[0] - s0[0], e0[1] - s0[1]))
+        // Where the corner, the badge and the layer are on screen. Reading them forces the browser to lay the page out,
+        // so they are read at the start and then only every so often (the map camera may still be gliding in, and the
+        // window may be resized), never on every frame.
+        let L = layer.getBoundingClientRect()
+        const home = () => [L.left + el.offsetLeft + el.offsetWidth / 2, L.top + el.offsetTop + el.offsetHeight / 2]
+        let S = home()
+        let E = centre()
+        let measured = performance.now()
+        const FLY = flightMs(Math.hypot(E[0] - S[0], E[1] - S[1]))
+        onFlight?.(true)
         const total = CROUCH + FLY + SLIP
         const pts: [number, number][] = []
         const t0 = performance.now()
@@ -148,9 +149,12 @@ export const Flyer = forwardRef<FlyerHandle, Props>(function Flyer({ friend, act
 
         const step = (now: number) => {
           const t = now - t0
-          const S = home()
-          const E = centre()
-          const L = layer.getBoundingClientRect()
+          if (now - measured > 90) {
+            measured = now
+            L = layer.getBoundingClientRect()
+            S = home()
+            E = centre()
+          }
           const dx = E[0] - S[0]
           const dy = E[1] - S[1]
           // The curve bows up and away from the straight line, like a bird gaining height first.
@@ -215,6 +219,7 @@ export const Flyer = forwardRef<FlyerHandle, Props>(function Flyer({ friend, act
             el.style.opacity = '0'
             drawTrail([], 0)
             flying.current = false
+            onFlight?.(false)
             finish()
           }
         }
@@ -225,9 +230,7 @@ export const Flyer = forwardRef<FlyerHandle, Props>(function Flyer({ friend, act
   return (
     <div className="j-flight" ref={layerRef} aria-hidden="true">
       <svg className="j-trail" ref={trailRef}>
-        {Array.from({ length: TRAIL }, (_, i) => (
-          <line key={i} stroke="#fff6d8" strokeLinecap="round" strokeOpacity="0" />
-        ))}
+        <path fill="none" stroke="#fff6d8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" strokeOpacity="0" />
       </svg>
       <div className="j-flyer" ref={bodyRef} data-pose="rest">
         <div className="j-flyer-bob">

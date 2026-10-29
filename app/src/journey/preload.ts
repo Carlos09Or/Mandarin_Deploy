@@ -82,18 +82,28 @@ const canWarm = () => {
   return !slow && !c?.saveData && (!c?.effectiveType || c.effectiveType === '4g')
 }
 
+/** Things that need every frame (the flight) pause the background downloads; they pick up where they left off. */
+let held = 0
+export const holdWarm = (on: boolean) => {
+  held = Math.max(0, held + (on ? 1 : -1))
+}
+const calmDown = async () => {
+  while (held > 0) await new Promise((r) => setTimeout(r, 250))
+}
+
 /** Fetches the rest of the pictures a few at a time, then the stroke data, stopping if the connection turns out poor. */
 async function warm() {
   const urls = [...LATER.map(asset), ...CHARS.map((c) => `${import.meta.env.BASE_URL}hanzi/${c}.json`)]
   let next = 0
+  // Fetch only: the service worker keeps what arrives, and a screen decodes its pictures when it needs them. Decoding
+  // a hundred pictures nobody has asked for would cost the phone memory and frames.
   const worker = async () => {
     while (next < urls.length && canWarm()) {
-      const url = urls[next++]
-      if (url.endsWith('.json')) await fetch(url).then((r) => r.arrayBuffer()).catch(() => undefined)
-      else await load(url)
+      await calmDown()
+      await fetch(urls[next++]).then((r) => r.arrayBuffer()).catch(() => undefined)
     }
   }
-  await Promise.all([worker(), worker(), worker()])
+  await Promise.all([worker(), worker()])
 }
 
 /** Loads the map's pictures once per session; later calls return the same promise. The rest then load when the browser is idle. */

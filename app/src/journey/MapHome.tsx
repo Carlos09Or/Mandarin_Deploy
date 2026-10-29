@@ -5,6 +5,7 @@ import {
 } from '../data/journey'
 import { getProgress, isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
 import { Flyer, type FlyerHandle } from './Flyer'
+import { holdWarm } from './preload'
 import { Face } from './parts'
 import { currentProvince, isUnlocked, openProvinces, provinceDone } from './stops'
 import { toast } from './toast'
@@ -34,6 +35,9 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   const pinRef = useRef<HTMLDivElement>(null)
   const railRef = useRef<SVGPathElement>(null)
   const flyerRef = useRef<FlyerHandle>(null)
+  const mapRef = useRef<HTMLDivElement>(null)
+  // While the traveller flies, the rest of the map stands still so every frame goes to the flight.
+  const hushed = useRef(false)
   // Provinces whose fog is gone on screen (revealed before, or just animated).
   const [shown, setShown] = useState(() => new Set(progress.revealed))
   const [pinAt, setPinAt] = useState(() => event?.hopFrom ?? currentProvince(progress).id)
@@ -184,7 +188,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   // The boats start sailing the first time the map shows, not while the loading screen is still fetching the map.
   const seaStop = useRef<(() => void) | null>(null)
   useEffect(() => {
-    if (active && !seaStop.current) seaStop.current = startSea(layerRef.current!, svgRef.current!, activeRef, shownRef)
+    if (active && !seaStop.current) seaStop.current = startSea(layerRef.current!, svgRef.current!, activeRef, shownRef, hushed)
   }, [active])
   useEffect(() => () => seaStop.current?.(), [])
   useEffect(() => {
@@ -211,7 +215,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   }
 
   return (
-    <div className={`j-map ${isNight(progress) ? 'night' : ''}`}>
+    <div ref={mapRef} className={`j-map ${isNight(progress) ? 'night' : ''}`}>
       <div className="j-map-scroll" ref={scrollRef}>
         <div className="j-stage" ref={stageRef}>
           <svg ref={svgRef} viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} preserveAspectRatio="none">
@@ -306,7 +310,16 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
         </div>
       </div>
 
-      <Flyer ref={flyerRef} friend={progress.traveler} active={active} />
+      <Flyer
+        ref={flyerRef}
+        friend={progress.traveler}
+        active={active}
+        onFlight={(on) => {
+          hushed.current = on
+          mapRef.current?.classList.toggle('flying', on)
+          holdWarm(on)
+        }}
+      />
 
       <div className="j-map-bar">
         <div className={`j-titlebar ${isNight(progress) ? 'night' : ''}`}>
@@ -348,7 +361,13 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
 
 // ---- The living sea: sailing boats with foam, and ripples on open water ----
 
-function startSea(layer: HTMLElement, svg: SVGSVGElement, active: { current: boolean }, shown: { current: Set<string> }) {
+function startSea(
+  layer: HTMLElement,
+  svg: SVGSVGElement,
+  active: { current: boolean },
+  shown: { current: Set<string> },
+  hushed: { current: boolean },
+) {
   let alive = true
   for (const boat of SEA_BOATS) setSail(boat)
 
@@ -402,8 +421,8 @@ function startSea(layer: HTMLElement, svg: SVGSVGElement, active: { current: boo
     let anchored = false
     const sailOn = (now: number) => {
       if (!alive) return
-      // While the map is hidden, keep the loop alive but skip the work.
-      if (!active.current) {
+      // While the map is hidden (or the traveller is flying), keep the loop alive but skip the work.
+      if (!active.current || hushed.current) {
         requestAnimationFrame(sailOn)
         return
       }
@@ -436,7 +455,7 @@ function startSea(layer: HTMLElement, svg: SVGSVGElement, active: { current: boo
   const land = [...svg.querySelectorAll<SVGPathElement>('#j-fog path')]
   const ripple = () => {
     if (!alive) return
-    if (!active.current) {
+    if (!active.current || hushed.current) {
       setTimeout(ripple, 1000)
       return
     }
