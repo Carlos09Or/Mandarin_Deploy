@@ -1,4 +1,5 @@
-import { asset } from '../data/journey'
+import { DOOR_FILES, asset, walkerFiles } from '../data/journey'
+import { getProgress } from '../lib/progress'
 import { WORD_FRIEND_FILES } from '../lesson/friends'
 
 // The pictures of the journey, fetched and decoded once so that no screen pops in later. The ones the
@@ -7,17 +8,17 @@ import { WORD_FRIEND_FILES } from '../lesson/friends'
 // Keep these lists in step with public/journey.
 const NOW = [
   // map
-  'map-illustrated-clean.webp', 'map-fog-clean.webp', 'boat-1.webp', 'boat-2.webp',
+  'map-illustrated-clean.webp', 'map-fog-clean.webp',
+  // the boats at sea, sailing and at anchor
+  ...['sailboat', 'fishing-boat', 'cayuco', 'ferry', 'container-ship', 'tanker', 'bulk-carrier', 'cruise-ship'].flatMap((b) => [`boats/${b}-sail.webp`, `boats/${b}-anchor.webp`]),
   'map-cloud.webp', 'map-cloud-2.webp', 'map-cloud-3.webp', 'map-cloud-4.webp',
   'characters/wawa-sombrero.svg', 'characters/harpia-banda.svg', 'characters/sloth-montuno.svg', 'characters/tucan-pollera.svg',
   'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-passport.webp', 'nav-profile.webp',
-  // the first route you open from the map: its medallions, backdrop and landmark
-  'stops/airplane.webp', 'stops/promenade.webp', 'stops/church.webp', 'stops/chinese-gate.webp', 'stops/bicycle.webp',
-  'stops/ruin-tower.webp', 'stops/storybook.webp', 'stops/fishing-boat.webp', 'stops/waterfall.webp', 'stops/mountain.webp',
-  'stops/beach-umbrella.webp', 'stops/arch-bridge.webp',
-  'route-bg-day.webp', 'route-bg-night.webp', 'route-pattern.webp', 'landmark-canal.webp',
 ]
 const LATER = [
+  // a province's door page: the doors, and each friend's walk up to them (journey/LessonDoor.tsx)
+  ...DOOR_FILES,
+  ...walkerFiles(getProgress().traveler),
   // the friends who bring each new word (lesson/Intro.tsx)
   ...WORD_FRIEND_FILES,
   // other routes
@@ -25,6 +26,7 @@ const LATER = [
   // the train that takes you on to the next province (AllAboard)
   'train.webp', 'train-wheel.webp', 'train-smoke.webp', 'train-travel-empty.webp',
   // passport
+  'landmark-canal.webp', 'stops/arch-bridge.webp',
   'passport-cover.webp', 'passport-page.webp', 'postcard-panama.webp',
 ]
 

@@ -1,10 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { FRIENDS, FRIEND_IDS } from '../data/friends'
 import {
-  BADGE_AT, SEA_LANES, CLOUDS, EXTRA_HOLE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province,
+  BADGE_AT, BOAT_SIZE, SEA_BOATS, CLOUDS, EXTRA_HOLE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province, type SeaBoat,
 } from '../data/journey'
 import { getProgress, isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
-import { Face, TitleCard } from './parts'
+import { Face } from './parts'
 import { currentProvince, isUnlocked, openProvinces, provinceDone } from './stops'
 import { toast } from './toast'
 import './journey.css'
@@ -38,9 +38,11 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   const [picking, setPicking] = useState(false)
   const busy = useRef(false)
   const activeRef = useRef(active)
+  const shownRef = useRef(shown)
   useLayoutEffect(() => {
     activeRef.current = active
-  }, [active])
+    shownRef.current = shown
+  }, [active, shown])
 
   const placePin = ([x, y]: readonly [number, number]) => {
     if (pinRef.current) Object.assign(pinRef.current.style, pct([x, y - 9]))
@@ -177,7 +179,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   }, [active, event])
 
   useEffect(() => placePin(badgeAt(pinAt)), [pinAt])
-  useEffect(() => startSea(layerRef.current!, svgRef.current!, activeRef), [])
+  useEffect(() => startSea(layerRef.current!, svgRef.current!, activeRef, shownRef), [])
   useEffect(() => {
     const keep = () => centerOn(badgeAt(pinAtRef.current), false)
     window.addEventListener('resize', keep)
@@ -200,7 +202,6 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
     onOpen(p)
   }
 
-  const here = provinceById(pinAt)
   return (
     <div className={`j-map ${isNight(progress) ? 'night' : ''}`}>
       <div className="j-map-scroll" ref={scrollRef}>
@@ -298,17 +299,11 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
       </div>
 
       <div className="j-map-bar">
-        <TitleCard
-          lead={
-            <button type="button" className="j-round" onClick={() => setPicking(true)} aria-label="Choose your traveller">
-              <Face id={progress.traveler} />
-            </button>
-          }
-          kicker="Mandarin journey"
-          name={here?.name ?? ''}
-          zh={here?.zh ?? ''}
-          night={isNight(progress)}
-        />
+        <div className={`j-titlebar ${isNight(progress) ? 'night' : ''}`}>
+          <button type="button" className="j-round" onClick={() => setPicking(true)} aria-label="Choose your traveller">
+            <Face id={progress.traveler} />
+          </button>
+        </div>
       </div>
 
       {picking && (
@@ -343,53 +338,89 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
 
 // ---- The living sea: sailing boats with foam, and ripples on open water ----
 
-function startSea(layer: HTMLElement, svg: SVGSVGElement, active: { current: boolean }) {
+function startSea(layer: HTMLElement, svg: SVGSVGElement, active: { current: boolean }, shown: { current: Set<string> }) {
   let alive = true
-  for (const lane of SEA_LANES) sailLane(lane)
+  for (const boat of SEA_BOATS) setSail(boat)
 
-  // One boat per lane, crossing it again and again; it fades in and out at the ends.
-  function sailLane(lane: (typeof SEA_LANES)[number]) {
-    const img = new Image()
-    img.onload = () => alive && launch(lane, img.src)
-    img.src = asset(`${lane.sprite}.webp`)
+  // Each boat belongs to a province's waters and comes out when that province's fog clears. Some
+  // cross the sea again and again, some drop anchor on the way, some just stay where they are.
+  function setSail(boat: SeaBoat) {
+    const sail = new Image()
+    const anchor = new Image()
+    let ready = 0
+    const go = () => ++ready === 2 && alive && launch(boat, sail.src, anchor.src)
+    sail.onload = anchor.onload = go
+    sail.src = asset(`boats/${boat.kind}-sail.webp`)
+    anchor.src = asset(`boats/${boat.kind}-anchor.webp`)
   }
-  function launch(lane: (typeof SEA_LANES)[number], src: string) {
+  function launch(boat: SeaBoat, sailSrc: string, anchorSrc: string) {
     const el = document.createElement('div')
     el.className = 'j-boat'
-    el.innerHTML = `<img src="${src}" alt="" draggable="false">`
-    el.style.width = `${lane.size * 100}%`
-    const [ax, ay] = lane.from
-    const [bx, by] = lane.to
+    el.innerHTML = `<img src="${boat.at ? anchorSrc : sailSrc}" alt="" draggable="false">`
+    const img = el.firstElementChild as HTMLImageElement
+    el.style.width = `${BOAT_SIZE[boat.kind] * 100}%`
+    layer.appendChild(el)
+    let out = false
+    const appear = () => {
+      const on = shown.current.has(boat.province)
+      if (on !== out) el.classList.toggle('on', (out = on))
+    }
+    if (boat.at) {
+      // At anchor: bobbing where it is, facing whichever way it was drawn.
+      Object.assign(el.style, pct(boat.at))
+      if (boat.flip) el.style.transform = 'translate(-50%, -60%) scaleX(-1)'
+      const wait = () => {
+        if (!alive) return
+        appear()
+        setTimeout(wait, 500)
+      }
+      wait()
+      return
+    }
+    const [ax, ay] = boat.from!
+    const [bx, by] = boat.to!
     // Sprites face left; flip the ones heading right.
     if (bx > ax) el.style.transform = 'translate(-50%, -60%) scaleX(-1)'
-    layer.appendChild(el)
     const len = Math.hypot(bx - ax, by - ay) || 1
     const dir = [(bx - ax) / len, (by - ay) / len]
-    const t0 = performance.now() - Math.random() * lane.secs * 1000
+    const secs = boat.secs!
+    const rest = boat.rest ?? 0
+    const stop = boat.stop ?? 1
+    const cycle = secs + rest
+    const t0 = performance.now() - Math.random() * cycle * 1000
     let lastFoam = 0
-    const sail = (now: number) => {
+    let anchored = false
+    const sailOn = (now: number) => {
       if (!alive) return
       // While the map is hidden, keep the loop alive but skip the work.
       if (!active.current) {
-        requestAnimationFrame(sail)
+        requestAnimationFrame(sailOn)
         return
       }
-      const k = ((now - t0) / (lane.secs * 1000)) % 1
+      appear()
+      // The line is sailed in `secs`; a boat that calls in waits `rest` seconds at `stop` of the way.
+      const t = (((now - t0) / 1000) % cycle + cycle) % cycle
+      const resting = rest > 0 && t >= secs * stop && t < secs * stop + rest
+      const k = resting ? stop : t < secs * stop ? t / secs : (t - rest) / secs
+      if (resting !== anchored) {
+        anchored = resting
+        img.src = resting ? anchorSrc : sailSrc
+      }
       const x = ax + (bx - ax) * k
       const y = ay + (by - ay) * k
       Object.assign(el.style, pct([x, y]))
       el.style.opacity = String(Math.min(1, k * 10, (1 - k) * 10))
-      if (now - lastFoam > 170) {
+      if (!resting && now - lastFoam > 170) {
         // Foam peels off the stern, a little behind the hull.
-        const back = (lane.size * VB.w) / 2
+        const back = (BOAT_SIZE[boat.kind] * VB.w) / 2
         const fx = (x - dir[0] * back - VB.x) / VB.w
         const fy = (y - dir[1] * back * 0.6 - VB.y) / VB.h
-        foam(layer, fx, fy, dir)
+        if (out) foam(layer, fx, fy, dir)
         lastFoam = now
       }
-      requestAnimationFrame(sail)
+      requestAnimationFrame(sailOn)
     }
-    requestAnimationFrame(sail)
+    requestAnimationFrame(sailOn)
   }
 
   const land = [...svg.querySelectorAll<SVGPathElement>('#j-fog path')]

@@ -1,0 +1,66 @@
+{
+ "sailboat-sail": {
+  "w": 260,
+  "h": 294
+ },
+ "fishing-boat-sail": {
+  "w": 260,
+  "h": 166
+ },
+ "cayuco-sail": {
+  "w": 260,
+  "h": 258
+ },
+ "ferry-sail": {
+  "w": 260,
+  "h": 187
+ },
+ "sailboat-anchor": {
+  "w": 260,
+  "h": 310
+ },
+ "fishing-boat-anchor": {
+  "w": 260,
+  "h": 191
+ },
+ "cayuco-anchor": {
+  "w": 260,
+  "h": 253
+ },
+ "ferry-anchor": {
+  "w": 260,
+  "h": 206
+ },
+ "container-ship-sail": {
+  "w": 340,
+  "h": 291
+ },
+ "tanker-sail": {
+  "w": 340,
+  "h": 289
+ },
+ "bulk-carrier-sail": {
+  "w": 340,
+  "h": 296
+ },
+ "cruise-ship-sail": {
+  "w": 340,
+  "h": 324
+ },
+ "container-ship-anchor": {
+  "w": 340,
+  "h": 330
+ },
+ "tanker-anchor": {
+  "w": 340,
+  "h": 332
+ },
+ "bulk-carrier-anchor": {
+  "w": 340,
+  "h": 332
+ },
+ "cruise-ship-anchor": {
+  "w": 340,
+  "h": 351
+ }
+}

@@ -84,8 +84,14 @@
 .j-boat img {
   width: 100%;
   display: block;
+  /* A province's boats are out of sight until its fog clears. */
+  opacity: 0;
+  transition: opacity 1.6s ease 0.8s;
   transform-origin: 50% 70%;
   animation: j-rock 2.6s ease-in-out infinite alternate;
+}
+.j-boat.on img {
+  opacity: 1;
 }
 @keyframes j-rock {
   from {
@@ -1366,15 +1372,6 @@
   color: #fff;
   text-shadow: 0 2px 14px rgba(1, 20, 60, 0.7);
 }
-.j-splash-logo {
-  display: flex;
-  justify-content: center;
-}
-.j-splash-logo img {
-  width: min(64vw, 270px);
-  height: auto;
-  filter: drop-shadow(0 8px 12px rgba(1, 30, 80, 0.28));
-}
 /* The loading bar: hanzi and pinyin on the left, the percentage on the right, the bar below. */
 .j-splash-load {
   width: min(100%, 320px);
@@ -1818,4 +1815,451 @@
   border-color: rgba(240, 214, 160, 0.22);
   box-shadow: 0 8px 22px -14px rgba(0, 0, 0, 0.65);
   color: #efe6d2;
+}
+
+/* ---------- a province's door page (LessonDoor.tsx) ---------- */
+.j-door {
+  --dw: min(60vw, 280px, 28dvh); /* the door's width */
+  --dh: calc(var(--dw) * var(--ar)); /* and height */
+  --sw: calc(var(--dw) * 1.2); /* a slide of the track: the door and its path */
+  --track-h: calc(var(--dh) * (var(--step) - 0.02) + var(--dw) * 0.9);
+  --lane: calc(var(--dw) * 0.78); /* how far the walker has to go, from the bottom of the lane to the doorstep */
+  --walk-delay: 0.4s; /* the hop on the tap comes first */
+  --walk-time: 1.7s;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.j-door-back {
+  position: absolute;
+  top: max(env(safe-area-inset-top), 12px);
+  left: 14px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid #eee8dd;
+  background: #fff;
+  color: #6b5a44;
+  font-size: 22px;
+  font-weight: 900;
+  opacity: 0;
+}
+.j-door-title {
+  position: absolute;
+  top: max(env(safe-area-inset-top), 14px);
+  left: 0;
+  right: 0;
+  padding-top: 5dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  pointer-events: none;
+}
+.j-door-title b {
+  font-family: var(--font-han);
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #3b2a1a;
+}
+.j-door-title small {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #9a8466;
+}
+.j-door-dots {
+  display: flex;
+  margin-top: 4px;
+}
+/* a small dot inside a larger tap area */
+.j-door-dots button {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+}
+.j-door-dots button::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e2a92e;
+  transition: transform 0.2s;
+}
+.j-door-dots button.locked::before {
+  background: #e0dcd4;
+}
+.j-door-dots button.now::before {
+  background: #e0453a;
+}
+.j-door-dots button.view::before {
+  transform: scale(1.5);
+  box-shadow: 0 0 0 3px rgba(60, 50, 40, 0.12);
+}
+.j-door-stage {
+  position: relative;
+  width: 100%;
+  margin-top: 6dvh;
+}
+/* the doors side by side: swipe sideways, each snaps into the middle */
+.j-door-track {
+  display: flex;
+  height: var(--track-h);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  cursor: grab;
+}
+.j-door-track::-webkit-scrollbar {
+  display: none;
+}
+/* spacers so the first and the last door can reach the middle */
+.j-door-track::before,
+.j-door-track::after {
+  content: '';
+  flex: 0 0 calc(50% - var(--sw) / 2);
+}
+.j-slide {
+  position: relative;
+  flex: 0 0 var(--sw);
+  scroll-snap-align: center;
+  transform: scale(0.84);
+  transform-origin: 50% 35%;
+  opacity: 0.8;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.j-slide.on {
+  transform: none;
+  opacity: 1;
+}
+/* doors you have not reached yet */
+.j-slide.locked {
+  filter: grayscale(1);
+}
+.j-slide.locked:not(.on) {
+  opacity: 0.55;
+}
+.j-door-lock {
+  position: absolute;
+  left: var(--cx);
+  top: calc(var(--dh) * 0.62);
+  width: 38px;
+  height: 38px;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 3px 10px rgba(60, 50, 40, 0.25);
+  font-size: 19px;
+  filter: none;
+}
+.j-door-frame {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin: 0 auto;
+  padding: 0;
+  width: var(--dw);
+  height: var(--dh);
+  opacity: 0;
+  transform: translateY(10px) scale(0.96);
+}
+.j-door-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.j-door-art + .j-door-art {
+  position: absolute;
+  inset: 0;
+}
+.j-door-art.half,
+.j-door-art.open {
+  opacity: 0;
+}
+/* the path starts under the doorstep and widens towards the traveller */
+.j-door-path {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: calc(var(--dh) * (var(--step) - 0.02));
+  width: 100%;
+  pointer-events: none;
+  opacity: 0;
+}
+.j-door-num {
+  position: absolute;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-han);
+  font-weight: 900;
+  line-height: 1;
+  color: #6b3f1d;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.j-door-glow {
+  position: absolute;
+  left: var(--cx);
+  top: calc(var(--dh) * 0.62);
+  width: calc(var(--dw) * 0.3);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0.4);
+  background: radial-gradient(circle, #fffbe8 0%, #ffe9a8 45%, rgba(255, 220, 130, 0) 72%);
+  opacity: 0;
+  pointer-events: none;
+}
+/* the lane runs from the doorstep down; the traveller walks up it whichever door is in view */
+.j-door-lane {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  top: calc(var(--dh) * var(--step));
+  height: var(--lane);
+  pointer-events: none;
+}
+.j-walker {
+  position: absolute;
+  left: var(--cx);
+  bottom: 0;
+  width: calc(var(--dw) * 0.56);
+  aspect-ratio: 482 / 508;
+  transform-origin: 50% 95%; /* the feet: the ground line is 95% of the way down the picture */
+  transform: translate(-50%, 0);
+  opacity: 0;
+}
+.j-walker-bob {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.j-walker img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.j-w-search,
+.j-w-jump,
+.j-w-rest,
+.j-w-step-l,
+.j-w-step-r {
+  opacity: 0;
+}
+.j-door-go {
+  position: absolute;
+  left: 50%;
+  bottom: max(env(safe-area-inset-bottom), 22px);
+  margin-bottom: 4dvh;
+  transform: translateX(-50%);
+  padding: 10px 30px 12px;
+  border-radius: 999px;
+  background: linear-gradient(#f6cf6a, #e2a92e);
+  box-shadow: 0 4px 0 #b07e14;
+  color: #5a3d00;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  opacity: 0;
+}
+.j-door-go span {
+  font-family: var(--font-han);
+  font-size: 19px;
+  margin-right: 3px;
+}
+.j-door-go.locked {
+  background: linear-gradient(#e4e1db, #cfcbc3);
+  box-shadow: 0 4px 0 #aaa59b;
+  color: #6f6a60;
+}
+.j-door-go:active {
+  transform: translateX(-50%) translateY(2px);
+  box-shadow: 0 2px 0 #b07e14;
+}
+
+/* nothing shows until the pictures are here (.ready) */
+.j-door.ready .j-door-title,
+.j-door.ready .j-door-back {
+  animation: j-door-fade 0.45s ease-out forwards;
+}
+.j-door.ready .j-door-frame {
+  animation: j-door-pop 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+.j-door.ready .j-door-go {
+  animation: j-door-fade 0.4s ease-out 0.35s forwards;
+}
+.j-door.ready .j-walker {
+  animation: j-door-fade 0.4s ease-out 0.25s forwards;
+}
+.j-door.ready .j-door-path {
+  animation: j-door-fade 0.5s ease-out 0.15s forwards;
+}
+.j-door.ready .j-walker-bob {
+  animation: j-idle 2.8s ease-in-out infinite alternate;
+}
+/* waiting: looking up at the door, and now and then a hand over the eyes to look closer */
+.j-door.ready .j-w-look {
+  animation: j-look 6.5s linear infinite;
+}
+.j-door.ready .j-w-search {
+  animation: j-search 6.5s linear infinite;
+}
+/* after the tap the traveller walks (.walking) and the button gives way */
+.j-door.walking .j-door-go {
+  animation: j-door-away 0.25s ease-out forwards;
+  pointer-events: none;
+}
+.j-door.walking .j-door-back,
+.j-door.walking .j-door-frame,
+.j-door.walking .j-door-dots {
+  pointer-events: none;
+}
+/* the walk starts: no more swiping, and the other doors fade away */
+.j-door.walking .j-door-track {
+  overflow-x: hidden;
+  pointer-events: none;
+}
+.j-door.walking .j-slide:not(.on) {
+  opacity: 0;
+}
+.j-door.walking .j-slide.on .j-door-art.half {
+  animation: j-door-fade 0.35s ease-out 0.1s forwards;
+}
+.j-door.walking .j-slide.on .j-door-art.open {
+  animation: j-door-fade 0.4s ease-out calc(var(--walk-delay) + var(--walk-time) * 0.5) forwards;
+}
+.j-door.walking .j-w-look,
+.j-door.walking .j-w-search {
+  animation: none;
+  opacity: 0;
+}
+.j-door.walking .j-w-jump {
+  animation: j-hide-after 0.4s linear forwards;
+}
+.j-door.walking .j-walker {
+  animation: j-walk var(--walk-time) linear var(--walk-delay) both;
+}
+.j-door.walking .j-walker-bob {
+  animation: j-hop 0.4s ease-out, j-bob 0.16s ease-in-out var(--walk-delay) infinite alternate;
+}
+/* the walk, a step every 0.16 s: rest, left foot, rest, right foot */
+.j-door.walking .j-w-rest {
+  animation: j-gait-rest 0.64s steps(1, end) var(--walk-delay) infinite;
+}
+.j-door.walking .j-w-step-l {
+  animation: j-gait-l 0.64s steps(1, end) var(--walk-delay) infinite;
+}
+.j-door.walking .j-w-step-r {
+  animation: j-gait-r 0.64s steps(1, end) var(--walk-delay) infinite;
+}
+.j-door.walking .j-slide.on .j-door-glow {
+  animation: j-door-glow 0.7s ease-in calc(var(--walk-delay) + var(--walk-time) - 0.5s) forwards;
+}
+
+@keyframes j-door-fade {
+  to { opacity: 1; }
+}
+@keyframes j-door-away {
+  to { opacity: 0; transform: translateX(-50%) translateY(8px); }
+}
+@keyframes j-door-pop {
+  to { opacity: 1; transform: none; }
+}
+@keyframes j-idle {
+  to { transform: translateY(-1.2%); }
+}
+@keyframes j-look {
+  0%, 66% { opacity: 1; }
+  70%, 92% { opacity: 0; }
+  96%, 100% { opacity: 1; }
+}
+@keyframes j-search {
+  0%, 66% { opacity: 0; }
+  70%, 92% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+@keyframes j-hop {
+  50% { transform: translateY(-9%); }
+}
+@keyframes j-hide-after {
+  0%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes j-walk {
+  0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  82% { opacity: 1; }
+  100% { transform: translate(-50%, calc(var(--lane) * -1)) scale(0.46); opacity: 0; }
+}
+@keyframes j-bob {
+  to { transform: translateY(-2.2%); }
+}
+@keyframes j-gait-rest {
+  0% { opacity: 1; }
+  25% { opacity: 0; }
+  50% { opacity: 1; }
+  75% { opacity: 0; }
+}
+@keyframes j-gait-l {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes j-gait-r {
+  0% { opacity: 0; }
+  75% { opacity: 1; }
+}
+@keyframes j-door-glow {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  45% { opacity: 1; }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(2.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .j-door.ready .j-walker-bob,
+  .j-door.walking .j-walker-bob,
+  .j-door.walking .j-w-rest,
+  .j-door.walking .j-w-step-l,
+  .j-door.walking .j-w-step-r,
+  .j-door.walking .j-slide.on .j-door-glow {
+    animation: none;
+  }
+  .j-door.ready .j-w-look,
+  .j-door.ready .j-w-search,
+  .j-door.walking .j-w-jump {
+    animation: none;
+  }
+  .j-door.ready .j-w-search {
+    opacity: 0;
+  }
+  .j-door.walking .j-walker {
+    animation: none;
+    opacity: 1;
+    transform: translate(-50%, calc(var(--lane) * -0.5)) scale(0.75);
+  }
+  .j-door.walking .j-slide.on .j-door-art.open {
+    animation: none;
+    opacity: 1;
+  }
 }

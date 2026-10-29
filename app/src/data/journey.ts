@@ -1,4 +1,5 @@
 import map from './map-provinces.json'
+import type { PathNode } from './course'
 import type { FriendId } from './friends'
 
 // The course as a train journey across Panama: each province is one unit. A province's
@@ -79,6 +80,54 @@ export const STOP_ICONS: Record<string, string> = {
 }
 export const STORY_ICON = 'stops/storybook.webp'
 
+// ---- The door a lesson opens through ----
+
+/**
+ * Every door picture is cut on the same frame, centred on its plaque, so they all line up. `plaque` is where the
+ * blank plaque sits (shares of the picture's width and height; `d` is its diameter as a share of the width) and
+ * also the doorway's centre line; `step` is how far down the doorstep is.
+ */
+export const DOOR_FRAME = { w: 760, h: 1228, step: 0.824, plaque: { x: 0.5, y: 0.32, d: 0.157 } }
+/** Panama's six lessons each have a door that nods to their place; its checkpoint is the canal lock. */
+const PANAMA_DOORS = ['door-1-airport', 'door-2-seaside', 'door-3-oldtown', 'door-4-chinatown', 'door-5-causeway', 'door-6-ruins']
+/** Any lesson without a door of its own opens through this one. */
+const DEFAULT_DOOR = 'door-8-generic'
+export const DOOR_STATES = ['closed', 'half', 'open'] as const
+/** The path from the traveller to each door. */
+const DOOR_PATH: Record<string, string> = {
+  'door-1-airport': 'cobble', 'door-2-seaside': 'sand', 'door-3-oldtown': 'cobble', 'door-4-chinatown': 'stones',
+  'door-5-causeway': 'boardwalk', 'door-6-ruins': 'stones', 'door-7-canal': 'boardwalk', 'door-8-generic': 'cobble',
+}
+export type DoorArt = { name: string; path: string }
+export const doorFor = (node: PathNode): DoorArt => {
+  const name = (node.unitId === 1 ? (node.kind === 'checkpoint' ? 'door-7-canal' : PANAMA_DOORS[node.index]) : undefined) ?? DEFAULT_DOOR
+  return { name, path: DOOR_PATH[name] }
+}
+/** Every door is drawn closed, half open and wide open; the walk fades from one to the next. */
+const doorPictures = (name: string) => DOOR_STATES.map((st) => `door/${name}-${st}.webp`)
+/**
+ * The traveller waits looking up (`look`), now and then shades their eyes (`search`), hops on the tap (`jump`) and
+ * then walks: `rest`, `step-l`, `rest`, `step-r`, over and over.
+ */
+export const WALK_POSES = ['look', 'search', 'jump', 'rest', 'step-l', 'step-r'] as const
+export const walkerFiles = (walker: string) => WALK_POSES.map((p) => `door/${walker}-${p}.webp`)
+/** The pictures a door page needs: the door, its path and the walker's poses. */
+export const doorFiles = (door: DoorArt, walker: string) => [
+  ...doorPictures(door.name),
+  `door/path-${door.path}.webp`,
+  ...walkerFiles(walker),
+]
+/** Every door and path picture, for the preloader (the walker's own poses are added by whoever is travelling). */
+export const DOOR_FILES = [
+  ...[...PANAMA_DOORS, 'door-7-canal', DEFAULT_DOOR].flatMap(doorPictures),
+  ...[...new Set(Object.values(DOOR_PATH))].map((p) => `door/path-${p}.webp`),
+]
+
+const ZH_NUMBERS = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
+const PY_NUMBERS = ['líng', 'yī', 'èr', 'sān', 'sì', 'wǔ', 'liù', 'qī', 'bā', 'jiǔ', 'shí']
+/** "第一课" and "Dì-yī kè" for lesson n (1 to 10). */
+export const lessonTitle = (n: number) => ({ zh: `第${ZH_NUMBERS[n] ?? n}课`, py: `Dì-${PY_NUMBERS[n] ?? n} kè`, num: ZH_NUMBERS[n] ?? String(n) })
+
 // ---- Map geometry (map-provinces.json comes from tools/build_panama_map.py) ----
 
 export type Region = { id: string; name: string; kind: string; unit: number | null; d: string; c: [number, number] }
@@ -102,28 +151,10 @@ export const CLOUDS: Record<string, [string, number, number, number][]> = {
   'panama-oeste': [['map-cloud-3', -22, -6, 110], ['map-cloud-4', 22, 16, 80], ['map-cloud', 6, -22, 80]],
 }
 /**
- * Sea lanes in map (viewBox) coordinates. Small boats potter along the coasts; big ships sail to
- * and from the Canal (its Pacific mouth is near 570,135 and its Caribbean one near 520,35).
- * Sprites face left with the bow down-left; `size` is the boat's width as a share of the map.
- * A lane whose sprite isn't in public/journey/boats yet is simply skipped.
+ * The boats of each province's waters: where they sail or rest is worked out from the map itself
+ * (tools/place_boats.py), so none touches land or another boat. Their pictures are in public/journey/boats.
  */
-export type SeaLane = { sprite: string; from: [number, number]; to: [number, number]; size: number; secs: number }
-export const SEA_LANES: SeaLane[] = [
-  // big ships, slow, on the Canal routes
-  { sprite: 'boats/cargo-ship', from: [700, 430], to: [585, 145], size: 0.06, secs: 95 },
-  { sprite: 'boats/cargo-ship', from: [560, 150], to: [470, 470], size: 0.06, secs: 110 },
-  { sprite: 'boats/cruise-ship', from: [380, -60], to: [512, 30], size: 0.055, secs: 90 },
-  { sprite: 'boats/tanker', from: [540, 25], to: [660, -75], size: 0.055, secs: 100 },
-  // small boats along the coasts
-  { sprite: 'boat-1', from: [600, 175], to: [690, 300], size: 0.03, secs: 46 },
-  { sprite: 'boat-2', from: [360, 445], to: [545, 455], size: 0.03, secs: 52 },
-  { sprite: 'boats/fishing-boat', from: [60, 295], to: [175, 315], size: 0.026, secs: 44 },
-  { sprite: 'boats/sailboat', from: [260, 32], to: [420, 12], size: 0.026, secs: 50 },
-  { sprite: 'boats/cayuco', from: [700, 12], to: [870, 62], size: 0.024, secs: 56 },
-  { sprite: 'boat-1', from: [600, 262], to: [705, 292], size: 0.026, secs: 40 },
-  { sprite: 'boats/sailboat', from: [100, 445], to: [250, 470], size: 0.026, secs: 58 },
-  { sprite: 'boat-2', from: [700, 425], to: [820, 462], size: 0.028, secs: 48 },
-]
+export { BOAT_SIZE, SEA_BOATS, type BoatKind, type SeaBoat } from './sea-boats'
 // ---- Characters as small portraits ----
 
 /** Crop boxes in the 200 × 200 character art: [x, y, size] around head and shoulders. */

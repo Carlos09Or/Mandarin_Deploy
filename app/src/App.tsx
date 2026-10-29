@@ -15,9 +15,9 @@ import { completeNode, getProgress, useProgress, type Reward } from './lib/progr
 // Everything but the map is loaded as its own file, so the app opens on the map without downloading the
 // lessons, the writing trainer or the passport first. They are fetched in the background once it is open.
 const screens = {
+  LessonDoor: () => import('./journey/LessonDoor').then((m) => ({ default: m.LessonDoor })),
   AllAboard: () => import('./journey/AllAboard').then((m) => ({ default: m.AllAboard })),
   Passport: () => import('./journey/Passport').then((m) => ({ default: m.Passport })),
-  Route: () => import('./journey/Route').then((m) => ({ default: m.Route })),
   LessonComplete: () => import('./lesson/LessonComplete').then((m) => ({ default: m.LessonComplete })),
   LessonPlayer: () => import('./lesson/LessonPlayer').then((m) => ({ default: m.LessonPlayer })),
   Profile: () => import('./screens/Profile').then((m) => ({ default: m.Profile })),
@@ -25,10 +25,10 @@ const screens = {
   Write: () => import('./screens/Write').then((m) => ({ default: m.Write })),
 }
 const AllAboard = lazy(screens.AllAboard)
+const LessonDoor = lazy(screens.LessonDoor)
 const Passport = lazy(screens.Passport)
-const Route = lazy(screens.Route)
-// The route is what you open first from the map, so its code is fetched right away, not when idle.
-void screens.Route()
+// The door page is what you open first from the map, so its code is fetched right away, not when idle.
+void screens.LessonDoor()
 const LessonComplete = lazy(screens.LessonComplete)
 const LessonPlayer = lazy(screens.LessonPlayer)
 const Profile = lazy(screens.Profile)
@@ -61,9 +61,8 @@ const nextBuddy = (): FriendId => {
 export default function App() {
   const progress = useProgress()
   const [tab, setTab] = useState<Tab>('map')
-  // The journey: a province's route, the lesson, the stamp, the trip onward.
+  // The journey: a province's door page, the lesson, the stamp, the trip onward.
   const [province, setProvince] = useState<Province | null>(null)
-  const [justDone, setJustDone] = useState<string | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [result, setResult] = useState<Result | null>(null)
   const [stamp, setStamp] = useState<Province | null>(null)
@@ -110,8 +109,8 @@ export default function App() {
   const afterResult = () => {
     if (!result) return
     setResult(null)
+    // Without a stamp to collect, the province's page opens on the next door.
     if (result.stamp) setStamp(result.stamp)
-    else setJustDone(result.nodeId)
   }
 
   const afterStamp = () => {
@@ -146,25 +145,11 @@ export default function App() {
         <div className={mapVisible ? 'contents' : 'hidden'}>
           <MapHome
             active={loaded && mapVisible}
-            onOpen={(p) => {
-              setJustDone(null)
-              setProvince(p)
-            }}
+            onOpen={setProvince}
             event={mapEvent}
             onEventDone={() => setMapEvent(null)}
           />
         </div>
-        {tab === 'map' && province && (
-          <Later>
-            <Route
-              key={province.id}
-              province={province}
-              justDone={justDone}
-              onBack={() => setProvince(null)}
-              onBoard={(s) => !busy && startRide({ node: s.node, place: s.place, province })}
-            />
-          </Later>
-        )}
         {tab === 'review' && (
           <Later>
             <Review onReview={(pool) => start(buildReview(pool, getProgress()))} onWrite={(c, n) => start(buildWriting(c, n))} />
@@ -196,6 +181,20 @@ export default function App() {
             station={session.station}
             onExit={() => setSession(null)}
             onFinish={finish}
+          />
+        </Later>
+      )}
+      {tab === 'map' && province && !busy && (
+        <Later>
+          <LessonDoor
+            key={province.id}
+            province={province}
+            traveler={progress.traveler}
+            onBack={() => setProvince(null)}
+            // Stay on screen until the lesson's code is here, so the page can't be tapped in between.
+            onDone={(stop) =>
+              void screens.LessonPlayer().catch(() => undefined).then(() => startRide({ ...stop, province }))
+            }
           />
         </Later>
       )}

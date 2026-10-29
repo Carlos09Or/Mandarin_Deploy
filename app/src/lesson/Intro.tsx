@@ -25,6 +25,8 @@ const CHAR = 0.42
 /** The sloth lifts the sign to the top: it travels this share of its own height. */
 const LIFT = `${((HEIGHT - SIGN_H) / SIGN_H) * 100}%`
 const SLOTH_UP = 0.38
+/** The quick friends wait this long (seconds) after the sign pops up before they fly in. */
+const ARRIVE = 0.3
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -43,6 +45,8 @@ export function Intro({ n, step, count, lead }: Props) {
   const sloth = friend === 'sloth'
 
   const [ready, setReady] = useState(false)
+  /** The quick friends stay out of sight until the sign is up, then fly in. */
+  const [arrived, setArrived] = useState(false)
   const [pose, setPose] = useState<Pose>(sloth ? 'peek' : 'enter')
   const [lifted, setLifted] = useState(false)
   const [shown, setShown] = useState(false)
@@ -87,12 +91,12 @@ export function Intro({ n, step, count, lead }: Props) {
           say()
         })
       } else {
-        at(560, () => {
-          setPose('alert')
-          setShown(true)
-          say()
-        })
-        at(1150, () => {
+        // The sign pops up first; the friend arrives a moment later and lands on it.
+        setShown(true)
+        say()
+        at(ARRIVE * 1000, () => setArrived(true))
+        at(ARRIVE * 1000 + 560, () => setPose('alert'))
+        at(ARRIVE * 1000 + 1150, () => {
           setPose('settled')
           blink()
         })
@@ -110,6 +114,7 @@ export function Intro({ n, step, count, lead }: Props) {
     clear()
     setInstant(true)
     setReady(true)
+    setArrived(true)
     setLifted(true)
     setShown(true)
     setPose(sloth ? 'up-done' : 'settled')
@@ -133,7 +138,7 @@ export function Intro({ n, step, count, lead }: Props) {
       <div
         className="-mx-5 flex flex-1 flex-col items-center justify-center gap-3 overflow-x-clip px-5 text-center"
         style={{ ['--w' as string]: 'clamp(224px, 64vw, 270px)' }}
-        onClick={() => !shown && finish()}
+        onClick={() => (!shown || pose === 'enter' || pose === 'alert') && finish()}
       >
         <div className="relative shrink-0" style={{ width: W, height: `calc(${W} * ${HEIGHT})` }}>
           {/* the sign */}
@@ -184,12 +189,21 @@ export function Intro({ n, step, count, lead }: Props) {
               style={{ bottom: `calc(${W} * ${SIGN_H} - 2px)`, [fromLeft ? 'left' : 'right']: '3%' }}
             >
               <motion.div
-                initial={start}
-                animate={ready ? { x: 0, y: 0 } : undefined}
-                transition={instant ? { duration: 0 } : { duration: friend === 'harpia' ? 0.5 : 0.56, ease: friend === 'harpia' ? 'easeIn' : 'easeOut' }}
+                initial={{ ...start, opacity: 0 }}
+                // driven by state on both sides: the first exercise of a lesson mounts with `initial` switched off
+                animate={arrived ? { x: 0, y: 0, opacity: 1 } : { ...start, opacity: 0 }}
+                transition={
+                  instant
+                    ? { duration: 0 }
+                    : {
+                        duration: friend === 'harpia' ? 0.5 : 0.56,
+                        ease: friend === 'harpia' ? 'easeIn' : 'easeOut',
+                        opacity: { duration: 0.12 },
+                      }
+                }
               >
                 <motion.div
-                  animate={ready && friend !== 'harpia' && !instant ? { y: [0, -36, 0] } : undefined}
+                  animate={arrived && friend !== 'harpia' && !instant ? { y: [0, -36, 0] } : undefined}
                   transition={{ duration: 0.56, ease: 'easeInOut' }}
                 >
                   <img

@@ -52,9 +52,6 @@ export function Splash({ onDone }: { onDone: () => void }) {
       <div className="j-splash-fill" style={{ backgroundImage: `url(${art})` }} />
       <img className="j-splash-art" src={art} alt="" fetchPriority="high" decoding="async" />
       <div className="j-splash-top">
-        <div className="j-splash-logo">
-          <img src={`${import.meta.env.BASE_URL}brand/wordmark.webp`} alt="Mandarin Journey · Panama to China" />
-        </div>
         <div className="j-splash-load">
           <div className="j-splash-row">
             <span className="j-splash-label">
