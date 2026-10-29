@@ -28,6 +28,8 @@ const screens = {
 const AllAboard = lazy(screens.AllAboard)
 const Passport = lazy(screens.Passport)
 const Route = lazy(screens.Route)
+// The route is what you open first from the map, so its code is fetched right away, not when idle.
+void screens.Route()
 const TrainRide = lazy(screens.TrainRide)
 const LessonComplete = lazy(screens.LessonComplete)
 const LessonPlayer = lazy(screens.LessonPlayer)

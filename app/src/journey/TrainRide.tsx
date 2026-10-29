@@ -1,8 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { FriendId } from '../data/friends'
-import { pickRideScene } from '../data/journey'
+import { pickRideScene, type RideScene } from '../data/journey'
 import { CHIMNEY, crewFor, loop, puff } from './art'
 import { Strip, Train } from './parts'
+import { whenLoaded } from './preload'
 import './journey.css'
 
 type Props = { place: string; traveler: FriendId; night: boolean; onDone: () => void }
@@ -21,9 +22,22 @@ const WHEEL_BOTTOM = H * (745 / 941)
 /**
  * Boarding a lesson: the train races past with the traveller driving and the friends at the
  * windows, while the painting (with its own rails) rushes the other way. Tap to skip.
+ * The ride only starts once its painting and the train have arrived, so it never shows empty.
  */
-export function TrainRide({ place, traveler, night, onDone }: Props) {
-  const [scene] = useState(() => pickRideScene(night))
+export function TrainRide(props: Props) {
+  const [scene] = useState(() => pickRideScene(props.night))
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    let alive = true
+    void whenLoaded([scene.file, 'train.webp', 'train-wheel.webp', 'train-smoke.webp']).then(() => alive && setReady(true))
+    return () => {
+      alive = false
+    }
+  }, [scene])
+  return ready ? <Ride {...props} scene={scene} /> : <div className="j-overlay j-ride" role="presentation" />
+}
+
+function Ride({ place, traveler, scene, onDone }: Props & { scene: RideScene }) {
   const bgRef = useRef<HTMLDivElement>(null)
   const trainRef = useRef<HTMLDivElement>(null)
   const smokeRef = useRef<HTMLDivElement>(null)

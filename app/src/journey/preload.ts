@@ -10,31 +10,35 @@ const NOW = [
   'map-cloud.webp', 'map-cloud-2.webp', 'map-cloud-3.webp', 'map-cloud-4.webp',
   'characters/wawa-sombrero.svg', 'characters/harpia-banda.svg', 'characters/sloth-montuno.svg', 'characters/tucan-pollera.svg',
   'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-passport.webp', 'nav-profile.webp',
-]
-const LATER = [
-  // routes
-  'route-bg-day.webp', 'route-bg-night.webp', 'landmark-canal.webp', 'ride-landscape.webp', 'route-pattern.webp',
-  // route stops
+  // the first route you open from the map: its medallions, backdrop and landmark
   'stops/airplane.webp', 'stops/promenade.webp', 'stops/church.webp', 'stops/chinese-gate.webp', 'stops/bicycle.webp',
   'stops/ruin-tower.webp', 'stops/storybook.webp', 'stops/fishing-boat.webp', 'stops/waterfall.webp', 'stops/mountain.webp',
   'stops/beach-umbrella.webp', 'stops/arch-bridge.webp',
-  // passport
-  'passport-cover.webp', 'passport-page.webp', 'postcard-panama.webp',
+  'route-bg-day.webp', 'route-bg-night.webp', 'route-pattern.webp', 'landmark-canal.webp',
+]
+const LATER = [
+  // other routes
+  'ride-landscape.webp',
   // trains
   'train.webp', 'train-wheel.webp', 'train-smoke.webp', 'train-travel-empty.webp', 'train-felt.webp',
   'ride-bg-papercut.webp', 'ride-bg-coast.webp', 'ride-bg-jungle.webp', 'ride-bg-sunset.webp', 'ride-bg-rain.webp', 'ride-bg-night.webp',
+  // passport
+  'passport-cover.webp', 'passport-page.webp', 'postcard-panama.webp',
 ]
 
 /** Decoded images are kept here for the whole session, so the browser never drops them. */
-const kept: HTMLImageElement[] = []
+const kept = new Map<string, Promise<void>>()
+const images: HTMLImageElement[] = []
 let done: Promise<void> | null = null
 
 /** Counts a picture as ready once it has arrived; decoding then carries on in the background. */
 function load(url: string) {
+  const known = kept.get(url)
+  if (known) return known
   const img = new Image()
   img.decoding = 'async'
-  kept.push(img)
-  return new Promise<void>((resolve) => {
+  images.push(img)
+  const ready = new Promise<void>((resolve) => {
     img.onload = () => {
       img.decode().catch(() => undefined)
       resolve()
@@ -42,6 +46,14 @@ function load(url: string) {
     img.onerror = () => resolve()
     img.src = url
   })
+  kept.set(url, ready)
+  return ready
+}
+
+/** Resolves once these pictures have arrived (or after `cap` ms, so a slow connection never blocks a screen). */
+export function whenLoaded(files: string[], cap = 4000): Promise<void> {
+  const all = Promise.all(files.map((f) => load(asset(f)))).then(() => undefined)
+  return Promise.race([all, new Promise<void>((resolve) => setTimeout(resolve, cap))])
 }
 
 /** Loads the map's pictures once per session; later calls return the same promise. The rest then load when the browser is idle. */
@@ -59,8 +71,8 @@ export function preloadJourney(onProgress: (share: number) => void): Promise<voi
       }),
     ),
   ).then(() => {
-    const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1500))
-    idle(() => void LATER.reduce((p, f) => p.then(() => load(asset(f))), Promise.resolve()))
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 300))
+    idle(() => void LATER.reduce((p, f) => p.then(() => load(asset(f))), Promise.resolve()), { timeout: 800 })
   })
   return done
 }
