@@ -580,71 +580,13 @@
   color: #9b9486;
 }
 
-/* ---------- the ride: the train races past with everyone on board ---------- */
+/* ---------- full-screen overlays (the trip onward between provinces) ---------- */
 .j-overlay {
   position: fixed;
   inset: 0;
   z-index: 55;
   overflow: hidden;
 }
-.j-ride {
-  background: #3dbdf5;
-  cursor: pointer;
-}
-/* Measurements are those of the 375 × 812 stage; TrainRide scales the stage to the screen. */
-.j-ride-stage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 812px;
-  transform-origin: top left;
-  overflow: hidden;
-}
-/* The painting carries its own rails; rain falls over everything when it is the rainy one. */
-.j-rain {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-.j-speed i {
-  position: absolute;
-  height: 2px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.75);
-}
-.j-ride-cap {
-  position: absolute;
-  left: 50%;
-  top: 610px;
-  width: 327px;
-  transform: translateX(-50%);
-  padding: 14px 10px 12px;
-  border-radius: 20px;
-  background: rgba(255, 250, 240, 0.95);
-  box-shadow: 0 12px 24px -14px rgba(0, 0, 0, 0.6);
-  text-align: center;
-  color: #0a426d;
-}
-.j-ride-cap .j-han {
-  display: block;
-  font-size: 30px;
-  font-weight: 900;
-  color: #d21034;
-}
-.j-ride-cap b {
-  font-size: 16px;
-  font-weight: 900;
-}
-.j-ride-cap small {
-  display: block;
-  margin-top: 10px;
-  font-size: 12px;
-  font-weight: 800;
-  color: #9a7b4c;
-}
-
 /* ---------- repeating landscape strips ---------- */
 .j-strip {
   position: absolute;

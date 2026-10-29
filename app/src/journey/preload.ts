@@ -22,9 +22,8 @@ const LATER = [
   ...WORD_FRIEND_FILES,
   // other routes
   'ride-landscape.webp',
-  // trains
-  'train.webp', 'train-wheel.webp', 'train-smoke.webp', 'train-travel-empty.webp', 'train-felt.webp',
-  'ride-bg-papercut.webp', 'ride-bg-coast.webp', 'ride-bg-jungle.webp', 'ride-bg-sunset.webp', 'ride-bg-rain.webp', 'ride-bg-night.webp',
+  // the train that takes you on to the next province (AllAboard)
+  'train.webp', 'train-wheel.webp', 'train-smoke.webp', 'train-travel-empty.webp',
   // passport
   'passport-cover.webp', 'passport-page.webp', 'postcard-panama.webp',
 ]

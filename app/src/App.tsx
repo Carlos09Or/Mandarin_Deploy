@@ -10,7 +10,7 @@ import { holdUpdates } from './lib/updates'
 import { toast } from './journey/toast'
 import type { LessonSummary } from './lesson/LessonPlayer'
 import { buildNode, buildReview, buildWriting, type Exercise } from './lib/lesson'
-import { completeNode, getProgress, isNight, useProgress, type Reward } from './lib/progress'
+import { completeNode, getProgress, useProgress, type Reward } from './lib/progress'
 
 // Everything but the map is loaded as its own file, so the app opens on the map without downloading the
 // lessons, the writing trainer or the passport first. They are fetched in the background once it is open.
@@ -18,7 +18,6 @@ const screens = {
   AllAboard: () => import('./journey/AllAboard').then((m) => ({ default: m.AllAboard })),
   Passport: () => import('./journey/Passport').then((m) => ({ default: m.Passport })),
   Route: () => import('./journey/Route').then((m) => ({ default: m.Route })),
-  TrainRide: () => import('./journey/TrainRide').then((m) => ({ default: m.TrainRide })),
   LessonComplete: () => import('./lesson/LessonComplete').then((m) => ({ default: m.LessonComplete })),
   LessonPlayer: () => import('./lesson/LessonPlayer').then((m) => ({ default: m.LessonPlayer })),
   Profile: () => import('./screens/Profile').then((m) => ({ default: m.Profile })),
@@ -30,7 +29,6 @@ const Passport = lazy(screens.Passport)
 const Route = lazy(screens.Route)
 // The route is what you open first from the map, so its code is fetched right away, not when idle.
 void screens.Route()
-const TrainRide = lazy(screens.TrainRide)
 const LessonComplete = lazy(screens.LessonComplete)
 const LessonPlayer = lazy(screens.LessonPlayer)
 const Profile = lazy(screens.Profile)
@@ -63,10 +61,9 @@ const nextBuddy = (): FriendId => {
 export default function App() {
   const progress = useProgress()
   const [tab, setTab] = useState<Tab>('map')
-  // The journey: a province's route, the train ride into a lesson, the stamp, the trip onward.
+  // The journey: a province's route, the lesson, the stamp, the trip onward.
   const [province, setProvince] = useState<Province | null>(null)
   const [justDone, setJustDone] = useState<string | null>(null)
-  const [ride, setRide] = useState<Ride | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [result, setResult] = useState<Result | null>(null)
   const [stamp, setStamp] = useState<Province | null>(null)
@@ -84,7 +81,7 @@ export default function App() {
   }, [loaded])
 
   // A new version of the app reloads the page, so it waits until the learner isn't mid-lesson.
-  const busy = !!(ride || session || result || stamp || aboard)
+  const busy = !!(session || result || stamp || aboard)
   useEffect(() => (busy ? holdUpdates() : undefined), [busy])
 
   const start = (exercises: Exercise[], nodeId: string | null = null, newWords: number[] = [], journey?: Ride) =>
@@ -164,7 +161,7 @@ export default function App() {
               province={province}
               justDone={justDone}
               onBack={() => setProvince(null)}
-              onBoard={(s) => !busy && setRide({ node: s.node, place: s.place, province })}
+              onBoard={(s) => !busy && startRide({ node: s.node, place: s.place, province })}
             />
           </Later>
         )}
@@ -190,26 +187,6 @@ export default function App() {
         )}
       </Shell>
 
-      {ride && (
-        <Later>
-          <TrainRide
-            place={ride.place}
-            traveler={progress.traveler}
-            night={isNight(progress)}
-            // The ride stays on screen until the lesson's code is here, so the route never shows (and
-            // can't be tapped again) between the train and the first card.
-            onDone={() =>
-              void screens
-                .LessonPlayer()
-                .catch(() => undefined)
-                .then(() => {
-                  startRide(ride)
-                  setRide(null)
-                })
-            }
-          />
-        </Later>
-      )}
       {session && (
         <Later cover>
           <LessonPlayer

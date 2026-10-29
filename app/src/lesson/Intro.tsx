@@ -19,14 +19,12 @@ const SPRITES = sprites as Record<string, { w: number; h: number }>
 const W = 'var(--w)'
 /** The sign is 0.62 of its width tall, and the friends stand on its top edge. */
 const SIGN_H = 0.62
-const HEIGHT = SIGN_H + 0.46
+const HEIGHT = SIGN_H + 0.36
 /** The friends are only company for the sign: the hanzi is the star, so they are drawn small. */
 const CHAR = 0.42
-/** Room for the two sound buttons beside the sign. */
-const SIDE = 56
 /** The sloth lifts the sign to the top: it travels this share of its own height. */
 const LIFT = `${((HEIGHT - SIGN_H) / SIGN_H) * 100}%`
-const SLOTH_UP = 0.44
+const SLOTH_UP = 0.38
 
 const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -133,11 +131,11 @@ export function Intro({ n, step, count, lead }: Props) {
   return (
     <Stage eyebrow="New word">
       <div
-        className="flex flex-1 flex-col items-center justify-center gap-3 overflow-x-clip text-center"
-        style={{ ['--w' as string]: 'clamp(240px, 68vw, 290px)' }}
+        className="-mx-5 flex flex-1 flex-col items-center justify-center gap-3 overflow-x-clip px-5 text-center"
+        style={{ ['--w' as string]: 'clamp(224px, 64vw, 270px)' }}
         onClick={() => !shown && finish()}
       >
-        <div className="relative shrink-0" style={{ width: W, height: `calc(${W} * ${HEIGHT})`, marginRight: SIDE }}>
+        <div className="relative shrink-0" style={{ width: W, height: `calc(${W} * ${HEIGHT})` }}>
           {/* the sign */}
           <motion.div
             className="absolute inset-x-0 z-20 flex items-center justify-center rounded-2xl border-2 border-line-dark bg-card shadow-[0_3px_0_var(--color-line)]"
@@ -245,7 +243,7 @@ export function Intro({ n, step, count, lead }: Props) {
 
         <motion.div
           className="flex flex-col items-center gap-1"
-          style={{ width: W, marginRight: SIDE }}
+          style={{ width: W }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: shown ? 1 : 0, y: shown ? 0 : 8 }}
           transition={{ duration: instant ? 0 : 0.3 }}
