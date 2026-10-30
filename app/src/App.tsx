@@ -6,7 +6,7 @@ import type { Province } from './data/journey'
 import { MapHome, type MapEvent } from './journey/MapHome'
 import { Splash } from './journey/Splash'
 import { nextProvince } from './journey/stops'
-import { holdUpdates } from './lib/updates'
+import { holdUpdates, registerUpdates } from './lib/updates'
 import { toast } from './journey/toast'
 import type { LessonSummary } from './lesson/LessonPlayer'
 import { buildNode, buildReview, buildWriting, type Exercise } from './lib/lesson'
@@ -73,6 +73,12 @@ export default function App() {
   const mapVisible = tab === 'map' && !province
 
   // Once the app is open, fetch the other screens while the browser is idle, so they open at once.
+  // The service worker only starts once the app is open: its install downloads the app a second time for offline use,
+  // which on a slow line would fight the loading screen for the connection.
+  useEffect(() => {
+    if (loaded) registerUpdates()
+  }, [loaded])
+
   useEffect(() => {
     if (!loaded) return
     const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1000))

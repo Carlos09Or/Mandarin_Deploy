@@ -16,8 +16,6 @@ import { WORD_FRIEND_FILES } from '../lesson/friends'
 const NOW = [
   // the map and its fog, in a light version first (the sharp one follows, see `whenSharp`)
   'map-illustrated-clean-lo.webp', 'map-fog-clean-lo.webp',
-  // the traveller waiting in the corner of the map, who flies to a badge when it is tapped (journey/Flyer.tsx)
-  ...flightFiles(getProgress().traveler),
   'characters/wawa-sombrero.svg', 'characters/harpia-banda.svg', 'characters/sloth-montuno.svg', 'characters/tucan-pollera.svg',
   'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-passport.webp', 'nav-profile.webp',
 ]
@@ -27,6 +25,8 @@ const SHARP = ['map-illustrated-clean.webp', 'map-fog-clean.webp']
 const CHARS = [...new Set(vocab.words.flatMap((w) => [...w.hanzi, ...w.example.hanzi]).filter((c) => /\p{Script=Han}/u.test(c)))]
 /** In the order the learner is likely to need them. */
 const LATER = [
+  // the traveller in the corner of the map, who flies to a badge when it is tapped: the map shows it once it is open (journey/Flyer.tsx)
+  ...flightFiles(getProgress().traveler),
   // the first thing after the map: a province's door page, closed doors first (journey/LessonDoor.tsx)
   ...DOOR_FILES.filter((f) => f.endsWith('-closed.webp') || f.includes('/path-')),
   ...walkerFiles(getProgress().traveler),

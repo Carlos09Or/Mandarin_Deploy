@@ -37,6 +37,8 @@ export default defineConfig({
         // with the loading screen on a slow connection. Everything else (doors, friends, train, passport, stroke data)
         // is kept the first time it is fetched: src/journey/preload.ts warms it in the background when the connection
         // allows, and a screen that needs it sooner just asks for it.
+        // The big install icons are only fetched by the browser when the app is installed, never needed offline.
+        globIgnores: ['icon-512.png', 'icon-maskable-512.png'],
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}', 'brand/*.webp', 'journey/{map-illustrated-clean-lo,map-fog-clean-lo,splash-day,splash-night,nav-*}.webp'],
         // Opening or reloading the app asks the network for the page first, so a deploy shows up on the next
         // reload; the stored copy of index.html is only the offline fallback. Scripts and styles have hashed

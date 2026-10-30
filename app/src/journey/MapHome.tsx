@@ -42,6 +42,9 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   const [shown, setShown] = useState(() => new Set(progress.revealed))
   const [pinAt, setPinAt] = useState(() => event?.hopFrom ?? currentProvince(progress).id)
   const [picking, setPicking] = useState(false)
+  // The traveller in the corner is only put on the map once it shows, so its pictures never compete with the map's own.
+  const [started, setStarted] = useState(active)
+  if (active && !started) setStarted(true)
   // The light map shows first; the sharp one fades in over it when it has arrived.
   const [sharp, setSharp] = useState(false)
   const [lightGone, setLightGone] = useState(false)
@@ -219,7 +222,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
       return
     }
     busy.current = true
-    void flyerRef.current!.fly(badge).then(() => {
+    void (flyerRef.current?.fly(badge) ?? Promise.resolve()).then(() => {
       setPinAt(id)
       busy.current = false
       onOpen(p)
@@ -349,16 +352,18 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
         </div>
       </div>
 
-      <Flyer
-        ref={flyerRef}
-        friend={progress.traveler}
-        active={active}
-        onFlight={(on) => {
-          hushed.current = on
-          mapRef.current?.classList.toggle('flying', on)
-          holdWarm(on)
-        }}
-      />
+      {started && (
+        <Flyer
+          ref={flyerRef}
+          friend={progress.traveler}
+          active={active}
+          onFlight={(on) => {
+            hushed.current = on
+            mapRef.current?.classList.toggle('flying', on)
+            holdWarm(on)
+          }}
+        />
+      )}
 
       <div className="j-map-bar">
         <div className={`j-titlebar ${isNight(progress) ? 'night' : ''}`}>
