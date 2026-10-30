@@ -6,8 +6,17 @@ import './journey.css'
 
 /** Never block the app for longer than this, even on a very slow connection. */
 const MAX_WAIT = 25000
-/** The bar always takes at least this long to fill, so the screen never just flashes by. */
+/** The bar always takes at least this long to fill, so the screen never just flashes by; less once the learner has been here before. */
 const MIN_SHOW = 1600
+const MIN_SHOW_AGAIN = 800
+const SEEN = 'mj.opened'
+const hasOpened = () => {
+  try {
+    return localStorage.getItem(SEEN) === '1'
+  } catch {
+    return false
+  }
+}
 
 /**
  * The loading screen: a still painting of the four friends watching the train cross the bay, at
@@ -27,15 +36,21 @@ export function Splash({ onDone }: { onDone: () => void }) {
     document.getElementById('boot')?.remove()
     let alive = true
     const t0 = performance.now()
+    const minShow = hasOpened() ? MIN_SHOW_AGAIN : MIN_SHOW
     const give = setTimeout(() => (loaded.current = 1), MAX_WAIT)
     preloadJourney((s) => (loaded.current = s)).then(() => (loaded.current = 1))
     // The bar shows whichever is behind: what has loaded, or the minimum time.
     const step = (now: number) => {
       if (!alive) return
-      const share = Math.min(loaded.current, (now - t0) / MIN_SHOW)
+      const share = Math.min(loaded.current, (now - t0) / minShow)
       setShown(share)
       if (share < 1) return void requestAnimationFrame(step)
       setLeaving(true)
+      try {
+        localStorage.setItem(SEEN, '1')
+      } catch {
+        /* private window: the long splash simply shows again next time */
+      }
       setTimeout(() => alive && onDone(), 500)
     }
     requestAnimationFrame(step)

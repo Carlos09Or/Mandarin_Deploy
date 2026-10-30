@@ -51,20 +51,32 @@ const kept = new Map<string, Promise<void>>()
 const images: HTMLImageElement[] = []
 let done: Promise<void> | null = null
 
-/** Counts a picture as ready once it has arrived; decoding then carries on in the background. */
+/** How long to wait before each new try when a picture fails to arrive (a dropped connection often comes back a moment later). */
+const RETRY_AFTER = [600, 1800]
+
+/** Counts a picture as ready once it has arrived; decoding then carries on in the background. A failed one is tried again, and forgotten if it still fails. */
 function load(url: string) {
   const known = kept.get(url)
   if (known) return known
-  const img = new Image()
-  img.decoding = 'async'
-  images.push(img)
   const ready = new Promise<void>((resolve) => {
-    img.onload = () => {
-      img.decode().catch(() => undefined)
-      resolve()
+    const attempt = (n: number) => {
+      const img = new Image()
+      img.decoding = 'async'
+      img.onload = () => {
+        images.push(img)
+        img.decode().catch(() => undefined)
+        resolve()
+      }
+      img.onerror = () => {
+        if (n < RETRY_AFTER.length) setTimeout(() => attempt(n + 1), RETRY_AFTER[n])
+        else {
+          kept.delete(url)
+          resolve()
+        }
+      }
+      img.src = url
     }
-    img.onerror = () => resolve()
-    img.src = url
+    attempt(0)
   })
   kept.set(url, ready)
   return ready
@@ -111,13 +123,16 @@ export function preloadJourney(onProgress: (share: number) => void): Promise<voi
     onProgress(1)
     return done
   }
-  let count = 0
+  // The bar follows weight, not file count: the two maps are most of what is waited for.
+  const weight = (f: string) => (f.startsWith('map-') ? 8 : 1)
+  const total = NOW.reduce((a, f) => a + weight(f), 0)
+  let arrived = 0
   const t0 = performance.now()
   done = Promise.all(
     NOW.map((f) =>
       load(asset(f)).then(() => {
-        count++
-        onProgress(count / NOW.length)
+        arrived += weight(f)
+        onProgress(arrived / total)
       }),
     ),
   ).then(() => {

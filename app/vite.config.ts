@@ -49,7 +49,7 @@ export default defineConfig({
             handler: 'NetworkFirst',
             options: {
               cacheName: 'pages',
-              networkTimeoutSeconds: 3,
+              networkTimeoutSeconds: 2,
               // Skip the browser's own HTTP cache too (GitHub Pages sends max-age=600).
               fetchOptions: { cache: 'no-cache' },
               precacheFallback: { fallbackURL: 'index.html' },
