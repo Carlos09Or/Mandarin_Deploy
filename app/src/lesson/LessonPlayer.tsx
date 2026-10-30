@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { plainPinyin, word } from '../data/course'
 import { chime, pinRandomVoice, unpinVoice } from '../lib/audio'
 import { retry, type Exercise } from '../lib/lesson'
-import { recordAnswer, recordTrace } from '../lib/progress'
+import { isNight, recordAnswer, recordTrace, useProgress } from '../lib/progress'
 import { AudioButton } from '../components/AudioButton'
 import { IconClose } from '../components/icons'
 import { Buddy } from '../components/Friends'
@@ -51,6 +51,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
   const [confirmExit, setConfirmExit] = useState(false)
   const [arrived, setArrived] = useState(false)
   const stats = useRef({ answers: 0, mistakes: 0, start: 0 })
+  const night = isNight(useProgress())
 
   useEffect(() => {
     stats.current.start = Date.now()
@@ -217,7 +218,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
         : word(ex.word).hanzi
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-paper">
+    <div className={`fixed inset-0 z-40 flex flex-col bg-paper ${night ? 'lesson-night' : ''}`}>
       <header className="mx-auto flex w-full max-w-lg items-center gap-4 px-4 pt-[max(env(safe-area-inset-top),16px)] pb-2">
         <button type="button" aria-label="Quit lesson" onClick={() => setConfirmExit(true)} className="text-muted">
           <IconClose className="h-7 w-7" />

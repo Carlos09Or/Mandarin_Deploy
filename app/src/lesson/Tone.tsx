@@ -87,10 +87,10 @@ export function ToneExercise({ ex, selected, onSelect, revealed }: Props) {
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full" aria-hidden>
           {[1, 2, 3, 4, 5].map((level) => (
             <g key={level}>
-              <text x="10" y={y(level) + 5} fontSize="14" fontWeight="700" fill="#b9ada0">
+              <text x="10" y={y(level) + 5} fontSize="14" fontWeight="700" style={{ fill: 'var(--color-tone-label)' }}>
                 {level}
               </text>
-              <line x1="34" x2={W - 8} y1={y(level)} y2={y(level)} stroke="#e6dccd" strokeWidth="2" strokeDasharray="5 6" />
+              <line x1="34" x2={W - 8} y1={y(level)} y2={y(level)} style={{ stroke: 'var(--color-tone-line)' }} strokeWidth="2" strokeDasharray="5 6" />
             </g>
           ))}
           {shown && (

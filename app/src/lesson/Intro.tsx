@@ -160,7 +160,7 @@ export function Intro({ n, step, count, lead }: Props) {
             }
           >
             <motion.span
-              className="han leading-none font-medium whitespace-nowrap text-[#15110e]"
+              className="han leading-none font-medium whitespace-nowrap text-[color:var(--color-hanzi)]"
               style={{ fontSize: `calc(${W} * ${hanziSize})` }}
               initial={{ opacity: 0 }}
               animate={{ opacity: shown ? 1 : 0 }}

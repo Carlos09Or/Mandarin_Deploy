@@ -9,7 +9,7 @@ import { Stage } from './Stage'
 type Props = { char: string; n: number; guide: Guide; onDone: (mistakes: number) => void }
 
 // How visible the character's outline is behind the grid, and how soon a missed stroke gets a hint.
-const OUTLINE: Record<Guide, string> = { full: '#d8cdbd', faint: '#ece4d7', none: '#ffffff' }
+const OUTLINE: Record<Guide, string> = { full: '--color-guide-full', faint: '--color-guide-faint', none: '--color-card' }
 
 
 export function Trace({ char, n, guide, onDone }: Props) {
@@ -49,7 +49,7 @@ export function Trace({ char, n, guide, onDone }: Props) {
       showCharacter: false,
       showOutline: guide !== 'none',
       strokeColor: '#2f9e7e',
-      outlineColor: OUTLINE[guide],
+      outlineColor: getComputedStyle(el).getPropertyValue(OUTLINE[guide]).trim() || '#d8cdbd',
       drawingColor: '#2f9e7e',
       drawingWidth: 26,
       highlightColor: '#3b8fd9',
@@ -115,8 +115,8 @@ export function Trace({ char, n, guide, onDone }: Props) {
         <div className="relative rounded-3xl border-2 border-line bg-card p-2" style={{ width: size + 20, height: size + 20 }}>
           {/* 米字格: the practice grid used in Chinese copybooks */}
           <svg className="pointer-events-none absolute inset-2.5" width={size} height={size} aria-hidden>
-            <rect x="1" y="1" width={size - 2} height={size - 2} fill="none" stroke="#e1d6c5" strokeWidth="2" rx="8" />
-            <g stroke="#ece3d5" strokeWidth="1.5" strokeDasharray="6 6">
+            <rect x="1" y="1" width={size - 2} height={size - 2} fill="none" style={{ stroke: 'var(--color-grid)' }} strokeWidth="2" rx="8" />
+            <g style={{ stroke: 'var(--color-grid-soft)' }} strokeWidth="1.5" strokeDasharray="6 6">
               <line x1={size / 2} y1="0" x2={size / 2} y2={size} />
               <line x1="0" y1={size / 2} x2={size} y2={size / 2} />
               <line x1="0" y1="0" x2={size} y2={size} />

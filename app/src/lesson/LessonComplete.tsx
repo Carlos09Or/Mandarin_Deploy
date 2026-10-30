@@ -2,7 +2,7 @@ import { AnimatePresence, animate, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { word } from '../data/course'
 import { chime } from '../lib/audio'
-import { today, useProgress, type Reward } from '../lib/progress'
+import { isNight, today, useProgress, type Reward } from '../lib/progress'
 import { IconFlame, IconGem } from '../components/icons'
 import { Mascot } from '../components/Mascot'
 import { Buddy } from '../components/Friends'
@@ -19,9 +19,10 @@ export function LessonComplete({ summary, reward, newWords, buddy, onContinue }:
   const [i, setI] = useState(0)
   const step = steps[i]
   useEffect(() => chime.done(), [])
+  const progress = useProgress()
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-paper">
+    <div className={`fixed inset-0 z-40 flex flex-col bg-paper ${isNight(progress) ? 'lesson-night' : ''}`}>
       <main className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 py-10 text-center">
         <AnimatePresence mode="wait">
           {step === 'summary' ? (

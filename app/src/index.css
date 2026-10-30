@@ -55,6 +55,79 @@
   --color-wrong-soft: #fde6e3;
 }
 
+/* Colours that aren't utilities: the bottom edges of the selected/correct/wrong answers, the hanzi on its card,
+   and the practice grids. Kept as variables so the night lessons can swap them (.lesson-night below). */
+:root {
+  --color-jade-edge: #9fd8c3;
+  --color-sky-edge: #9cc6ee;
+  --color-wrong-edge: #f2b1aa;
+  --color-wrong-dark: #a8322b;
+  --color-hanzi: #15110e;
+  --color-guide-full: #d8cdbd;
+  --color-guide-faint: #ece4d7;
+  --color-grid: #e1d6c5;
+  --color-grid-soft: #ece3d5;
+  --color-tone-label: #b9ada0;
+  --color-tone-line: #e6dccd;
+}
+
+/* The lessons at night: a quiet dusk violet continuing the night doors. Only the hanzi and the one thing to act
+   on stay bright; cards sit close to the page. Palette from design/night-lessons-brief (v4). */
+.lesson-night {
+  color-scheme: dark;
+  /* The text colour is inherited from <body>, so it has to be set again where the tokens change. */
+  color: var(--color-ink);
+  --color-paper: #2c2a38;
+  --color-card: #3a364e;
+  --color-ink: #f3ece1;
+  --color-muted: #8e8aa6;
+  --color-line: #35324a;
+  --color-line-dark: #4a4663;
+
+  --color-brand: #d9605f;
+  --color-brand-dark: #a8434a;
+  --color-brand-soft: #4d3139;
+  --color-jade: #339b78;
+  --color-jade-dark: #277a5e;
+  --color-jade-soft: #2a4a44;
+  --color-gold: #f9be5e;
+  --color-gold-dark: #c99a3e;
+  --color-sky: #6580bd;
+  --color-sky-dark: #4d66a0;
+  --color-sky-soft: #2f3a5c;
+  --color-wrong: #dc5f63;
+  --color-wrong-soft: #4d3139;
+
+  --color-jade-edge: #1f5c49;
+  --color-sky-edge: #3a4a7a;
+  --color-wrong-edge: #6e3340;
+  --color-wrong-dark: #a8434a;
+  --color-hanzi: #f3ece1;
+  --color-guide-full: #5a5675;
+  --color-guide-faint: #433f5a;
+  --color-grid: #4a4663;
+  --color-grid-soft: #3f3b55;
+  --color-tone-label: #7d7899;
+  --color-tone-line: #46425f;
+}
+/* Text that is "dark" on a light day card needs to be light on the night card. The same tokens stay dark where
+   they are button edges. */
+.lesson-night .text-sky-dark {
+  color: #93a8dd;
+}
+.lesson-night .text-brand-dark {
+  color: #e58e8e;
+}
+.lesson-night .text-jade-dark {
+  color: #6fcfa8;
+}
+.lesson-night .text-gold-dark {
+  color: #f3c872;
+}
+.lesson-night .text-wrong {
+  color: #ef8c8e;
+}
+
 @layer base {
   html,
   body,
@@ -93,7 +166,7 @@
     @apply bg-jade text-white shadow-[0_4px_0_var(--color-jade-dark)] active:shadow-[0_1px_0_var(--color-jade-dark)];
   }
   .btn-wrong {
-    @apply bg-wrong text-white shadow-[0_4px_0_#a8322b] active:shadow-[0_1px_0_#a8322b];
+    @apply bg-wrong text-white shadow-[0_4px_0_var(--color-wrong-dark)] active:shadow-[0_1px_0_var(--color-wrong-dark)];
   }
   .btn-ghost {
     @apply border-2 border-line-dark bg-card text-muted shadow-[0_3px_0_var(--color-line-dark)] active:shadow-[0_1px_0_var(--color-line-dark)];
@@ -106,13 +179,13 @@
     @apply rounded-2xl border-2 border-line bg-card shadow-[0_3px_0_var(--color-line)] transition-[transform,box-shadow,border-color,background-color] duration-75 active:translate-y-[2px] active:shadow-[0_1px_0_var(--color-line)];
   }
   .tile-selected {
-    @apply border-sky bg-sky-soft shadow-[0_3px_0_#9cc6ee];
+    @apply border-sky bg-sky-soft shadow-[0_3px_0_var(--color-sky-edge)];
   }
   .tile-correct {
-    @apply border-jade bg-jade-soft shadow-[0_3px_0_#9fd8c3];
+    @apply border-jade bg-jade-soft shadow-[0_3px_0_var(--color-jade-edge)];
   }
   .tile-wrong {
-    @apply border-wrong bg-wrong-soft shadow-[0_3px_0_#f2b1aa];
+    @apply border-wrong bg-wrong-soft shadow-[0_3px_0_var(--color-wrong-edge)];
   }
 
   .card {
@@ -124,13 +197,13 @@
     @apply flex min-h-16 w-full items-center justify-center rounded-2xl border-2 border-line bg-card px-4 text-lg font-bold shadow-[0_3px_0_var(--color-line)] transition-[transform,box-shadow,border-color,background-color,color] duration-75 select-none active:translate-y-[2px] active:shadow-[0_1px_0_var(--color-line)] disabled:translate-y-0;
   }
   .opt-selected {
-    @apply border-jade bg-jade-soft shadow-[0_3px_0_#9fd8c3];
+    @apply border-jade bg-jade-soft shadow-[0_3px_0_var(--color-jade-edge)];
   }
   .opt-correct {
     @apply border-jade bg-jade text-white shadow-[0_3px_0_var(--color-jade-dark)];
   }
   .opt-wrong {
-    @apply border-wrong bg-wrong-soft text-wrong shadow-[0_3px_0_#f2b1aa];
+    @apply border-wrong bg-wrong-soft text-wrong shadow-[0_3px_0_var(--color-wrong-edge)];
   }
 }
 
