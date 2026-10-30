@@ -1,6 +1,7 @@
 import { FRIEND_IDS } from '../data/friends'
 import vocab from '../data/hsk1.json'
 import { DOOR_FILES, asset, flightFiles, walkerFiles } from '../data/journey'
+import { canWarm, markSlow, saveData } from '../lib/network'
 import { getProgress } from '../lib/progress'
 import { WORD_FRIEND_FILES } from '../lesson/friends'
 
@@ -13,13 +14,15 @@ import { WORD_FRIEND_FILES } from '../lesson/friends'
 // has fetched on the device (vite.config.ts); its install only fetches the app itself and the NOW pictures.
 // Keep these lists in step with public/journey.
 const NOW = [
-  // map
-  'map-illustrated-clean.webp', 'map-fog-clean.webp',
+  // the map and its fog, in a light version first (the sharp one follows, see `whenSharp`)
+  'map-illustrated-clean-lo.webp', 'map-fog-clean-lo.webp',
   // the traveller waiting in the corner of the map, who flies to a badge when it is tapped (journey/Flyer.tsx)
   ...flightFiles(getProgress().traveler),
   'characters/wawa-sombrero.svg', 'characters/harpia-banda.svg', 'characters/sloth-montuno.svg', 'characters/tucan-pollera.svg',
   'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-passport.webp', 'nav-profile.webp',
 ]
+/** The map as it is drawn at full size, fetched right after the first view so the map sharpens when it arrives. */
+const SHARP = ['map-illustrated-clean.webp', 'map-fog-clean.webp']
 /** Hanzi that need stroke data for the writing trainer. */
 const CHARS = [...new Set(vocab.words.flatMap((w) => [...w.hanzi, ...w.example.hanzi]).filter((c) => /\p{Script=Han}/u.test(c)))]
 /** In the order the learner is likely to need them. */
@@ -73,14 +76,10 @@ export function whenLoaded(files: string[], cap = 4000): Promise<void> {
   return Promise.race([all, new Promise<void>((resolve) => setTimeout(resolve, cap))])
 }
 
-type Connection = { saveData?: boolean; effectiveType?: string }
-/** Set when the map's pictures took long to arrive: this connection is slow whatever the browser says about it. */
-let slow = false
-/** Background downloads nobody asked for are only fine when the learner has not asked to save data and the line is not slow. */
-const canWarm = () => {
-  const c = (navigator as Navigator & { connection?: Connection }).connection
-  return !slow && !c?.saveData && (!c?.effectiveType || c.effectiveType === '4g')
-}
+let sharpDone!: () => void
+const sharp = new Promise<void>((resolve) => (sharpDone = resolve))
+/** Resolves once the sharp map has arrived (never, with data saver on: the light map stays). */
+export const whenSharp = () => sharp
 
 /** Things that need every frame (the flight) pause the background downloads; they pick up where they left off. */
 let held = 0
@@ -122,7 +121,8 @@ export function preloadJourney(onProgress: (share: number) => void): Promise<voi
       }),
     ),
   ).then(() => {
-    slow = performance.now() - t0 > 9000
+    if (performance.now() - t0 > 9000) markSlow()
+    if (!saveData()) void Promise.all(SHARP.map((f) => load(asset(f)))).then(sharpDone)
     const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 300))
     idle(() => void warm(), { timeout: 2500 })
   })

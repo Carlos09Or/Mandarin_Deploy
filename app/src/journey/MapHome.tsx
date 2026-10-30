@@ -5,7 +5,7 @@ import {
 } from '../data/journey'
 import { getProgress, isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
 import { Flyer, type FlyerHandle } from './Flyer'
-import { holdWarm } from './preload'
+import { holdWarm, whenSharp } from './preload'
 import { Face } from './parts'
 import { currentProvince, isUnlocked, openProvinces, provinceDone } from './stops'
 import { toast } from './toast'
@@ -42,6 +42,18 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   const [shown, setShown] = useState(() => new Set(progress.revealed))
   const [pinAt, setPinAt] = useState(() => event?.hopFrom ?? currentProvince(progress).id)
   const [picking, setPicking] = useState(false)
+  // The light map shows first; the sharp one fades in over it when it has arrived.
+  const [sharp, setSharp] = useState(false)
+  const [lightGone, setLightGone] = useState(false)
+  useEffect(() => {
+    let t = 0
+    void whenSharp().then(() => {
+      setSharp(true)
+      // Once the sharp map has faded in, the light one underneath is not drawn any more.
+      t = window.setTimeout(() => setLightGone(true), 1000)
+    })
+    return () => clearTimeout(t)
+  }, [])
   const busy = useRef(false)
   const activeRef = useRef(active)
   const shownRef = useRef(shown)
@@ -246,16 +258,43 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
                 </g>
               </mask>
             </defs>
-            <image href={asset('map-illustrated-clean.webp')} x={VB.x} y={VB.y} width={VB.w} height={VB.h} preserveAspectRatio="none" />
-            <image
-              href={asset('map-fog-clean.webp')}
-              x={VB.x - 1.3}
-              y={VB.y}
-              width={VB.w}
-              height={VB.h}
-              preserveAspectRatio="none"
-              mask="url(#j-fog)"
-            />
+            {!lightGone && (
+              <image href={asset('map-illustrated-clean-lo.webp')} x={VB.x} y={VB.y} width={VB.w} height={VB.h} preserveAspectRatio="none" />
+            )}
+            {sharp && (
+              <image
+                className="j-sharp"
+                href={asset('map-illustrated-clean.webp')}
+                x={VB.x}
+                y={VB.y}
+                width={VB.w}
+                height={VB.h}
+                preserveAspectRatio="none"
+              />
+            )}
+            {!lightGone && (
+              <image
+                href={asset('map-fog-clean-lo.webp')}
+                x={VB.x - 1.3}
+                y={VB.y}
+                width={VB.w}
+                height={VB.h}
+                preserveAspectRatio="none"
+                mask="url(#j-fog)"
+              />
+            )}
+            {sharp && (
+              <image
+                className="j-sharp"
+                href={asset('map-fog-clean.webp')}
+                x={VB.x - 1.3}
+                y={VB.y}
+                width={VB.w}
+                height={VB.h}
+                preserveAspectRatio="none"
+                mask="url(#j-fog)"
+              />
+            )}
             <path ref={railRef} fill="none" stroke="none" />
           </svg>
           <div ref={layerRef}>

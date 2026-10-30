@@ -1,5 +1,31 @@
 @import 'tailwindcss';
 
+/* The fonts ship with the app, cut down to the glyphs it can show (tools/build_fonts.py): no request to Google,
+   so text is right on a slow line and offline. Until a font arrives the system one stands in. */
+@font-face {
+  font-family: 'Nunito';
+  src: url('./fonts/Nunito.woff2') format('woff2');
+  font-weight: 500 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  src: url('./fonts/NotoSansSC.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fredoka';
+  src: url('./fonts/Fredoka.woff2') format('woff2');
+  font-weight: 600 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ZCOOL KuaiLe';
+  src: url('./fonts/ZCOOLKuaiLe.woff2') format('woff2');
+  font-display: swap;
+}
+
 @theme {
   --font-sans: 'Nunito', ui-rounded, system-ui, sans-serif;
   --font-han: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;

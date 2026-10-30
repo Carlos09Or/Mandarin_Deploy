@@ -282,6 +282,15 @@
     transform: translateY(0) rotate(1deg) scale(1, 0.992);
   }
 }
+/* The sharp map fades in over the light one it replaces. */
+.j-sharp {
+  animation: j-sharp-in 0.8s ease both;
+}
+@keyframes j-sharp-in {
+  from {
+    opacity: 0;
+  }
+}
 /* While the traveller flies, nothing else on the map moves. */
 .j-map.flying .j-cloud img,
 .j-map.flying .j-pin-bubble,

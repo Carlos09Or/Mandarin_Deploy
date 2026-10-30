@@ -6,3 +6,9 @@
 
 # Logs
 *.log
+
+# Respaldo local de Descargas (no va a git, para que el repo pese igual)
+design/respaldo-descargas/
+
+# Source fonts downloaded by tools/build_fonts.py
+tools/.font-cache/

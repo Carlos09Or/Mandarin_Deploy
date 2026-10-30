@@ -7,6 +7,7 @@
 
 import raw from '../data/hsk1.json'
 import voices from '../data/voices.json'
+import { lowBandwidth } from './network'
 
 const pad = (n: number) => String(n).padStart(3, '0')
 const CLIPS = new Map<string, string>()
@@ -16,11 +17,37 @@ for (const w of raw.words) {
 }
 
 let lastVoice = ''
-/** A random voice, never the same one twice in a row. */
+/** One voice for the whole session: on a poor connection every voice would be its own download. */
+let steady = ''
+/** A random voice, never the same one twice in a row; always the same one on a poor connection, where its clips are the ones fetched ahead. */
 function randomVoice() {
+  if (lowBandwidth()) return (steady ||= voices.voices[Math.floor(Math.random() * voices.voices.length)])
   const options = voices.voices.filter((v) => v !== lastVoice)
   lastVoice = options[Math.floor(Math.random() * options.length)]
   return lastVoice
+}
+
+/** Clips already asked for, so each is fetched once. */
+const fetched = new Set<string>()
+/**
+ * Fetches the voice clips of these words ahead of time (the service worker keeps them), so a lesson's first plays do not
+ * wait on the network. Every voice on a good connection, only the session's voice on a poor one, and no more than
+ * `MAX_AHEAD` words (a checkpoint covers a whole unit).
+ */
+const MAX_AHEAD = 12
+export async function prefetchClips(words: number[]) {
+  const low = lowBandwidth()
+  const who = low ? [randomVoice()] : voices.voices
+  const urls = words
+    .slice(0, MAX_AHEAD)
+    .flatMap((n) => [`w${pad(n)}`, `s${pad(n)}`])
+    .flatMap((id) => who.map((v) => `${import.meta.env.BASE_URL}audio/${v}/${id}.mp3`))
+    .filter((u) => !fetched.has(u) && fetched.add(u))
+  let next = 0
+  const worker = async () => {
+    while (next < urls.length) await fetch(urls[next++]).then((r) => r.arrayBuffer()).catch(() => undefined)
+  }
+  await Promise.all([worker(), worker()])
 }
 
 let pinned: string | null = null

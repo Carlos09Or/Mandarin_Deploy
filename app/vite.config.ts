@@ -37,7 +37,7 @@ export default defineConfig({
         // with the loading screen on a slow connection. Everything else (doors, friends, train, passport, stroke data)
         // is kept the first time it is fetched: src/journey/preload.ts warms it in the background when the connection
         // allows, and a screen that needs it sooner just asks for it.
-        globPatterns: ['**/*.{js,css,html,svg,png}', 'brand/*.webp', 'journey/{map-illustrated-clean,map-fog-clean,splash-day,splash-night,nav-*}.webp'],
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}', 'brand/*.webp', 'journey/{map-illustrated-clean-lo,map-fog-clean-lo,splash-day,splash-night,nav-*}.webp'],
         // Opening or reloading the app asks the network for the page first, so a deploy shows up on the next
         // reload; the stored copy of index.html is only the offline fallback. Scripts and styles have hashed
         // names, so the page it returns always points at files that match it.
@@ -56,10 +56,12 @@ export default defineConfig({
             },
           },
           {
-            // Voice clips are cached as they are played, so lessons already heard work offline.
+            // Voice clips are kept as they are fetched (the lesson's clips are fetched ahead of it, src/lib/audio.ts), so
+            // lessons already heard work offline. The browser asks audio for byte ranges, and Safari refuses a whole file
+            // in answer: rangeRequests cuts the kept copy to the range asked for.
             urlPattern: ({ url }) => url.pathname.includes('/audio/'),
             handler: 'CacheFirst',
-            options: { cacheName: 'audio', expiration: { maxEntries: 4000 } },
+            options: { cacheName: 'audio', expiration: { maxEntries: 4000 }, rangeRequests: true },
           },
           {
             // Journey artwork (doors, friends, train, passport) is cached the first time it is shown or warmed.
@@ -72,11 +74,6 @@ export default defineConfig({
             urlPattern: ({ url }) => url.pathname.includes('/hanzi/'),
             handler: 'CacheFirst',
             options: { cacheName: 'hanzi', expiration: { maxEntries: 400 } },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/,
-            handler: 'CacheFirst',
-            options: { cacheName: 'fonts', expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 365 } },
           },
         ],
       },

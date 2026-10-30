@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import type { PathNode } from '../data/course'
 import type { FriendId } from '../data/friends'
 import { DOOR_FRAME, DOOR_STATES, WALK_POSES, asset, doorFiles, doorFor, doorOpening, lessonTitle, type Province } from '../data/journey'
+import { prefetchClips } from '../lib/audio'
 import { useProgress } from '../lib/progress'
 import { whenLoaded } from './preload'
 import { stopsOf, type Stop } from './stops'
@@ -63,8 +64,9 @@ export function LessonDoor({ province, traveler, onBack, onDone }: Props) {
   // connection only ever waits for the closed doors.
   const [opening, setOpening] = useState(() => new Set([at]))
   useEffect(() => {
-    if (phase !== 'loading') void whenLoaded(doorOpening(doors[view]))
-  }, [phase, view, doors])
+    if (phase === 'loading') return
+    void whenLoaded(doorOpening(doors[view])).then(() => prefetchClips(stops[view].node.words))
+  }, [phase, view, doors, stops])
 
   useEffect(() => {
     if (phase !== 'walk') return
