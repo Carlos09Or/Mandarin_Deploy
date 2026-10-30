@@ -80,6 +80,8 @@
   pointer-events: none;
   /* Centred on its point on the lane. */
   transform: translate(-50%, -60%);
+  /* Sailing boats are moved by transform on every frame (MapHome.tsx startSea): their own layer, no layout. */
+  will-change: transform;
 }
 .j-boat img {
   width: 100%;

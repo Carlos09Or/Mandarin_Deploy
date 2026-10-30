@@ -1,6 +1,7 @@
 import { FRIEND_IDS } from '../data/friends'
 import vocab from '../data/hsk1.json'
 import { DOOR_FILES, asset, flightFiles, nightly, walkerFiles } from '../data/journey'
+import { SEA_BOATS } from '../data/sea-boats'
 import { canWarm, markSlow, saveData } from '../lib/network'
 import { getProgress, isNight } from '../lib/progress'
 import { WORD_FRIEND_FILES } from '../lesson/friends'
@@ -35,7 +36,7 @@ const LATER = [
   // the friends who bring each new word (lesson/Intro.tsx)
   ...WORD_FRIEND_FILES,
   // the sea's boats, clouds, the other friends' flights (journey/MapHome.tsx, Flyer.tsx)
-  ...['sailboat', 'fishing-boat', 'cayuco', 'ferry', 'container-ship', 'tanker', 'bulk-carrier', 'cruise-ship'].flatMap((b) => [`boats/${b}-sail.webp`, `boats/${b}-anchor.webp`]),
+  ...[...new Set(SEA_BOATS.map((b) => b.kind))].flatMap((b) => [`boats/${b}-sail.webp`, `boats/${b}-anchor.webp`]),
   'map-cloud.webp', 'map-cloud-2.webp', 'map-cloud-3.webp', 'map-cloud-4.webp',
   ...DOOR_FILES.filter((f) => !f.endsWith('-closed.webp') && !f.includes('/path-')).map(byLight),
   ...FRIEND_IDS.flatMap(flightFiles),
@@ -50,6 +51,7 @@ const LATER = [
 
 /** Decoded images are kept here for the whole session, so the browser never drops them. */
 const kept = new Map<string, Promise<void>>()
+const decoded = new Map<string, Promise<void>>()
 const images: HTMLImageElement[] = []
 let done: Promise<void> | null = null
 
@@ -66,7 +68,7 @@ function load(url: string) {
       img.decoding = 'async'
       img.onload = () => {
         images.push(img)
-        img.decode().catch(() => undefined)
+        decoded.set(url, img.decode().catch(() => undefined))
         resolve()
       }
       img.onerror = () => {
@@ -113,10 +115,26 @@ async function warm() {
   const worker = async () => {
     while (next < urls.length && canWarm()) {
       await calmDown()
-      await fetch(urls[next++]).then((r) => r.arrayBuffer()).catch(() => undefined)
+      // Low priority: anything the learner taps on meanwhile (a door page, a lesson) is served before these.
+      await fetch(urls[next++], { priority: 'low' }).then((r) => r.arrayBuffer()).catch(() => undefined)
     }
   }
   await Promise.all([worker(), worker()])
+}
+
+/**
+ * How fast the first pictures really came in, from what the browser measured: under ~250 KB/s (about 2 Mbit) the line is
+ * too poor for background downloads, even when it reports itself as 4g. Pictures kept on the device (no transfer) say nothing.
+ */
+const SLOW_BELOW = 250 * 1024
+function slowLine(urls: string[]) {
+  const seen = performance
+    .getEntriesByType('resource')
+    .filter((e): e is PerformanceResourceTiming => urls.some((u) => e.name.endsWith(u)) && (e as PerformanceResourceTiming).transferSize > 20_000)
+  if (seen.length < 2) return false
+  const bytes = seen.reduce((a, e) => a + e.transferSize, 0)
+  const span = Math.max(...seen.map((e) => e.responseEnd)) - Math.min(...seen.map((e) => e.startTime))
+  return span > 0 && bytes / (span / 1000) < SLOW_BELOW
 }
 
 /** Loads the map's pictures once per session; later calls return the same promise. The rest then load when the browser is idle. */
@@ -138,8 +156,9 @@ export function preloadJourney(onProgress: (share: number) => void): Promise<voi
       }),
     ),
   ).then(() => {
-    if (performance.now() - t0 > 9000) markSlow()
-    if (!saveData()) void Promise.all(SHARP.map((f) => load(asset(f)))).then(sharpDone)
+    if (performance.now() - t0 > 9000 || slowLine(NOW.map(asset))) markSlow()
+    // The sharp map is 3344 px wide (about 25 MB once decoded): it is decoded before it fades in, not while it is being painted.
+    if (!saveData()) void Promise.all(SHARP.map((f) => load(asset(f)).then(() => decoded.get(asset(f))))).then(sharpDone)
     const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 300))
     idle(() => void warm(), { timeout: 2500 })
   })

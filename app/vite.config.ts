@@ -10,10 +10,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      // A new service worker takes over at once; src/lib/updates.ts registers it and reloads onto it.
-      registerType: 'autoUpdate',
+      // A new service worker waits until the learner leaves the app; src/lib/updates.ts registers it and swaps it in then.
+      registerType: 'prompt',
       injectRegister: false,
       includeAssets: ['apple-touch-icon.png'],
+      // The manifest's big icons (512 px, ~0.6 MB) are fetched by the browser when the app is installed, not by the install here.
+      includeManifestIcons: false,
       manifest: {
         name: 'Mandarin Journey · HSK 1',
         short_name: 'Mandarin Journey',
@@ -30,8 +32,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // A new service worker takes over at once instead of waiting for every tab to close.
-        skipWaiting: true,
+        // A new version never takes over in the middle of a visit (that reloaded the page under the learner's finger):
+        // it waits, and src/lib/updates.ts swaps it in once the app goes to the background.
+        skipWaiting: false,
         clientsClaim: true,
         // The install only fetches the app itself and what the first view of the map is made of, so it never competes
         // with the loading screen on a slow connection. Everything else (doors, friends, train, passport, stroke data)
@@ -40,23 +43,11 @@ export default defineConfig({
         // The big install icons are only fetched by the browser when the app is installed, never needed offline.
         globIgnores: ['icon-512.png', 'icon-maskable-512.png'],
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}', 'brand/*.webp', 'journey/{map-illustrated-clean-lo,map-fog-clean-lo,splash-day,splash-night,nav-*}.webp'],
-        // Opening or reloading the app asks the network for the page first, so a deploy shows up on the next
-        // reload; the stored copy of index.html is only the offline fallback. Scripts and styles have hashed
-        // names, so the page it returns always points at files that match it.
-        navigateFallback: null,
-        directoryIndex: null,
+        // Opening the app never waits on the network: the page is answered from the copy kept with the app (precache),
+        // which always points at the scripts and styles installed with it. A deploy is picked up in the background
+        // (src/lib/updates.ts) and takes over the next time the learner leaves the app.
+        navigateFallback: 'index.html',
         runtimeCaching: [
-          {
-            urlPattern: ({ request }) => request.mode === 'navigate',
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'pages',
-              networkTimeoutSeconds: 2,
-              // Skip the browser's own HTTP cache too (GitHub Pages sends max-age=600).
-              fetchOptions: { cache: 'no-cache' },
-              precacheFallback: { fallbackURL: 'index.html' },
-            },
-          },
           {
             // Voice clips are kept as they are fetched (the lesson's clips are fetched ahead of it, src/lib/audio.ts), so
             // lessons already heard work offline. The browser asks audio for byte ranges, and Safari refuses a whole file

@@ -41,56 +41,14 @@ SPEED = {  # units per second
 # The script slides each one to the nearest spot that is really open water and clear of the others.
 B = lambda province, kind, how, a, b=None: dict(province=province, kind=kind, how=how, a=a, b=b)
 PLAN = [
-    # The Caribbean queue for the Canal, out in the open sea north of its mouth: they belong to Panama so they are
-    # there from the start. One sails in, waits its turn at anchor and moves on; the rest wait at anchor.
+    # Five boats only, around Panama, where the first lesson is: what the camera sees from the first badge. One ship
+    # sails in from the Caribbean queue for the Canal, waits its turn at anchor and moves on; a sailboat crosses the
+    # Gulf; the rest are at anchor or drifting. (There were 35 across every province; the map felt crowded and heavy.)
     B("panama", "container-ship", "call", (630, 50), (480, 72)),
-    B("panama", "tanker", "moor", (325, 90)),
-    B("panama", "bulk-carrier", "moor", (460, 114)),
-    B("panama", "cruise-ship", "sail", (690, 550), (810, 590)),
-    # Panama: the Gulf, the Pearl Islands and the Canal's Pacific mouth
-    B("panama", "ferry", "call", (810, 425), (700, 475)),
     B("panama", "sailboat", "sail", (690, 255), (610, 300)),
-    B("panama", "fishing-boat", "moor", (690, 350)),
     B("panama", "sailboat", "moor", (760, 255)),
+    B("panama", "fishing-boat", "moor", (690, 350)),
     B("panama", "cayuco", "drift", (800, 300)),
-    # Panama Oeste: the bay below the Canal and the coast west of it
-    B("panama-oeste", "fishing-boat", "moor", (655, 345)),
-    B("panama-oeste", "sailboat", "moor", (615, 340)),
-    B("panama-oeste", "ferry", "sail", (660, 400), (570, 445)),
-    # Colon: the Caribbean mouth of the Canal
-    B("colon", "ferry", "call", (520, 55), (400, 105)),
-    B("colon", "sailboat", "sail", (330, 70), (420, 95)),
-    B("colon", "fishing-boat", "moor", (470, 128)),
-    # Guna Yala (opens with Colon): cayucos among the islands
-    B("guna-yala", "cayuco", "sail", (780, 40), (900, 70)),
-    B("guna-yala", "cayuco", "moor", (848, 100)),
-    B("guna-yala", "sailboat", "moor", (740, 40)),
-    B("guna-yala", "fishing-boat", "sail", (960, 60), (1040, 100)),
-    # Bocas del Toro: the archipelago
-    B("bocas-del-toro", "cayuco", "moor", (205, 178)),
-    B("bocas-del-toro", "sailboat", "sail", (80, 35), (210, 60)),
-    B("bocas-del-toro", "fishing-boat", "moor", (60, 120)),
-    # Chiriqui and the Ngabe-Bugle coast: the south-west
-    B("chiriqui", "fishing-boat", "call", (50, 385), (150, 425)),
-    B("chiriqui", "sailboat", "moor", (40, 330)),
-    B("chiriqui", "cayuco", "drift", (110, 475)),
-    B("chiriqui", "fishing-boat", "moor", (22, 270)),
-    # Veraguas: the south coast and the big island
-    B("veraguas", "sailboat", "moor", (195, 405)),
-    B("veraguas", "fishing-boat", "sail", (50, 530), (160, 575)),
-    B("veraguas", "ferry", "call", (360, 500), (240, 565)),
-    # Azuero: Herrera, Los Santos, and Cocle's coast
-    B("herrera", "fishing-boat", "moor", (350, 415)),
-    B("los-santos", "fishing-boat", "call", (470, 525), (560, 570)),
-    B("los-santos", "cayuco", "moor", (430, 545)),
-    B("los-santos", "sailboat", "sail", (360, 575), (450, 595)),
-    B("cocle", "fishing-boat", "moor", (485, 330)),
-    # Darien: the Gulf of San Miguel and both coasts
-    B("darien", "cayuco", "sail", (910, 515), (990, 555)),
-    B("darien", "fishing-boat", "moor", (800, 405)),
-    B("darien", "sailboat", "drift", (790, 480)),
-    B("darien", "cayuco", "moor", (1048, 330)),
-    B("darien", "cayuco", "sail", (975, 190), (1060, 240)),
 ]
 # A comarca's boats come out when the province next to it opens.
 GATE = {"guna-yala": "colon"}

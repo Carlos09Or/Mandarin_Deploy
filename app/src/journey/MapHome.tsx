@@ -45,6 +45,9 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   // The traveller in the corner is only put on the map once it shows, so its pictures never compete with the map's own.
   const [started, setStarted] = useState(active)
   if (active && !started) setStarted(true)
+  // Clouds over provinces that are already cleared are never seen. The others are fetched once the map shows, not while the
+  // loading screen is still fetching the map itself (on a slow line they were taking a share of it).
+  const [clearedAtStart] = useState(() => new Set(progress.revealed))
   // The light map shows first; the sharp one fades in over it when it has arrived.
   const [sharp, setSharp] = useState(false)
   const [lightGone, setLightGone] = useState(false)
@@ -313,7 +316,9 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
                     data-dy={dy}
                     style={{ ...pct([c[0] + dx, c[1] + dy]), width: w }}
                   >
-                    <img src={asset(`${img}.webp`)} alt="" draggable={false} loading="lazy" decoding="async" />
+                    {started && !clearedAtStart.has(id) && (
+                      <img src={asset(`${img}.webp`)} alt="" draggable={false} loading="lazy" decoding="async" />
+                    )}
                   </div>
                 )
               }),
@@ -413,6 +418,16 @@ function startSea(
   hushed: { current: boolean },
 ) {
   let alive = true
+  // Sailing boats are moved with `transform`, not `left`/`top`: a changed `left` makes the browser lay the page out again
+  // on every frame, for every boat (35 of them, each with its own filter at night), which is what made the map heavy.
+  const stage = layer.parentElement as HTMLElement
+  let stageW = stage.offsetWidth
+  let stageH = stage.offsetHeight
+  const measure = () => {
+    stageW = stage.offsetWidth
+    stageH = stage.offsetHeight
+  }
+  window.addEventListener('resize', measure)
   for (const boat of SEA_BOATS) setSail(boat)
 
   // Each boat belongs to a province's waters and comes out when that province's fog clears. Some
@@ -452,8 +467,10 @@ function startSea(
     }
     const [ax, ay] = boat.from!
     const [bx, by] = boat.to!
-    // Sprites face left; flip the ones heading right.
-    if (bx > ax) el.style.transform = 'translate(-50%, -60%) scaleX(-1)'
+    // Sprites face left; flip the ones heading right. The boat sits at the layer's corner and is moved from there.
+    const flip = bx > ax ? ' scaleX(-1)' : ''
+    el.style.left = '0'
+    el.style.top = '0'
     const len = Math.hypot(bx - ax, by - ay) || 1
     const dir = [(bx - ax) / len, (by - ay) / len]
     const secs = boat.secs!
@@ -481,7 +498,7 @@ function startSea(
       }
       const x = ax + (bx - ax) * k
       const y = ay + (by - ay) * k
-      Object.assign(el.style, pct([x, y]))
+      el.style.transform = `translate(${((x - VB.x) / VB.w) * stageW}px, ${((y - VB.y) / VB.h) * stageH}px) translate(-50%, -60%)${flip}`
       el.style.opacity = String(Math.min(1, k * 10, (1 - k) * 10))
       if (!resting && now - lastFoam > 170) {
         // Foam peels off the stern, a little behind the hull.
@@ -524,6 +541,7 @@ function startSea(
   for (let i = 0; i < 34; i++) setTimeout(ripple, i * 180)
   return () => {
     alive = false
+    window.removeEventListener('resize', measure)
     layer.querySelectorAll('.j-boat, .j-foam, .j-wave').forEach((e) => e.remove())
   }
 }
