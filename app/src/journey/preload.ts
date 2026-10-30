@@ -1,8 +1,8 @@
 import { FRIEND_IDS } from '../data/friends'
 import vocab from '../data/hsk1.json'
-import { DOOR_FILES, asset, flightFiles, walkerFiles } from '../data/journey'
+import { DOOR_FILES, asset, flightFiles, nightly, walkerFiles } from '../data/journey'
 import { canWarm, markSlow, saveData } from '../lib/network'
-import { getProgress } from '../lib/progress'
+import { getProgress, isNight } from '../lib/progress'
 import { WORD_FRIEND_FILES } from '../lesson/friends'
 
 // The pictures of the journey, fetched and decoded once so that no screen pops in later, in two steps so a slow
@@ -19,6 +19,8 @@ const NOW = [
   'characters/wawa-sombrero.svg', 'characters/harpia-banda.svg', 'characters/sloth-montuno.svg', 'characters/tucan-pollera.svg',
   'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-passport.webp', 'nav-profile.webp',
 ]
+/** The door pictures for the light the learner is in now (their night twins after dark). */
+const byLight = (file: string) => nightly(file, isNight(getProgress()))
 /** The map as it is drawn at full size, fetched right after the first view so the map sharpens when it arrives. */
 const SHARP = ['map-illustrated-clean.webp', 'map-fog-clean.webp']
 /** Hanzi that need stroke data for the writing trainer. */
@@ -28,14 +30,14 @@ const LATER = [
   // the traveller in the corner of the map, who flies to a badge when it is tapped: the map shows it once it is open (journey/Flyer.tsx)
   ...flightFiles(getProgress().traveler),
   // the first thing after the map: a province's door page, closed doors first (journey/LessonDoor.tsx)
-  ...DOOR_FILES.filter((f) => f.endsWith('-closed.webp') || f.includes('/path-')),
+  ...DOOR_FILES.filter((f) => f.endsWith('-closed.webp') || f.includes('/path-')).map(byLight),
   ...walkerFiles(getProgress().traveler),
   // the friends who bring each new word (lesson/Intro.tsx)
   ...WORD_FRIEND_FILES,
   // the sea's boats, clouds, the other friends' flights (journey/MapHome.tsx, Flyer.tsx)
   ...['sailboat', 'fishing-boat', 'cayuco', 'ferry', 'container-ship', 'tanker', 'bulk-carrier', 'cruise-ship'].flatMap((b) => [`boats/${b}-sail.webp`, `boats/${b}-anchor.webp`]),
   'map-cloud.webp', 'map-cloud-2.webp', 'map-cloud-3.webp', 'map-cloud-4.webp',
-  ...DOOR_FILES.filter((f) => !f.endsWith('-closed.webp') && !f.includes('/path-')),
+  ...DOOR_FILES.filter((f) => !f.endsWith('-closed.webp') && !f.includes('/path-')).map(byLight),
   ...FRIEND_IDS.flatMap(flightFiles),
   // other routes
   'ride-landscape.webp',

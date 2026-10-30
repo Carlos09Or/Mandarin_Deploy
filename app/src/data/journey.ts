@@ -103,6 +103,8 @@ export const doorFor = (node: PathNode): DoorArt => {
   const name = (node.unitId === 1 ? (node.kind === 'checkpoint' ? 'door-7-canal' : PANAMA_DOORS[node.index]) : undefined) ?? DEFAULT_DOOR
   return { name, path: DOOR_PATH[name] }
 }
+/** After dark every door and path has a picture of its own, `<name>-night.webp` (tools/cut_doors_night.py). */
+export const nightly = (file: string, night: boolean) => (night ? file.replace('.webp', '-night.webp') : file)
 /** Every door is drawn closed, half open and wide open; the walk fades from one to the next. */
 const doorPictures = (name: string) => DOOR_STATES.map((st) => `door/${name}-${st}.webp`)
 /**
@@ -123,13 +125,14 @@ export const flightFiles = (friend: string) => FLIGHT_POSES.map((p) => `flight/$
  * The pictures a door page needs to show: the closed doors, their paths and the walker's poses. The half open and
  * open pictures only matter for the walk through the door, so they come after (`doorOpening`).
  */
-export const doorFiles = (door: DoorArt, walker: string) => [
-  `door/${door.name}-closed.webp`,
-  `door/path-${door.path}.webp`,
+export const doorFiles = (door: DoorArt, walker: string, night = false) => [
+  nightly(`door/${door.name}-closed.webp`, night),
+  nightly(`door/path-${door.path}.webp`, night),
   ...walkerFiles(walker),
 ]
 /** The pictures of a door opening, fetched once the page is showing. */
-export const doorOpening = (door: DoorArt) => DOOR_STATES.filter((st) => st !== 'closed').map((st) => `door/${door.name}-${st}.webp`)
+export const doorOpening = (door: DoorArt, night = false) =>
+  DOOR_STATES.filter((st) => st !== 'closed').map((st) => nightly(`door/${door.name}-${st}.webp`, night))
 /** Every door and path picture, for the preloader (the walker's own poses are added by whoever is travelling). */
 export const DOOR_FILES = [
   ...[...PANAMA_DOORS, 'door-7-canal', DEFAULT_DOOR].flatMap(doorPictures),

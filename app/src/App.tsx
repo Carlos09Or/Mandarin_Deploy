@@ -71,6 +71,10 @@ export default function App() {
   // The loading screen preloads every picture once; the app is mounted behind it meanwhile.
   const [loaded, setLoaded] = useState(false)
   const mapVisible = tab === 'map' && !province
+  // The door page fades in over the map, so the map stays drawn (still) until the page has covered it.
+  const [covered, setCovered] = useState(false)
+  useEffect(() => setCovered(false), [province])
+  const mapShown = mapVisible || (tab === 'map' && !covered)
 
   // Once the app is open, fetch the other screens while the browser is idle, so they open at once.
   // The service worker only starts once the app is open: its install downloads the app a second time for offline use,
@@ -148,7 +152,7 @@ export default function App() {
     <>
       <Shell tab={tab} onTab={onTab} bleed={tab === 'map'}>
         {/* The map stays mounted behind every other screen, so it never loads twice. */}
-        <div className={mapVisible ? 'contents' : 'hidden'}>
+        <div className={mapShown ? 'contents' : 'hidden'}>
           <MapHome
             active={loaded && mapVisible}
             onOpen={setProvince}
@@ -197,6 +201,7 @@ export default function App() {
             province={province}
             traveler={progress.traveler}
             onBack={() => setProvince(null)}
+            onCovered={() => setCovered(true)}
             // Stay on screen until the lesson's code is here, so the page can't be tapped in between.
             onDone={(stop) =>
               void screens.LessonPlayer().catch(() => undefined).then(() => startRide({ ...stop, province }))

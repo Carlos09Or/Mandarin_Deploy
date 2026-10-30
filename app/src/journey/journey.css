@@ -1939,9 +1939,30 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #fff;
   user-select: none;
   -webkit-user-select: none;
+}
+/* The white page is a veil that fades in over the map, which blurs and brightens behind it, instead of cutting in. */
+.j-door::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #fff;
+  opacity: 0;
+  animation: j-veil 0.75s ease-in-out 0.15s forwards;
+}
+@keyframes j-veil {
+  from {
+    opacity: 0;
+    -webkit-backdrop-filter: blur(0) brightness(1);
+    backdrop-filter: blur(0) brightness(1);
+  }
+  to {
+    opacity: 1;
+    -webkit-backdrop-filter: blur(6px) brightness(1.25);
+    backdrop-filter: blur(6px) brightness(1.25);
+  }
 }
 .j-door-back {
   position: absolute;
@@ -2205,22 +2226,82 @@
   box-shadow: 0 2px 0 #b07e14;
 }
 
+/* after dark: a night sky for the page and the doors' night pictures (the map behind it dims instead of brightening) */
+.j-door.night::before {
+  background:
+    radial-gradient(1.5px 1.5px at 12% 14%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 78% 9%, #fff, transparent),
+    radial-gradient(1px 1px at 33% 22%, #e9e4ff, transparent),
+    radial-gradient(1px 1px at 90% 28%, #e9e4ff, transparent),
+    radial-gradient(1px 1px at 55% 6%, #fff, transparent),
+    radial-gradient(1px 1px at 6% 40%, #e9e4ff, transparent),
+    radial-gradient(70% 38% at 50% 0%, rgba(150, 140, 230, 0.35), transparent),
+    linear-gradient(#0d1235, #1a1b4b 55%, #2a2559);
+  animation-name: j-veil-night;
+}
+@keyframes j-veil-night {
+  from {
+    opacity: 0;
+    -webkit-backdrop-filter: blur(0) brightness(1);
+    backdrop-filter: blur(0) brightness(1);
+  }
+  to {
+    opacity: 1;
+    -webkit-backdrop-filter: blur(6px) brightness(0.8);
+    backdrop-filter: blur(6px) brightness(0.8);
+  }
+}
+.j-door.night .j-door-title b {
+  color: #f6ecd2;
+}
+.j-door.night .j-door-title small {
+  color: #b9b1da;
+}
+.j-door.night .j-door-back {
+  border-color: #3b4080;
+  background: #1c2152;
+  color: #e8e2f6;
+}
+.j-door.night .j-door-dots button.locked::before {
+  background: #484c7c;
+}
+.j-door.night .j-door-dots button.view::before {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+}
+.j-door.night .j-door-num {
+  color: #3a2d5c;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.j-door.night .j-door-lock {
+  background: rgba(28, 33, 82, 0.92);
+  box-shadow: 0 3px 10px rgba(0, 0, 20, 0.5);
+}
+.j-door.night .j-door-go.locked {
+  background: linear-gradient(#4d5080, #3a3d68);
+  box-shadow: 0 4px 0 #25274d;
+  color: #b4b6d6;
+}
+/* the traveller is the same picture by day and night, a little dimmer in the moonlight */
+.j-door.night .j-walker {
+  filter: brightness(0.86) saturate(0.95);
+}
+
 /* nothing shows until the pictures are here (.ready) */
 .j-door.ready .j-door-title,
 .j-door.ready .j-door-back {
-  animation: j-door-fade 0.45s ease-out forwards;
+  animation: j-door-fade 0.45s ease-out 0.4s forwards;
 }
 .j-door.ready .j-door-frame {
-  animation: j-door-pop 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  animation: j-door-pop 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) 0.4s forwards;
 }
 .j-door.ready .j-door-go {
-  animation: j-door-fade 0.4s ease-out 0.35s forwards;
+  animation: j-door-fade 0.4s ease-out 0.75s forwards;
 }
 .j-door.ready .j-walker {
-  animation: j-door-fade 0.4s ease-out 0.25s forwards;
+  animation: j-door-fade 0.4s ease-out 0.65s forwards;
 }
 .j-door.ready .j-door-path {
-  animation: j-door-fade 0.5s ease-out 0.15s forwards;
+  animation: j-door-fade 0.5s ease-out 0.55s forwards;
 }
 .j-door.ready .j-walker-bob {
   animation: j-idle 2.8s ease-in-out infinite alternate;
@@ -2343,6 +2424,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .j-door::before {
+    animation: j-veil-calm 0.25s ease-out forwards;
+  }
   .j-door.ready .j-walker-bob,
   .j-door.walking .j-walker-bob,
   .j-door.walking .j-w-rest,
@@ -2368,4 +2452,7 @@
     animation: none;
     opacity: 1;
   }
+}
+@keyframes j-veil-calm {
+  to { opacity: 1; }
 }
