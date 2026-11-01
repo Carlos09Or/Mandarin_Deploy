@@ -153,10 +153,10 @@ export const VB = { x: -40, y: -89, w: 1080, h: 607.5 }
 /** Where each province's fog starts to clear. */
 export const ORIGIN: Record<string, [number, number]> = { panama: [548, 128], 'panama-oeste': [480, 168] }
 /** Badges sit on the province centroid unless it lands on top of the city. */
-export const BADGE_AT: Record<string, [number, number]> = { panama: [612, 96], colon: [462, 66], 'panama-oeste': [520, 160] }
-/** The illustration draws the city and the Canal a little west of the real border, so Panama also uncovers that strip. */
+export const BADGE_AT: Record<string, [number, number]> = { panama: [654, 36], colon: [462, 66], 'panama-oeste': [520, 160] }
+/** The Canal's lock is drawn a little west of Panama's border, so Panama also uncovers that strip (the city itself is now inside the province). */
 export const EXTRA_HOLE: Record<string, { cx: number; cy: number; rx: number; ry: number }> = {
-  panama: { cx: 505, cy: 112, rx: 78, ry: 38 },
+  panama: { cx: 552, cy: 108, rx: 36, ry: 40 },
 }
 /** Loose clouds sitting on a province until it opens: [image, dx, dy, width px]. */
 export const CLOUDS: Record<string, [string, number, number, number][]> = {
