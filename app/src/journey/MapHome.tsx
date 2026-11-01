@@ -365,6 +365,8 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
           onFlight={(on) => {
             hushed.current = on
             mapRef.current?.classList.toggle('flying', on)
+            // Ripples and foam are Web Animations, which the class above cannot pause.
+            layerRef.current?.querySelectorAll('.j-wave, .j-foam').forEach((e) => e.getAnimations().forEach((a) => (on ? a.pause() : a.play())))
             holdWarm(on)
           }}
         />
