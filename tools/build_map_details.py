@@ -1,4 +1,4 @@
-"""Cut the high-detail close-ups (patches/skyline-detail-*-hd.png) into overlay pictures for the map.
+"""Cut the high-detail close-ups (patches/*-detail-*-hd.png) into overlay pictures for the map.
 
 Usage: python3 tools/build_map_details.py
 
@@ -19,10 +19,14 @@ P = os.path.join(ROOT, 'design', 'map-quality-brief', 'patches') + '/'
 OUT = os.path.join(ROOT, 'app', 'public', 'journey', 'map') + '/'
 # id: (window x, y, size in map px, area around the buildings in window px)
 DETAILS = {
+    # the hill above the skyline (first, so the skyline close-ups lie over it)
+    'C': (3560, 640, 900, [(0, 115), (655, 115), (760, 130), (800, 215), (745, 285), (690, 325), (560, 345), (430, 392), (300, 396), (212, 390), (200, 305), (110, 300), (0, 300)]),
     'A': (3790, 770, 640, [(45, 310), (55, 240), (120, 225), (190, 160), (300, 150), (335, 215), (360, 260), (450, 285), (500, 300),
                            (530, 330), (540, 400), (640, 390), (640, 500), (540, 500), (45, 500)]),
     'B': (4290, 1010, 480, [(70, 200), (130, 115), (240, 100), (330, 130), (375, 190), (400, 250), (420, 320), (300, 340), (150, 320), (70, 260)]),
 }
+# the hills are teal-green: for the hill the sea is only the clearly blue (the others also count cyan shallows)
+SEA_HUE = {'C': 100}
 
 
 def gray(img):
@@ -47,7 +51,7 @@ def main():
         mask = np.zeros((s, s), np.uint8)
         cv2.fillPoly(mask, [np.array(poly, np.int32)], 255)
         hsv = cv2.cvtColor(orig, cv2.COLOR_BGR2HSV)
-        sea = ((hsv[:, :, 0] > 85) & (hsv[:, :, 0] < 130) & (hsv[:, :, 1] > 90)).astype(np.uint8) * 255
+        sea = ((hsv[:, :, 0] > SEA_HUE.get(k, 85)) & (hsv[:, :, 0] < 130) & (hsv[:, :, 1] > 90)).astype(np.uint8) * 255
         sea = cv2.dilate(sea, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (13, 13)))
         mask = cv2.subtract(mask, sea)
         mask = cv2.GaussianBlur(mask, (0, 0), 9).astype(np.float32) / 255
