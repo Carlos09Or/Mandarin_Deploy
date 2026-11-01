@@ -2,13 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import { asset } from '../data/journey'
 import { getProgress, isNight } from '../lib/progress'
 import { preloadJourney } from './preload'
+import { whenFirstView } from './sharp'
 import './journey.css'
 
 /** Never block the app for longer than this, even on a very slow connection. */
 const MAX_WAIT = 25000
 /** The bar always takes at least this long to fill, so the screen never just flashes by; less once the learner has been here before. */
-const MIN_SHOW = 1600
+const MIN_SHOW = 3500
 const MIN_SHOW_AGAIN = 800
+/** Once the map's first view is up, the screen waits this long at most for the sharp pieces on screen, so the map opens sharp. */
+const SHARP_WAIT = 3500
 const SEEN = 'mj.opened'
 const hasOpened = () => {
   try {
@@ -38,7 +41,10 @@ export function Splash({ onDone }: { onDone: () => void }) {
     const t0 = performance.now()
     const minShow = hasOpened() ? MIN_SHOW_AGAIN : MIN_SHOW
     const give = setTimeout(() => (loaded.current = 1), MAX_WAIT)
-    preloadJourney((s) => (loaded.current = s)).then(() => (loaded.current = 1))
+    // The first views of the map load behind this screen; the bar stops short of full until the sharp pieces on screen are in too.
+    preloadJourney((s) => (loaded.current = Math.min(s, 0.9)))
+      .then(() => whenFirstView(SHARP_WAIT))
+      .then(() => (loaded.current = 1))
     // The bar shows whichever is behind: what has loaded, or the minimum time.
     const step = (now: number) => {
       if (!alive) return

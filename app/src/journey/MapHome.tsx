@@ -8,6 +8,7 @@ import { saveData } from '../lib/network'
 import { getProgress, isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
 import { Flyer, type FlyerHandle } from './Flyer'
 import { holdWarm, whenSharp } from './preload'
+import { NEAR, requestSharp } from './sharp'
 import { Face } from './parts'
 import { currentProvince, isUnlocked, openProvinces, provinceDone } from './stops'
 import { toast } from './toast'
@@ -29,41 +30,68 @@ const badgeAt = (id: string) => BADGE_AT[id] ?? regionById.get(id)!.c
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 /** The map at full size is cut into tiles; only the ones near the screen are loaded, so the sharp map costs a few MB, not all of it. */
+/** Share of the screen (each side) that is not counted as on screen while the camera is still pulled back: (1 - 0.82) / 2. */
+const SEEN_SHRINK = 9
+/** How far beyond the screen (share of it, each side) pieces are fetched ahead on a good line. */
+const RING = 8
 const TILE_ROWS = 4
 const TILE_COLS = 6
 const TILES = Array.from({ length: TILE_ROWS * TILE_COLS }, (_, i) => [Math.floor(i / TILE_COLS), i % TILE_COLS] as const)
 
-function MapTile({ r, c, root }: { r: number; c: number; root: React.RefObject<HTMLDivElement | null> }) {
-  const box = useRef<HTMLDivElement>(null)
+/**
+ * Whether a map piece's sharp picture should be on screen: it is asked for through the queue (journey/sharp.ts) when the piece is on
+ * the screen, nearest the middle first, or, on a good line, just off it. Far from the screen it is dropped again, so only a few
+ * pieces are ever decoded (the light map stays underneath).
+ */
+function useSharpPiece(box: React.RefObject<HTMLDivElement | null>, root: React.RefObject<HTMLDivElement | null>, src: string, shrink: boolean) {
+  const [seen, setSeen] = useState(false)
   const [near, setNear] = useState(false)
+  const [ready, setReady] = useState(false)
   useEffect(() => {
     if (saveData() || !box.current) return
-    // Near the screen: loaded. Far from it: dropped again, so only a few tiles are ever decoded (the light map stays underneath).
-    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { root: root.current, rootMargin: '30%' })
-    io.observe(box.current)
-    return () => io.disconnect()
-  }, [root])
+    // The camera starts pulled back (zoom 0.82) and glides in: until it has, only the middle of what shows counts as on screen,
+    // which is what will still be on screen once it is in. The ring around it is a little more than a tile, not a third of the screen.
+    const on = new IntersectionObserver(([e]) => setSeen(e.isIntersecting), { root: root.current, rootMargin: shrink ? `-${SEEN_SHRINK}%` : '0px' })
+    const around = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { root: root.current, rootMargin: `${shrink ? RING - SEEN_SHRINK : RING}%` })
+    on.observe(box.current)
+    around.observe(box.current)
+    return () => {
+      on.disconnect()
+      around.disconnect()
+    }
+  }, [box, root, shrink])
+  useEffect(() => {
+    const el = box.current
+    const area = root.current
+    if (!el || !area || !(seen || near)) return
+    const a = el.getBoundingClientRect()
+    const b = area.getBoundingClientRect()
+    const away = Math.hypot(a.left + a.width / 2 - (b.left + b.width / 2), a.top + a.height / 2 - (b.top + b.height / 2))
+    return requestSharp(src, (seen ? 0 : NEAR) + away, () => setReady(true))
+  }, [box, root, seen, near, src])
+  return ready && (seen || near)
+}
+
+function MapTile({ r, c, root, shrink }: { r: number; c: number; root: React.RefObject<HTMLDivElement | null>; shrink: boolean }) {
+  const box = useRef<HTMLDivElement>(null)
+  const src = asset(`map/t-${r}-${c}.webp`)
+  const ready = useSharpPiece(box, root, src, shrink)
   return (
     <div
       ref={box}
       className="j-maptile"
       style={{ left: `${(c / TILE_COLS) * 100}%`, top: `${(r / TILE_ROWS) * 100}%`, width: `${100 / TILE_COLS + 0.1}%`, height: `${100 / TILE_ROWS + 0.1}%` }}
     >
-      {near && <TileImage src={asset(`map/t-${r}-${c}.webp`)} />}
+      {ready && <TileImage src={src} />}
     </div>
   )
 }
 
 /** A close-up repainted at twice the map's detail (tools/build_map_details.py), laid over the map where it belongs and loaded only when near the screen. */
-function MapDetail({ d, root }: { d: { id: string; x: number; y: number; w: number; h: number }; root: React.RefObject<HTMLDivElement | null> }) {
+function MapDetail({ d, root, shrink }: { d: { id: string; x: number; y: number; w: number; h: number }; root: React.RefObject<HTMLDivElement | null>; shrink: boolean }) {
   const box = useRef<HTMLDivElement>(null)
-  const [near, setNear] = useState(false)
-  useEffect(() => {
-    if (saveData() || !box.current) return
-    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { root: root.current, rootMargin: '30%' })
-    io.observe(box.current)
-    return () => io.disconnect()
-  }, [root])
+  const src = asset(`map/d-${d.id}.webp`)
+  const ready = useSharpPiece(box, root, src, shrink)
   const { mapW, mapH } = DETAILS
   return (
     <div
@@ -71,7 +99,7 @@ function MapDetail({ d, root }: { d: { id: string; x: number; y: number; w: numb
       className="j-mapdetail"
       style={{ left: `${(d.x / mapW) * 100}%`, top: `${(d.y / mapH) * 100}%`, width: `${(d.w / mapW) * 100}%`, height: `${(d.h / mapH) * 100}%` }}
     >
-      {near && <TileImage src={asset(`map/d-${d.id}.webp`)} />}
+      {ready && <TileImage src={src} />}
     </div>
   )
 }
@@ -209,6 +237,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   // Before anything shows (even behind the loading screen) the camera already looks at the
   // traveller, a little zoomed out; the first time the map shows it glides in from there.
   const approached = useRef(false)
+  const [pulledBack, setPulledBack] = useState(true)
   useLayoutEffect(() => {
     centerOn(badgeAt(pinAtRef.current), false, 0.82)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -231,7 +260,10 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
     placePin(badgeAt(from))
     if (!approached.current) {
       approached.current = true
-      requestAnimationFrame(() => centerOn(badgeAt(from), true, 1, 1600))
+      requestAnimationFrame(() => {
+        centerOn(badgeAt(from), true, 1, 1600)
+        setPulledBack(false)
+      })
     } else centerOn(badgeAt(from), false)
     const pending = openProvinces(now).filter((p) => !now.revealed.includes(p.id))
     if (!pending.length && !event) return
@@ -295,10 +327,10 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
           <div className="j-mapart">
             <img className="j-lo" src={asset('map/lo.webp')} alt="" draggable={false} />
             {TILES.map(([r, c]) => (
-              <MapTile key={`${r}-${c}`} r={r} c={c} root={scrollRef} />
+              <MapTile key={`${r}-${c}`} r={r} c={c} root={scrollRef} shrink={pulledBack} />
             ))}
             {DETAILS.details.map((d) => (
-              <MapDetail key={d.id} d={d} root={scrollRef} />
+              <MapDetail key={d.id} d={d} root={scrollRef} shrink={pulledBack} />
             ))}
           </div>
           <svg ref={svgRef} viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} preserveAspectRatio="none">
