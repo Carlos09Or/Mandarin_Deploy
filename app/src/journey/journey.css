@@ -67,11 +67,12 @@
 .j-cloud img {
   width: 100%;
   display: block;
-  animation: j-bob 5s ease-in-out infinite alternate;
+  animation: j-cloud-bob 5s ease-in-out infinite alternate;
 }
-@keyframes j-bob {
+/* What the clouds have always done (the door's walk used to share this name and replaced it): a slow rise and fall. */
+@keyframes j-cloud-bob {
   to {
-    transform: translate(6px, -4px);
+    transform: translateY(-2.2%);
   }
 }
 .j-boat {
@@ -138,6 +139,8 @@
   border: 3px solid #fff;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
   transition: background 0.4s;
+  /* Its own layer: the flight swells it (Flyer.tsx) and its pulse runs here, so neither repaints the big map layer. */
+  will-change: transform;
 }
 .j-badge.locked::after {
   content: '🔒';
@@ -148,18 +151,30 @@
 }
 .j-badge.open {
   background: #d21034;
-  animation: j-pulse 1.6s ease-in-out infinite;
+}
+/* The pulse is a ring that grows and fades: transform and opacity only, so it never repaints (a growing box-shadow did). */
+.j-badge.open::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 4px solid rgba(242, 193, 78, 0.9);
+  opacity: 0;
+  pointer-events: none;
+  animation: j-pulse 1.6s ease-out infinite;
 }
 .j-badge.done {
   background: #2f9e7e;
 }
 @keyframes j-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(242, 193, 78, 0.9), 0 3px 0 rgba(0, 0, 0, 0.18);
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
   }
-  50% {
-    box-shadow: 0 0 0 12px rgba(242, 193, 78, 0), 0 3px 0 rgba(0, 0, 0, 0.18);
+  60%,
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
   }
 }
 .j-label {
@@ -258,18 +273,17 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  visibility: hidden;
   max-width: none;
+  /* The poses not showing stay a hair above 0: a fully transparent picture is dropped by the browser and would only be
+     put on the graphics card in mid-flight, which is a stall. The flight shows them by animating opacity (Flyer.tsx). */
+  opacity: 0.004;
+  will-change: opacity;
+}
+.j-flyer-bob img.f-rest {
   filter: drop-shadow(0 4px 5px rgba(10, 40, 70, 0.35));
 }
-.j-flyer[data-pose='rest'] .f-rest,
-.j-flyer[data-pose='crouch'] .f-crouch,
-.j-flyer[data-pose='up'] .f-up,
-.j-flyer[data-pose='mid'] .f-mid,
-.j-flyer[data-pose='down'] .f-down,
-.j-flyer[data-pose='bank'] .f-bank,
-.j-flyer[data-pose='tuck'] .f-tuck {
-  visibility: visible;
+.j-flyer[data-pose='rest'] .f-rest {
+  opacity: 1;
 }
 /* Barely moving while it waits: a slow breath, a tiny sway. */
 @keyframes j-idle {
@@ -295,27 +309,39 @@
 }
 /* While the traveller flies, nothing else on the map moves. */
 .j-map.flying .j-cloud img,
+.j-map.flying .j-boat img,
 .j-map.flying .j-pin-bubble,
-.j-map.flying .j-badge {
+.j-map.flying .j-badge::before {
   animation-play-state: paused;
 }
 .j-flyer.go img {
   filter: none;
 }
-.j-trail {
+.j-spark {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: #fff6d8;
+  box-shadow: 0 0 6px rgba(255, 214, 90, 0.8);
+  opacity: 0;
+  will-change: transform, opacity;
 }
-.j-ring {
+.j-burst {
   position: absolute;
+  left: 0;
+  top: 0;
   width: 34px;
   height: 34px;
+  margin: -17px 0 0 -17px;
   border-radius: 50%;
   border: 3px solid rgba(255, 233, 160, 0.95);
   box-shadow: 0 0 6px rgba(255, 214, 90, 0.7);
+  opacity: 0;
+  will-change: transform, opacity;
 }
 @media (prefers-reduced-motion: reduce) {
   .j-flyer-bob,
@@ -1933,7 +1959,9 @@
   --track-h: calc(var(--dh) * (var(--step) - 0.02) + var(--dw) * 0.9);
   --lane: calc(var(--dw) * 0.78); /* how far the walker has to go, from the bottom of the lane to the doorstep */
   --walk-delay: 0.4s; /* the hop on the tap comes first */
-  --walk-time: 1.7s;
+  --walk-time: 1s;
+  /* one full stride (rest, left foot, rest, right foot): shorter as the walk gets quicker, so the feet keep up */
+  --gait: 0.42s;
   position: fixed;
   inset: 0;
   z-index: 60;
@@ -2351,17 +2379,17 @@
   animation: j-walk var(--walk-time) linear var(--walk-delay) both;
 }
 .j-door.walking .j-walker-bob {
-  animation: j-hop 0.4s ease-out, j-bob 0.16s ease-in-out var(--walk-delay) infinite alternate;
+  animation: j-hop 0.4s ease-out, j-walk-bob calc(var(--gait) / 4) ease-in-out var(--walk-delay) infinite alternate;
 }
-/* the walk, a step every 0.16 s: rest, left foot, rest, right foot */
+/* the walk, a step every quarter of --gait: rest, left foot, rest, right foot */
 .j-door.walking .j-w-rest {
-  animation: j-gait-rest 0.64s steps(1, end) var(--walk-delay) infinite;
+  animation: j-gait-rest var(--gait) steps(1, end) var(--walk-delay) infinite;
 }
 .j-door.walking .j-w-step-l {
-  animation: j-gait-l 0.64s steps(1, end) var(--walk-delay) infinite;
+  animation: j-gait-l var(--gait) steps(1, end) var(--walk-delay) infinite;
 }
 .j-door.walking .j-w-step-r {
-  animation: j-gait-r 0.64s steps(1, end) var(--walk-delay) infinite;
+  animation: j-gait-r var(--gait) steps(1, end) var(--walk-delay) infinite;
 }
 .j-door.walking .j-slide.on .j-door-glow {
   animation: j-door-glow 0.7s ease-in calc(var(--walk-delay) + var(--walk-time) - 0.5s) forwards;
@@ -2401,7 +2429,7 @@
   82% { opacity: 1; }
   100% { transform: translate(-50%, calc(var(--lane) * -1)) scale(0.46); opacity: 0; }
 }
-@keyframes j-bob {
+@keyframes j-walk-bob {
   to { transform: translateY(-2.2%); }
 }
 @keyframes j-gait-rest {

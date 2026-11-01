@@ -14,3 +14,5 @@ export const POSES: Record<Friend, Pose[]> = {
 }
 /** Every picture of every friend, so the lesson can warm them up. */
 export const WORD_FRIEND_FILES = (Object.keys(POSES) as Friend[]).flatMap((f) => POSES[f].map((p) => file(f, p)))
+/** The pictures of the three quick friends, one of whom brings the first new word of a lesson. */
+export const QUICK_FRIEND_FILES = QUICK.flatMap((f) => POSES[f].map((p) => file(f, p)))

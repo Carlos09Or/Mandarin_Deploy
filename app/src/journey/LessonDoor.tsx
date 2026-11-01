@@ -15,12 +15,14 @@ type Props = {
   onBack: () => void
   /** Called once the page's veil has fully covered the map behind it, which can then stop drawing. */
   onCovered?: () => void
+  /** Called as the walk begins, so whatever the lesson needs can be fetched while the traveller walks to the door. */
+  onWalk?: () => void
   /** Called once the walk is over, with the lesson the door was for. */
   onDone: (stop: { node: PathNode; place: string }) => void
 }
 
 /** How long the tap-to-lesson takes: --walk-delay + --walk-time in journey.css, plus a beat for the light. */
-const WALK_MS = 2200
+const WALK_MS = 1500
 
 const LOCKED = 'Finish the doors before this one first'
 
@@ -31,7 +33,7 @@ const LOCKED = 'Finish the doors before this one first'
  * Doors you have not reached yet are grey. Tap to go: the traveller hops, walks up the path while the door opens
  * and goes in through the light; then the lesson starts. Finished lessons can be opened again.
  */
-export function LessonDoor({ province, traveler, onBack, onCovered, onDone }: Props) {
+export function LessonDoor({ province, traveler, onBack, onCovered, onWalk, onDone }: Props) {
   const progress = useProgress()
   const night = isNight(progress)
   const stops = useMemo(() => stopsOf(province).filter((s): s is Extract<Stop, { node: PathNode }> => s.kind !== 'story'), [province])
@@ -50,8 +52,10 @@ export function LessonDoor({ province, traveler, onBack, onCovered, onDone }: Pr
   // 'loading' while the pictures arrive, 'wait' for the tap, 'walk' to the door.
   const [phase, setPhase] = useState<'loading' | 'wait' | 'walk'>('loading')
   const done = useRef(onDone)
+  const walking = useRef(onWalk)
   useEffect(() => {
     done.current = onDone
+    walking.current = onWalk
   })
 
   // The veil (.j-door::before) takes 0.15s + 0.75s to fade in over the map; reduced motion takes 0.25s.
@@ -85,6 +89,7 @@ export function LessonDoor({ province, traveler, onBack, onCovered, onDone }: Pr
 
   useEffect(() => {
     if (phase !== 'walk') return
+    walking.current?.()
     const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     const t = setTimeout(() => done.current({ node: stop.node, place: stop.place }), calm ? 700 : WALK_MS)
     return () => clearTimeout(t)

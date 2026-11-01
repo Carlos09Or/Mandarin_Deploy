@@ -76,6 +76,14 @@ export function Intro({ n, step, count, lead }: Props) {
         })
       })
 
+    // The sign is what the learner came for: a quick friend's word shows at once and the friend flies in when their
+    // pictures are here (a slow line used to keep the whole card blank until then). The sloth's show is the sign's
+    // own lift, so that one waits for his pictures.
+    if (!sloth && !reduced()) {
+      setReady(true)
+      setShown(true)
+      say()
+    }
     void whenLoaded(POSES[friend].map((p) => file(friend, p)), 2500).then(() => {
       if (!alive) return
       if (reduced()) return finish()
@@ -91,9 +99,7 @@ export function Intro({ n, step, count, lead }: Props) {
           say()
         })
       } else {
-        // The sign pops up first; the friend arrives a moment later and lands on it.
-        setShown(true)
-        say()
+        // The friend arrives and lands on the sign.
         at(ARRIVE * 1000, () => setArrived(true))
         at(ARRIVE * 1000 + 560, () => setPose('alert'))
         at(ARRIVE * 1000 + 1150, () => {

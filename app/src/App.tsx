@@ -6,8 +6,10 @@ import type { Province } from './data/journey'
 import { MapHome, type MapEvent } from './journey/MapHome'
 import { Splash } from './journey/Splash'
 import { nextProvince } from './journey/stops'
+import { whenLoaded } from './journey/preload'
 import { holdUpdates, registerUpdates } from './lib/updates'
 import { toast } from './journey/toast'
+import { QUICK_FRIEND_FILES } from './lesson/friends'
 import type { LessonSummary } from './lesson/LessonPlayer'
 import { buildNode, buildReview, buildWriting, type Exercise } from './lib/lesson'
 import { completeNode, getProgress, useProgress, type Reward } from './lib/progress'
@@ -202,6 +204,11 @@ export default function App() {
             traveler={progress.traveler}
             onBack={() => setProvince(null)}
             onCovered={() => setCovered(true)}
+            // The walk to the door takes a couple of seconds: the lesson's code and the friends' pictures arrive meanwhile.
+            onWalk={() => {
+              void screens.LessonPlayer()
+              void whenLoaded(QUICK_FRIEND_FILES)
+            }}
             // Stay on screen until the lesson's code is here, so the page can't be tapped in between.
             onDone={(stop) =>
               void screens.LessonPlayer().catch(() => undefined).then(() => startRide({ ...stop, province }))
