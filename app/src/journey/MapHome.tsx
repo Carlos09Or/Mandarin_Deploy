@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { FRIENDS, FRIEND_IDS } from '../data/friends'
 import DETAILS from '../data/map-details.json'
 import {
-  BADGE_AT, BOAT_SIZE, SEA_BOATS, CLOUDS, EXTRA_HOLE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province, type SeaBoat,
+  BADGE_AT, BOAT_SIZE, SEA_BOATS, CLOUDS, EXTRA_HOLE, OPEN_ZONE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province, type SeaBoat,
 } from '../data/journey'
 import { saveData } from '../lib/network'
 import { getProgress, isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
@@ -327,6 +327,9 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
               <filter id="j-soft" x="-10%" y="-10%" width="120%" height="120%">
                 <feGaussianBlur stdDeviation="2.2" />
               </filter>
+              <filter id="j-edge" x="-10%" y="-10%" width="120%" height="120%">
+                <feGaussianBlur stdDeviation="5" />
+              </filter>
               {REGIONS.map((r) => {
                 const o = ORIGIN[r.id] ?? r.c
                 return (
@@ -340,9 +343,18 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
                 <g filter="url(#j-soft)">
                   {REGIONS.map((r) => {
                     const e = EXTRA_HOLE[r.id]
+                    const zone = OPEN_ZONE[r.id]
                     return (
                       <g key={r.id} id={`j-hole-${r.id}`} clipPath={`url(#j-clip-${r.id})`}>
-                        <path d={r.d} fill="#000" stroke="#000" strokeWidth="7" strokeLinejoin="round" />
+                        {zone ? (
+                          <>
+                            <path d={zone} fill="#000" filter="url(#j-edge)" />
+                            {/* the whole province is still land for the boats, which keep off it (it paints nothing) */}
+                            <path d={r.d} fill="none" />
+                          </>
+                        ) : (
+                          <path d={r.d} fill="#000" stroke="#000" strokeWidth="7" strokeLinejoin="round" />
+                        )}
                         {e && <ellipse {...e} fill="#000" />}
                       </g>
                     )

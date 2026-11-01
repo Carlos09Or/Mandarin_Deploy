@@ -158,6 +158,14 @@ export const BADGE_AT: Record<string, [number, number]> = { panama: [650, 50], c
 export const EXTRA_HOLE: Record<string, { cx: number; cy: number; rx: number; ry: number }> = {
   panama: { cx: 552, cy: 108, rx: 36, ry: 40 },
 }
+/**
+ * What opens when a province is unlocked, where that is smaller than the province: Panama's own outline runs east almost to Darien,
+ * but its first unit is the city (the canal and the skyline), so only that opens, and the fog of the map (not clouds) stays over the rest, with a soft edge. Map units, like the regions.
+ */
+export const OPEN_ZONE: Record<string, string> = {
+  panama:
+    'M490 80 C505 72 535 68 552 64 C570 58 590 52 612 47 C632 44 652 44 668 50 C682 56 690 68 700 72 C716 76 734 82 742 96 C750 110 758 128 754 150 C752 168 752 180 750 192 L490 192 Z',
+}
 /** Loose clouds sitting on a province until it opens: [image, dx, dy, width px]. */
 export const CLOUDS: Record<string, [string, number, number, number][]> = {
   panama: [
