@@ -16,14 +16,14 @@ import { WORD_FRIEND_FILES } from '../lesson/friends'
 // Keep these lists in step with public/journey.
 const NOW = [
   // the map and its fog, in a light version first (the sharp one follows, see `whenSharp`)
-  'map-illustrated-clean-lo.webp', 'map-fog-clean-lo.webp',
+  'map/lo.webp', 'map-fog-v2-lo.webp',
   'characters/wawa-sombrero.svg', 'characters/harpia-banda.svg', 'characters/sloth-montuno.svg', 'characters/tucan-pollera.svg',
   'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-passport.webp', 'nav-profile.webp',
 ]
 /** The door pictures for the light the learner is in now (their night twins after dark). */
 const byLight = (file: string) => nightly(file, isNight(getProgress()))
-/** The map as it is drawn at full size, fetched right after the first view so the map sharpens when it arrives. */
-const SHARP = ['map-illustrated-clean.webp', 'map-fog-clean.webp']
+/** The fog at full size, fetched right after the first view so it sharpens when it arrives (the map's own tiles load as the camera nears them). */
+const SHARP = ['map-fog-v2.webp']
 /** Hanzi that need stroke data for the writing trainer. */
 const CHARS = [...new Set(vocab.words.flatMap((w) => [...w.hanzi, ...w.example.hanzi]).filter((c) => /\p{Script=Han}/u.test(c)))]
 /** In the order the learner is likely to need them. */

@@ -44,6 +44,29 @@
   transform-origin: 0 0;
   will-change: transform;
 }
+.j-mapart,
+.j-maptile,
+.j-mapdetail {
+  position: absolute;
+}
+.j-mapart {
+  inset: 0;
+  transition: filter 1.2s ease;
+}
+.j-mapart img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.j-maptile img,
+.j-mapdetail img {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.j-maptile img.on,
+.j-mapdetail img.on {
+  opacity: 1;
+}
 .j-stage > svg {
   position: absolute;
   inset: 0;
@@ -53,6 +76,7 @@
   transition: filter 1.2s ease;
 }
 .j-map.night .j-stage > svg,
+.j-map.night .j-mapart,
 .j-map.night .j-boat,
 .j-map.night .j-cloud {
   filter: brightness(0.6) saturate(0.85) hue-rotate(-8deg);

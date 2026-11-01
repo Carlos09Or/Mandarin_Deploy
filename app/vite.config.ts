@@ -42,7 +42,7 @@ export default defineConfig({
         // allows, and a screen that needs it sooner just asks for it.
         // The big install icons are only fetched by the browser when the app is installed, never needed offline.
         globIgnores: ['icon-512.png', 'icon-maskable-512.png'],
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}', 'brand/*.webp', 'journey/{map-illustrated-clean-lo,map-fog-clean-lo,splash-day,splash-night,nav-*}.webp'],
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}', 'brand/*.webp', 'journey/{map/lo,map-fog-v2-lo,splash-day,splash-night,nav-*}.webp'],
         // Opening the app never waits on the network: the page is answered from the copy kept with the app (precache),
         // which always points at the scripts and styles installed with it. A deploy is picked up in the background
         // (src/lib/updates.ts) and takes over the next time the learner leaves the app.

@@ -1,8 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { FRIENDS, FRIEND_IDS } from '../data/friends'
+import DETAILS from '../data/map-details.json'
 import {
   BADGE_AT, BOAT_SIZE, SEA_BOATS, CLOUDS, EXTRA_HOLE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province, type SeaBoat,
 } from '../data/journey'
+import { saveData } from '../lib/network'
 import { getProgress, isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
 import { Flyer, type FlyerHandle } from './Flyer'
 import { holdWarm, whenSharp } from './preload'
@@ -25,6 +27,60 @@ const pct = ([x, y]: readonly [number, number]) => ({ left: `${((x - VB.x) / VB.
 const regionById = new Map(REGIONS.map((r) => [r.id, r]))
 const badgeAt = (id: string) => BADGE_AT[id] ?? regionById.get(id)!.c
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+/** The map at full size is cut into tiles; only the ones near the screen are loaded, so the sharp map costs a few MB, not all of it. */
+const TILE_ROWS = 4
+const TILE_COLS = 6
+const TILES = Array.from({ length: TILE_ROWS * TILE_COLS }, (_, i) => [Math.floor(i / TILE_COLS), i % TILE_COLS] as const)
+
+function MapTile({ r, c, root }: { r: number; c: number; root: React.RefObject<HTMLDivElement | null> }) {
+  const box = useRef<HTMLDivElement>(null)
+  const [near, setNear] = useState(false)
+  useEffect(() => {
+    if (saveData() || !box.current) return
+    // Near the screen: loaded. Far from it: dropped again, so only a few tiles are ever decoded (the light map stays underneath).
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { root: root.current, rootMargin: '30%' })
+    io.observe(box.current)
+    return () => io.disconnect()
+  }, [root])
+  return (
+    <div
+      ref={box}
+      className="j-maptile"
+      style={{ left: `${(c / TILE_COLS) * 100}%`, top: `${(r / TILE_ROWS) * 100}%`, width: `${100 / TILE_COLS + 0.1}%`, height: `${100 / TILE_ROWS + 0.1}%` }}
+    >
+      {near && <TileImage src={asset(`map/t-${r}-${c}.webp`)} />}
+    </div>
+  )
+}
+
+/** A close-up repainted at twice the map's detail (tools/build_map_details.py), laid over the map where it belongs and loaded only when near the screen. */
+function MapDetail({ d, root }: { d: { id: string; x: number; y: number; w: number; h: number }; root: React.RefObject<HTMLDivElement | null> }) {
+  const box = useRef<HTMLDivElement>(null)
+  const [near, setNear] = useState(false)
+  useEffect(() => {
+    if (saveData() || !box.current) return
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { root: root.current, rootMargin: '30%' })
+    io.observe(box.current)
+    return () => io.disconnect()
+  }, [root])
+  const { mapW, mapH } = DETAILS
+  return (
+    <div
+      ref={box}
+      className="j-mapdetail"
+      style={{ left: `${(d.x / mapW) * 100}%`, top: `${(d.y / mapH) * 100}%`, width: `${(d.w / mapW) * 100}%`, height: `${(d.h / mapH) * 100}%` }}
+    >
+      {near && <TileImage src={asset(`map/d-${d.id}.webp`)} />}
+    </div>
+  )
+}
+
+/** Fades in once decoded; mounted fresh each time the tile comes near, so it starts hidden every time. */
+function TileImage({ src }: { src: string }) {
+  const [ready, setReady] = useState(false)
+  return <img className={ready ? 'on' : ''} src={src} alt="" draggable={false} decoding="async" onLoad={() => setReady(true)} />
+}
 
 export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   const progress = useProgress()
@@ -236,6 +292,15 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
     <div ref={mapRef} className={`j-map ${isNight(progress) ? 'night' : ''}`}>
       <div className="j-map-scroll" ref={scrollRef}>
         <div className="j-stage" ref={stageRef}>
+          <div className="j-mapart">
+            <img className="j-lo" src={asset('map/lo.webp')} alt="" draggable={false} />
+            {TILES.map(([r, c]) => (
+              <MapTile key={`${r}-${c}`} r={r} c={c} root={scrollRef} />
+            ))}
+            {DETAILS.details.map((d) => (
+              <MapDetail key={d.id} d={d} root={scrollRef} />
+            ))}
+          </div>
           <svg ref={svgRef} viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} preserveAspectRatio="none">
             <defs>
               <filter id="j-soft" x="-10%" y="-10%" width="120%" height="120%">
@@ -265,23 +330,9 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
               </mask>
             </defs>
             {!lightGone && (
-              <image href={asset('map-illustrated-clean-lo.webp')} x={VB.x} y={VB.y} width={VB.w} height={VB.h} preserveAspectRatio="none" />
-            )}
-            {sharp && (
               <image
-                className="j-sharp"
-                href={asset('map-illustrated-clean.webp')}
+                href={asset('map-fog-v2-lo.webp')}
                 x={VB.x}
-                y={VB.y}
-                width={VB.w}
-                height={VB.h}
-                preserveAspectRatio="none"
-              />
-            )}
-            {!lightGone && (
-              <image
-                href={asset('map-fog-clean-lo.webp')}
-                x={VB.x - 1.3}
                 y={VB.y}
                 width={VB.w}
                 height={VB.h}
@@ -292,8 +343,8 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
             {sharp && (
               <image
                 className="j-sharp"
-                href={asset('map-fog-clean.webp')}
-                x={VB.x - 1.3}
+                href={asset('map-fog-v2.webp')}
+                x={VB.x}
                 y={VB.y}
                 width={VB.w}
                 height={VB.h}
