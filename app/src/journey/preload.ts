@@ -2,7 +2,7 @@ import { FRIEND_IDS } from '../data/friends'
 import vocab from '../data/hsk1.json'
 import { DOOR_FILES, asset, flightFiles, nightly, walkerFiles } from '../data/journey'
 import { SEA_BOATS } from '../data/sea-boats'
-import { canWarm, markSlow, saveData } from '../lib/network'
+import { canWarm, lowBandwidth, markSlow } from '../lib/network'
 import { getProgress, isNight } from '../lib/progress'
 import { WORD_FRIEND_FILES } from '../lesson/friends'
 
@@ -92,6 +92,11 @@ export function whenLoaded(files: string[], cap = 4000): Promise<void> {
   return Promise.race([all, new Promise<void>((resolve) => setTimeout(resolve, cap))])
 }
 
+let nowDone!: () => void
+const now = new Promise<void>((resolve) => (nowDone = resolve))
+/** Resolves once the first view of the map has arrived: the sharp pieces of the map wait for it (journey/sharp.ts). */
+export const whenNow = () => now
+
 let sharpDone!: () => void
 const sharp = new Promise<void>((resolve) => (sharpDone = resolve))
 /** Resolves once the sharp map has arrived (never, with data saver on: the light map stays). */
@@ -157,8 +162,10 @@ export function preloadJourney(onProgress: (share: number) => void): Promise<voi
     ),
   ).then(() => {
     if (performance.now() - t0 > 9000 || slowLine(NOW.map(asset))) markSlow()
+    nowDone()
     // The sharp map is 3344 px wide (about 25 MB once decoded): it is decoded before it fades in, not while it is being painted.
-    if (!saveData()) void Promise.all(SHARP.map((f) => load(asset(f)).then(() => decoded.get(asset(f))))).then(sharpDone)
+    // On a slow line the light fog stays (the sharp one is 240 KB the first view does not need).
+    if (!lowBandwidth()) void Promise.all(SHARP.map((f) => load(asset(f)).then(() => decoded.get(asset(f))))).then(sharpDone)
     const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 300))
     idle(() => void warm(), { timeout: 2500 })
   })

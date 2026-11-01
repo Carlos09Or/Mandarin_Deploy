@@ -7,6 +7,7 @@ import { MapHome, type MapEvent } from './journey/MapHome'
 import { Splash } from './journey/Splash'
 import { nextProvince } from './journey/stops'
 import { whenLoaded } from './journey/preload'
+import { canWarm } from './lib/network'
 import { holdUpdates, registerUpdates } from './lib/updates'
 import { toast } from './journey/toast'
 import { QUICK_FRIEND_FILES } from './lesson/friends'
@@ -88,7 +89,8 @@ export default function App() {
   useEffect(() => {
     if (!loaded) return
     const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1000))
-    idle(() => Object.values(screens).forEach((load) => void load()))
+    // On a slow line they are fetched when opened (about 90 KB), not ahead of the map's own pictures.
+    idle(() => canWarm() && Object.values(screens).forEach((load) => void load()))
   }, [loaded])
 
   // A new version of the app reloads the page, so it waits until the learner isn't mid-lesson.
