@@ -1,7 +1,6 @@
 # Mandarin Learning Hub · v2
 
 Free HSK 1 Mandarin course for Spanish speakers, built as an installable web app (PWA).
-The legacy static app still lives at the repository root; this folder is its replacement.
 
 ## Learning model
 
@@ -31,12 +30,8 @@ npm run dev
 
 ## Data
 
-`src/data/hsk1.json`, `public/hanzi/` and `public/units/` are generated from the legacy files in
-`../js/` and `../assets/ui/`. After changing the vocabulary, run from the repository root:
-
-```bash
-node tools/export-v2-data.mjs
-```
+`src/data/hsk1.json` holds the 300-word vocabulary and is the source for the audio manifest below.
+`public/hanzi/` holds the stroke data for the writing trainer.
 
 ## Voice audio
 
