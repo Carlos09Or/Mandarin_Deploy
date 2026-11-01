@@ -19,6 +19,11 @@ X = [0, 541, 1082, 1622, 2163, 2704]
 Y = [0, 414, 828, 1242]
 W, H = round(3344 * S), round(1882 * S)
 TAU = 7.0  # px: how sharply the blend flips between two crops
+# Straight steps of a few levels in the tone of the sea that sit inside a crop (the agent painted the crop with a seam in it), as
+# (axis, line, from, to) in map px: 'h' is a line y = line between x = from and x = to. Found by looking at the assembled map; the
+# step is measured on the sea along the line and shared out to both sides, so the waves themselves are left as they are.
+SEA_STEPS = [('h', 815, 2840, 3640)]
+STEP_FADE = 110  # px: how far from the line the correction reaches
 
 
 def water(img):
@@ -38,6 +43,37 @@ def aligned(i):
     gx, gy = np.meshgrid(np.arange(N), np.arange(N))
     return cv2.remap(hd, (gx + flow[:, :, 0]).astype(np.float32), (gy + flow[:, :, 1]).astype(np.float32),
                      cv2.INTER_CUBIC, borderMode=cv2.BORDER_REFLECT)
+
+
+def heal_step(img, axis, line, a0, a1):
+    """Remove a straight step in the sea's tone: half of it is taken off one side and added to the other, fading out with distance."""
+    big = img if axis == 'h' else img.transpose(1, 0, 2)
+    sea = (big[:, :, 2] + 30 < big[:, :, 0]).astype(np.float32)  # BGR: blue or cyan, foam and all (a line of foam is still the sea)
+    sea = cv2.erode(sea, np.ones((5, 5), np.uint8))
+    lum = big.astype(np.float32).mean(2)
+    cols = np.arange(a0, a1)
+    ok = (sea[line - 5:line + 5, a0:a1] > 0).all(axis=0)
+    # the rows right next to the line, so the step is the jump at the line itself and not the slope of the waves around it
+    above = lum[line - 4:line - 1, a0:a1].mean(0)
+    below = lum[line + 1:line + 4, a0:a1].mean(0)
+    step = below - above
+    # the step is not the same all along the line: measured where there is sea, smoothed along the line, carried over the rest
+    good = np.where(ok)[0]
+    step = np.interp(np.arange(len(cols)), good, step[good])
+    step = cv2.GaussianBlur(cv2.medianBlur(step.astype(np.float32)[None, :], 1)[0][None, :], (0, 0), 10)[0] if len(good) else step
+    print(f'sea step at {axis}={line}: median {np.median(step[ok]):+.1f} levels (from {step[ok].min():+.1f} to {step[ok].max():+.1f}) over {int(ok.sum())} px')
+    d = np.arange(big.shape[0], dtype=np.float32) - (line - 0.5)  # >0 below the line
+    fall = np.where(np.abs(d) < STEP_FADE, 0.5 + 0.5 * np.cos(np.pi * np.abs(d) / STEP_FADE), 0.0)
+    sign = np.where(d > 0, -0.5, 0.5)
+    # along the line: fade the correction in and out at both ends, and keep it to the sea
+    t = np.clip(np.minimum(cols - a0, a1 - 1 - cols) / 120.0, 0, 1)
+    t = t * t * (3 - 2 * t)
+    mask = cv2.GaussianBlur(sea, (0, 0), 12)[:, a0:a1] * t[None, :]
+    corr = (sign * fall)[:, None] * step[None, :] * mask
+    big = big.astype(np.float32)
+    big[:, a0:a1] += corr[:, :, None]
+    big = np.clip(big, 0, 255).astype(np.uint8)
+    return big if axis == 'h' else big.transpose(1, 0, 2).copy()
 
 
 def main(out):
@@ -76,28 +112,35 @@ def main(out):
 
     # Blend: weight = exp(distance to own edge / TAU), relative to the best crop at that pixel.
     yy, xx = np.mgrid[0:N, 0:N]
-    dist = np.minimum(np.minimum(xx, N - 1 - xx), np.minimum(yy, N - 1 - yy)).astype(np.float32)
+    # Distance of each pixel to its crop's four edges. A crop on the map border has no neighbour beyond that one edge, so only
+    # that edge is treated as far away (the others still fade the crop out where its neighbours take over: raising the whole half
+    # of the crop, as this once did, left a hard edge, a visible step in the sea, where a border crop ended).
+    left, right = xx.astype(np.float32), (N - 1 - xx).astype(np.float32)
+    top, bottom = yy.astype(np.float32), (N - 1 - yy).astype(np.float32)
+
+    def edge_distance(i):
+        r, c = int(i[1]), int(i[3])
+        return np.minimum(np.minimum(np.full_like(left, N) if c == 1 else left, np.full_like(left, N) if c == 6 else right),
+                          np.minimum(np.full_like(left, N) if r == 1 else top, np.full_like(left, N) if r == 4 else bottom))
+
+    dists = {i: edge_distance(i) for i in ids}
     best = np.full((H, W), -1.0, np.float32)
     for i in ids:
         y, x = pos[i]
         hh, ww = min(N, H - y), min(N, W - x)
-        best[y:y + hh, x:x + ww] = np.maximum(best[y:y + hh, x:x + ww], dist[:hh, :ww])
-    # crops on the map border have no neighbour beyond it: treat that border as far away
+        best[y:y + hh, x:x + ww] = np.maximum(best[y:y + hh, x:x + ww], dists[i][:hh, :ww])
     num = np.zeros((H, W, 3), np.float32)
     den = np.zeros((H, W), np.float32)
     for i in ids:
         y, x = pos[i]
         hh, ww = min(N, H - y), min(N, W - x)
-        d = dist.copy()
-        r, c = int(i[1]), int(i[3])
-        if c == 1: d[:, :N // 2] = np.maximum(d[:, :N // 2], N)
-        if c == 6: d[:, N // 2:] = np.maximum(d[:, N // 2:], N)
-        if r == 1: d[:N // 2] = np.maximum(d[:N // 2], N)
-        if r == 4: d[N // 2:] = np.maximum(d[N // 2:], N)
-        w = np.exp(np.minimum(d[:hh, :ww] - np.maximum(best[y:y + hh, x:x + ww], d[:hh, :ww]), 0) / TAU)
+        d = dists[i][:hh, :ww]
+        w = np.exp(np.minimum(d - np.maximum(best[y:y + hh, x:x + ww], d), 0) / TAU)
         num[y:y + hh, x:x + ww] += crops[i][:hh, :ww] * w[:, :, None]
         den[y:y + hh, x:x + ww] += w
     out_img = np.clip(num / np.maximum(den, 1e-6)[:, :, None], 0, 255).astype(np.uint8)
+    for axis, line, a0, a1 in SEA_STEPS:
+        out_img = heal_step(out_img, axis, line, a0, a1)
     cv2.imwrite(out, out_img)
     print('wrote', out, out_img.shape)
 

@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { FRIENDS, FRIEND_IDS } from '../data/friends'
 import DETAILS from '../data/map-details.json'
 import {
-  BADGE_AT, BOAT_SIZE, SEA_BOATS, CLOUDS, EXTRA_HOLE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province, type SeaBoat,
+  BADGE_AT, BOAT_SIZE, SEA_BOATS, CLOUDS, EXTRA_HOLE, OPEN_ZONE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province, type SeaBoat,
 } from '../data/journey'
 import { saveData } from '../lib/network'
 import { getProgress, isNight, markRevealed, setTraveler, useProgress } from '../lib/progress'
@@ -30,8 +30,6 @@ const badgeAt = (id: string) => BADGE_AT[id] ?? regionById.get(id)!.c
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 /** The map at full size is cut into tiles; only the ones near the screen are loaded, so the sharp map costs a few MB, not all of it. */
-/** Share of the screen (each side) that is not counted as on screen while the camera is still pulled back: (1 - 0.82) / 2. */
-const SEEN_SHRINK = 9
 /** How far beyond the screen (share of it, each side) pieces are fetched ahead on a good line. */
 const RING = 8
 const TILE_ROWS = 4
@@ -43,23 +41,22 @@ const TILES = Array.from({ length: TILE_ROWS * TILE_COLS }, (_, i) => [Math.floo
  * the screen, nearest the middle first, or, on a good line, just off it. Far from the screen it is dropped again, so only a few
  * pieces are ever decoded (the light map stays underneath).
  */
-function useSharpPiece(box: React.RefObject<HTMLDivElement | null>, root: React.RefObject<HTMLDivElement | null>, src: string, shrink: boolean) {
+function useSharpPiece(box: React.RefObject<HTMLDivElement | null>, root: React.RefObject<HTMLDivElement | null>, src: string) {
   const [seen, setSeen] = useState(false)
   const [near, setNear] = useState(false)
   const [ready, setReady] = useState(false)
   useEffect(() => {
     if (saveData() || !box.current) return
-    // The camera starts pulled back (zoom 0.82) and glides in: until it has, only the middle of what shows counts as on screen,
-    // which is what will still be on screen once it is in. The ring around it is a little more than a tile, not a third of the screen.
-    const on = new IntersectionObserver(([e]) => setSeen(e.isIntersecting), { root: root.current, rootMargin: shrink ? `-${SEEN_SHRINK}%` : '0px' })
-    const around = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { root: root.current, rootMargin: `${shrink ? RING - SEEN_SHRINK : RING}%` })
+    // On screen means on screen; the ring around it is a fraction of the screen, not a third of it.
+    const on = new IntersectionObserver(([e]) => setSeen(e.isIntersecting), { root: root.current, rootMargin: '0px' })
+    const around = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { root: root.current, rootMargin: `${RING}%` })
     on.observe(box.current)
     around.observe(box.current)
     return () => {
       on.disconnect()
       around.disconnect()
     }
-  }, [box, root, shrink])
+  }, [box, root])
   useEffect(() => {
     const el = box.current
     const area = root.current
@@ -72,10 +69,10 @@ function useSharpPiece(box: React.RefObject<HTMLDivElement | null>, root: React.
   return ready && (seen || near)
 }
 
-function MapTile({ r, c, root, shrink }: { r: number; c: number; root: React.RefObject<HTMLDivElement | null>; shrink: boolean }) {
+function MapTile({ r, c, root }: { r: number; c: number; root: React.RefObject<HTMLDivElement | null> }) {
   const box = useRef<HTMLDivElement>(null)
   const src = asset(`map/t-${r}-${c}.webp`)
-  const ready = useSharpPiece(box, root, src, shrink)
+  const ready = useSharpPiece(box, root, src)
   return (
     <div
       ref={box}
@@ -88,10 +85,10 @@ function MapTile({ r, c, root, shrink }: { r: number; c: number; root: React.Ref
 }
 
 /** A close-up repainted at twice the map's detail (tools/build_map_details.py), laid over the map where it belongs and loaded only when near the screen. */
-function MapDetail({ d, root, shrink }: { d: { id: string; x: number; y: number; w: number; h: number }; root: React.RefObject<HTMLDivElement | null>; shrink: boolean }) {
+function MapDetail({ d, root }: { d: { id: string; x: number; y: number; w: number; h: number }; root: React.RefObject<HTMLDivElement | null> }) {
   const box = useRef<HTMLDivElement>(null)
   const src = asset(`map/d-${d.id}.webp`)
-  const ready = useSharpPiece(box, root, src, shrink)
+  const ready = useSharpPiece(box, root, src)
   const { mapW, mapH } = DETAILS
   return (
     <div
@@ -192,7 +189,6 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
           c.style.opacity = '0'
         }, i * 90)
       })
-      centerOn(o)
       setTimeout(() => {
         setShown((s) => new Set(s).add(id))
         const p = provinceById(id)
@@ -234,12 +230,11 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
       requestAnimationFrame(step)
     })
 
-  // Before anything shows (even behind the loading screen) the camera already looks at the
-  // traveller, a little zoomed out; the first time the map shows it glides in from there.
-  const approached = useRef(false)
-  const [pulledBack, setPulledBack] = useState(true)
+  // Before anything shows (even behind the loading screen) the camera already looks at the traveller, so the pieces of the
+  // map near it are the ones that load first. The camera never scales the map: a phone draws a layer once at its scale and
+  // redraws it patch by patch when it changes, which showed as rectangles of different sharpness.
   useLayoutEffect(() => {
-    centerOn(badgeAt(pinAtRef.current), false, 0.82)
+    centerOn(badgeAt(pinAtRef.current), false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -258,13 +253,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
     const now = getProgress()
     const from = event?.hopFrom ?? pinAt
     placePin(badgeAt(from))
-    if (!approached.current) {
-      approached.current = true
-      requestAnimationFrame(() => {
-        centerOn(badgeAt(from), true, 1, 1600)
-        setPulledBack(false)
-      })
-    } else centerOn(badgeAt(from), false)
+    centerOn(badgeAt(from), false)
     const pending = openProvinces(now).filter((p) => !now.revealed.includes(p.id))
     if (!pending.length && !event) return
     let alive = true
@@ -327,16 +316,19 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
           <div className="j-mapart">
             <img className="j-lo" src={asset('map/lo.webp')} alt="" draggable={false} />
             {TILES.map(([r, c]) => (
-              <MapTile key={`${r}-${c}`} r={r} c={c} root={scrollRef} shrink={pulledBack} />
+              <MapTile key={`${r}-${c}`} r={r} c={c} root={scrollRef} />
             ))}
             {DETAILS.details.map((d) => (
-              <MapDetail key={d.id} d={d} root={scrollRef} shrink={pulledBack} />
+              <MapDetail key={d.id} d={d} root={scrollRef} />
             ))}
           </div>
           <svg ref={svgRef} viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} preserveAspectRatio="none">
             <defs>
               <filter id="j-soft" x="-10%" y="-10%" width="120%" height="120%">
                 <feGaussianBlur stdDeviation="2.2" />
+              </filter>
+              <filter id="j-edge" x="-10%" y="-10%" width="120%" height="120%">
+                <feGaussianBlur stdDeviation="5" />
               </filter>
               {REGIONS.map((r) => {
                 const o = ORIGIN[r.id] ?? r.c
@@ -351,9 +343,18 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
                 <g filter="url(#j-soft)">
                   {REGIONS.map((r) => {
                     const e = EXTRA_HOLE[r.id]
+                    const zone = OPEN_ZONE[r.id]
                     return (
                       <g key={r.id} id={`j-hole-${r.id}`} clipPath={`url(#j-clip-${r.id})`}>
-                        <path d={r.d} fill="#000" stroke="#000" strokeWidth="7" strokeLinejoin="round" />
+                        {zone ? (
+                          <>
+                            <path d={zone} fill="#000" filter="url(#j-edge)" />
+                            {/* the whole province is still land for the boats, which keep off it (it paints nothing) */}
+                            <path d={r.d} fill="none" />
+                          </>
+                        ) : (
+                          <path d={r.d} fill="#000" stroke="#000" strokeWidth="7" strokeLinejoin="round" />
+                        )}
                         {e && <ellipse {...e} fill="#000" />}
                       </g>
                     )

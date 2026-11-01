@@ -115,7 +115,7 @@ export function Shell({ tab, onTab, bleed = false, children }: Props) {
       </aside>
 
       {/* Phone dock */}
-      <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t-2 border-line bg-paper md:hidden">
+      <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 bg-paper md:hidden">
         <div className="mx-auto flex max-w-md justify-around px-1 pt-1.5 pb-1">
           {TABS.map((t) => (
             <button

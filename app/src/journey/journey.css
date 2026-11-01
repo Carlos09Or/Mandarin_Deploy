@@ -267,12 +267,23 @@
   /* The picture is a big square (room for the wings); the standing traveller fills its middle, so the square hangs
      partly outside the corner to put the feet just above the dock. */
   --s: clamp(170px, 46vw, 220px);
+  /* How far down the square the standing feet are (each friend's own picture): the feet rest 14px above the dock. */
+  --feet: 0.65;
   position: absolute;
   left: calc(14px - var(--s) * 0.4);
-  bottom: calc(10px - var(--s) * 0.41);
+  bottom: calc(14px - var(--s) * (1 - var(--feet)));
   width: var(--s);
   aspect-ratio: 1;
   will-change: transform, opacity;
+}
+.j-flyer[data-friend='wawa'] {
+  --feet: 0.69;
+}
+.j-flyer[data-friend='harpia'] {
+  --feet: 0.646;
+}
+.j-flyer[data-friend='tucan'] {
+  --feet: 0.642;
 }
 .j-flyer.arrive {
   animation: j-arrive 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
