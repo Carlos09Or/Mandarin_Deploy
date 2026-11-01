@@ -263,7 +263,7 @@ export const Flyer = forwardRef<FlyerHandle, Props>(function Flyer({ friend, act
         <i key={i} className="j-spark" />
       ))}
       <i className="j-burst" />
-      <div className="j-flyer" ref={bodyRef} data-pose="rest">
+      <div className="j-flyer" ref={bodyRef} data-pose="rest" data-friend={friend}>
         <div className="j-flyer-bob">
           {FLIGHT_POSES.map((p) => (
             <img key={`${friend}-${p}`} className={`f-${p}`} src={asset(`flight/${friend}-${p}.webp`)} alt="" draggable={false} />
