@@ -1,7 +1,70 @@
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+
+/** Longest the app's scripts and styles wait for the splash painting (index.html) before they are asked for anyway. */
+const PAINTING_FIRST_MS = 1500
+
+/**
+ * The splash painting comes before the app's scripts and styles: on a slow line they shared the connection with it,
+ * so the painting arrived seconds late although it was asked for first. The built page asks for them only once the
+ * painting has arrived (or after PAINTING_FIRST_MS): the scripts are fetched at once, and the app starts once the
+ * stylesheet is in, so the loading screen is never drawn unstyled.
+ */
+const paintingFirst = (): Plugin => ({
+  name: 'painting-first',
+  apply: 'build',
+  transformIndexHtml: {
+    order: 'post',
+    handler(html) {
+      const entry = html.match(/<script type="module" crossorigin src="([^"]+)"><\/script>\s*/)
+      if (!entry) throw new Error('painting-first: no entry script in index.html')
+      const preloads = [...html.matchAll(/<link rel="modulepreload" crossorigin href="([^"]+)">\s*/g)]
+      const styles = [...html.matchAll(/<link rel="stylesheet" crossorigin href="([^"]+)">\s*/g)]
+      for (const m of [entry, ...preloads, ...styles]) html = html.replace(m[0], '')
+      const list = (ms: RegExpMatchArray[]) => JSON.stringify(ms.map((m) => m[1]))
+      const loader = `<script>
+      ;(function () {
+        var started = false
+        var add = function (rel, href) {
+          var link = document.createElement('link')
+          link.rel = rel
+          link.href = href
+          link.crossOrigin = ''
+          document.head.appendChild(link)
+          return link
+        }
+        var start = function () {
+          if (started) return
+          started = true
+          ;[${JSON.stringify(entry[1])}].concat(${list(preloads)}).forEach(function (href) { add('modulepreload', href) })
+          var styles = ${list(styles)}.map(function (href) {
+            var link = add('stylesheet', href)
+            return new Promise(function (done) { link.onload = link.onerror = done })
+          })
+          Promise.all(styles).then(function () {
+            var script = document.createElement('script')
+            script.type = 'module'
+            script.crossOrigin = ''
+            script.src = ${JSON.stringify(entry[1])}
+            document.body.appendChild(script)
+          })
+        }
+        var art = document.getElementById('boot-art')
+        if (art.complete) start()
+        else {
+          art.addEventListener('load', start)
+          art.addEventListener('error', start)
+          setTimeout(start, ${PAINTING_FIRST_MS})
+        }
+      })()
+    </script>
+  </body>`
+      return html.replace('</body>', loader)
+    },
+  },
+})
 
 // BASE_PATH lets the same build run at a domain root (Vercel) or under /repo/ (GitHub Pages).
 export default defineConfig({
@@ -9,6 +72,7 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    paintingFirst(),
     VitePWA({
       // A new service worker waits until the learner leaves the app; src/lib/updates.ts registers it and swaps it in then.
       registerType: 'prompt',

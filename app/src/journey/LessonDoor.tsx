@@ -5,7 +5,7 @@ import { DOOR_FRAME, DOOR_STATES, WALK_POSES, asset, doorFiles, doorFor, doorOpe
 import { prefetchClips } from '../lib/audio'
 import { isNight, useProgress } from '../lib/progress'
 import { whenLoaded } from './preload'
-import { stopsOf, type Stop } from './stops'
+import { around, doorStops, firstDoor } from './stops'
 import { toast } from './toast'
 import './journey.css'
 
@@ -36,10 +36,10 @@ const LOCKED = 'Finish the doors before this one first'
 export function LessonDoor({ province, traveler, onBack, onCovered, onWalk, onDone }: Props) {
   const progress = useProgress()
   const night = isNight(progress)
-  const stops = useMemo(() => stopsOf(province).filter((s): s is Extract<Stop, { node: PathNode }> => s.kind !== 'story'), [province])
+  const stops = useMemo(() => doorStops(province), [province])
   const doors = useMemo(() => stops.map((s) => doorFor(s.node)), [stops])
   const next = stops.findIndex((s) => !progress.nodes[s.node.id])
-  const at = next === -1 ? stops.length - 1 : next
+  const at = firstDoor(stops, progress)
   // Which door is in view; the page opens on the next one to play.
   const [view, setView] = useState(at)
   const stop = stops[view]
@@ -69,14 +69,17 @@ export function LessonDoor({ province, traveler, onBack, onCovered, onWalk, onDo
     return () => clearTimeout(t)
   }, [])
 
-  // The doors are all fetched before the page shows, so swiping never waits on a picture.
+  // The page shows once the door it opens on and its neighbours are here (the map fetched them ahead, preload.ts
+  // `warmAhead`); the doors further along arrive meanwhile, long before a swipe reaches them.
   useEffect(() => {
     let alive = true
     // Only 'loading' moves on: a later render must never pull a walk back to waiting.
-    void whenLoaded(doors.flatMap((d) => doorFiles(d, traveler, night))).then(() => alive && setPhase((p) => (p === 'loading' ? 'wait' : p)))
+    void whenLoaded(around(doors, at).flatMap((d) => doorFiles(d, traveler, night))).then(() => alive && setPhase((p) => (p === 'loading' ? 'wait' : p)))
+    void whenLoaded(doors.flatMap((d) => doorFiles(d, traveler, night)))
     return () => {
       alive = false
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doors, traveler, night])
 
   // Once the page shows, the door in view gets its opening pictures (the others when they come into view), so a slow
