@@ -21,6 +21,18 @@ export function stopsOf(p: Province): Stop[] {
   return stops
 }
 
+/** The stops that have a door on the province's page (every one but the story). */
+export const doorStops = (p: Province) => stopsOf(p).filter((s): s is Extract<Stop, { node: PathNode }> => s.kind !== 'story')
+
+/** The door page opens on the first door not played yet (the last one once all are played). */
+export function firstDoor(stops: Extract<Stop, { node: PathNode }>[], progress: Progress) {
+  const i = stops.findIndex((s) => !progress.nodes[s.node.id])
+  return i === -1 ? stops.length - 1 : i
+}
+
+/** An item and its neighbours on each side: the doors a page shows before the first swipe. */
+export const around = <T>(list: T[], i: number) => list.slice(Math.max(0, i - 1), i + 2)
+
 /** Index of the next stop to ride to; the story never blocks the line. */
 export function nextStop(stops: Stop[], progress: Progress) {
   const i = stops.findIndex((s) => s.kind !== 'story' && !progress.nodes[s.node.id])

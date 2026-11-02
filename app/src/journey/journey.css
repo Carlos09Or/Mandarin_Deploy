@@ -1521,6 +1521,9 @@
   width: min(100vw, calc(100dvh * 941 / 1672));
   max-width: none;
   height: auto;
+  /* Its size is known before it arrives, so the tiny stand-in behind it (index.html) fills the same place. */
+  aspect-ratio: 941 / 1672;
+  background: center / 100% 100% no-repeat;
   /* The plain sky at the top melts into the fill, so no edge shows on tall phones. */
   mask-image: linear-gradient(to bottom, transparent 0, #000 9%);
 }
@@ -1536,6 +1539,12 @@
   padding: 0 28px;
   color: #0a426d;
   text-shadow: 0 0 16px rgba(255, 255, 255, 0.9);
+  /* The bar waits for the painting (Splash.tsx), then comes in. */
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.j-splash-top.on {
+  opacity: 1;
 }
 .j-splash.night .j-splash-top {
   color: #fff;

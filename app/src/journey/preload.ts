@@ -1,14 +1,19 @@
 import { FRIEND_IDS } from '../data/friends'
 import vocab from '../data/hsk1.json'
-import { DOOR_FILES, asset, flightFiles, nightly, walkerFiles } from '../data/journey'
+import { word } from '../data/course'
+import { DOOR_FILES, asset, doorFiles, doorFor, doorOpening, flightFiles, nightly, walkerFiles } from '../data/journey'
 import { SEA_BOATS } from '../data/sea-boats'
+import { prefetchClips } from '../lib/audio'
 import { canWarm, lowBandwidth, markSlow } from '../lib/network'
 import { getProgress, isNight } from '../lib/progress'
-import { WORD_FRIEND_FILES } from '../lesson/friends'
+import { POSES, QUICK, WORD_FRIEND_FILES, file } from '../lesson/friends'
+import { around, currentProvince, doorStops, firstDoor } from './stops'
 
-// The pictures of the journey, fetched and decoded once so that no screen pops in later, in two steps so a slow
+// The pictures of the journey, fetched and decoded once so that no screen pops in later, in steps so a slow
 // connection is never kept waiting for things nobody can see yet:
 //  - NOW: only what the first view of the map is made of. It loads behind the loading screen.
+//  - NEXT: what the learner's next lesson needs, from the tap on the badge to its first word (`warmAhead`). It loads
+//    while the learner looks at the map, on any connection: it is what they will open next.
 //  - LATER: everything the next screens use (doors, friends, train, passport, stroke data), fetched quietly in the
 //    background once the map is up, and only when the connection can afford it (see `canWarm`).
 // Whatever LATER has not fetched yet loads when its screen asks for it. The service worker keeps every picture it
@@ -166,8 +171,50 @@ export function preloadJourney(onProgress: (share: number) => void): Promise<voi
     // The sharp map is 3344 px wide (about 25 MB once decoded): it is decoded before it fades in, not while it is being painted.
     // On a slow line the light fog stays (the sharp one is 240 KB the first view does not need).
     if (!lowBandwidth()) void Promise.all(SHARP.map((f) => load(asset(f)).then(() => decoded.get(asset(f))))).then(sharpDone)
-    const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 300))
-    idle(() => void warm(), { timeout: 2500 })
   })
   return done
+}
+
+/** No step of the next lesson keeps the ones after it waiting longer than this (what has not arrived keeps loading). */
+const STEP_WAIT = 8000
+
+/** The learner's next lesson: the door its province's page opens on. */
+function nextLesson() {
+  const progress = getProgress()
+  const stops = doorStops(currentProvince(progress))
+  const at = firstDoor(stops, progress)
+  return { progress, node: stops[at].node, doors: stops.map((s) => doorFor(s.node)), at }
+}
+
+/** Fetches what the next lesson needs, in the order the learner meets it: the flight, the door page, the lesson. */
+async function warmNext() {
+  const { progress, node, doors, at } = nextLesson()
+  const night = isNight(progress)
+  const step = (files: string[]) => whenLoaded(files, STEP_WAIT)
+  // the traveller's flight to the badge (journey/Flyer.tsx), then the doors the page opens on and the one that opens
+  await step(flightFiles(progress.traveler))
+  await step(around(doors, at).flatMap((d) => doorFiles(d, progress.traveler, night)))
+  await step(doorOpening(doors[at], night))
+  // the lesson's voice clips, then the friends who bring its new words, the one bringing the first word first (lesson/Intro.tsx)
+  await prefetchClips(node.words)
+  if (node.kind === 'lesson') {
+    const first = QUICK[node.words[0] % QUICK.length]
+    await step([...POSES[first].map((p) => file(first, p)), ...WORD_FRIEND_FILES])
+    // and the stroke data of its characters, for the tracing at the end (lesson/Trace.tsx)
+    const chars = [...new Set(node.words.flatMap((n) => [...word(n).hanzi]))]
+    await Promise.all(chars.map((c) => fetch(`${import.meta.env.BASE_URL}hanzi/${c}.json`).catch(() => undefined)))
+  }
+}
+
+let ahead: Promise<void> | null = null
+/**
+ * Called once the map is open: fetches what the learner's next lesson needs, then (when the connection allows) the rest
+ * of the journey in the background. Resolves once the next lesson is ready, so whatever should wait for it can start.
+ */
+export function warmAhead(): Promise<void> {
+  if (ahead) return ahead
+  ahead = now.then(warmNext).catch(() => undefined)
+  const idle = window.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 300))
+  void ahead.then(() => idle(() => void warm(), { timeout: 2500 }))
+  return ahead
 }

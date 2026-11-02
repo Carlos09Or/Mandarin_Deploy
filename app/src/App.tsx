@@ -6,7 +6,7 @@ import type { Province } from './data/journey'
 import { MapHome, type MapEvent } from './journey/MapHome'
 import { Splash } from './journey/Splash'
 import { nextProvince } from './journey/stops'
-import { whenLoaded } from './journey/preload'
+import { warmAhead, whenLoaded } from './journey/preload'
 import { canWarm } from './lib/network'
 import { holdUpdates, registerUpdates } from './lib/updates'
 import { toast } from './journey/toast'
@@ -79,12 +79,16 @@ export default function App() {
   useEffect(() => setCovered(false), [province])
   const mapShown = mapVisible || (tab === 'map' && !covered)
 
-  // Once the app is open, fetch the other screens while the browser is idle, so they open at once.
-  // The service worker only starts once the app is open: its install downloads the app a second time for offline use,
-  // which on a slow line would fight the loading screen for the connection.
+  // Once the map is open, what the learner will most likely open next (their next lesson: its code, door, voice clips and
+  // friends) is fetched while they look at it, on any connection. The service worker only starts after that: its install
+  // downloads the app a second time for offline use, which on a slow line would fight the next lesson for the connection.
   useEffect(() => {
-    if (loaded) registerUpdates()
+    if (!loaded) return
+    void screens.LessonPlayer()
+    void warmAhead().then(registerUpdates)
   }, [loaded])
+
+  // Then the other screens are fetched while the browser is idle, so they open at once.
 
   useEffect(() => {
     if (!loaded) return
