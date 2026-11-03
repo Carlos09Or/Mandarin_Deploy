@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { SaveNudge } from './components/SaveNudge'
 import { Shell, type Tab } from './components/Shell'
-import { useWelcomeOpen } from './components/useWelcomeOpen'
+import { useWelcomeState } from './components/useWelcomeState'
 import { Welcome } from './components/Welcome'
 import type { PathNode } from './data/course'
 import { FRIEND_IDS, type FriendId } from './data/friends'
@@ -94,7 +94,9 @@ export default function App() {
       keepStorage()
     }
   }, [loaded])
-  const welcoming = useWelcomeOpen(loaded)
+  const welcome = useWelcomeState()
+  // The map stays still, and its "unlocked" toast waits, until the learner is through the welcome screens.
+  const welcoming = welcome !== 'closed'
 
   // Then the other screens are fetched while the browser is idle, so they open at once.
 
@@ -159,7 +161,7 @@ export default function App() {
         {/* The map stays mounted behind every other screen, so it never loads twice. */}
         <div className={mapShown ? 'contents' : 'hidden'}>
           <MapHome
-            active={loaded && mapVisible}
+            active={loaded && mapVisible && !welcoming}
             onOpen={setProvince}
             event={mapEvent}
             onEventDone={() => setMapEvent(null)}
@@ -227,7 +229,8 @@ export default function App() {
         </Later>
       )}
       <SaveNudge quiet={tab === 'map' && !province && !busy && !welcoming} />
-      {welcoming && <Welcome />}
+      {welcome === 'open' && <Welcome />}
+      {welcome === 'waiting' && <div className="fixed inset-0 z-[60] bg-paper" />}
       {!loaded && <Splash onDone={() => setLoaded(true)} />}
     </>
   )
