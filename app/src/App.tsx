@@ -12,24 +12,20 @@ import { holdUpdates, registerUpdates } from './lib/updates'
 import { toast } from './journey/toast'
 import { QUICK_FRIEND_FILES } from './lesson/friends'
 import type { LessonSummary } from './lesson/LessonPlayer'
-import { buildNode, buildReview, buildWriting, type Exercise } from './lib/lesson'
+import { buildNode, buildWriting, type Exercise } from './lib/lesson'
 import { completeNode, getProgress, useProgress, type Reward } from './lib/progress'
 
 // Everything but the map is loaded as its own file, so the app opens on the map without downloading the
-// lessons, the writing trainer or the passport first. They are fetched in the background once it is open.
+// lessons, the writing trainer or the review cards first. They are fetched in the background once it is open.
 const screens = {
   LessonDoor: () => import('./journey/LessonDoor').then((m) => ({ default: m.LessonDoor })),
-  AllAboard: () => import('./journey/AllAboard').then((m) => ({ default: m.AllAboard })),
-  Passport: () => import('./journey/Passport').then((m) => ({ default: m.Passport })),
   LessonComplete: () => import('./lesson/LessonComplete').then((m) => ({ default: m.LessonComplete })),
   LessonPlayer: () => import('./lesson/LessonPlayer').then((m) => ({ default: m.LessonPlayer })),
   Profile: () => import('./screens/Profile').then((m) => ({ default: m.Profile })),
   Review: () => import('./screens/Review').then((m) => ({ default: m.Review })),
   Write: () => import('./screens/Write').then((m) => ({ default: m.Write })),
 }
-const AllAboard = lazy(screens.AllAboard)
 const LessonDoor = lazy(screens.LessonDoor)
-const Passport = lazy(screens.Passport)
 // The door page is what you open first from the map, so its code is fetched right away, not when idle.
 void screens.LessonDoor()
 const LessonComplete = lazy(screens.LessonComplete)
@@ -52,7 +48,7 @@ type Session = {
   station?: string
   province?: Province
 }
-type Result = { summary: LessonSummary; reward: Reward; newWords: number[]; buddy: FriendId; nodeId: string | null; stamp: Province | null }
+type Result = { summary: LessonSummary; reward: Reward; newWords: number[]; buddy: FriendId; nodeId: string | null; finished: Province | null }
 type Ride = { node: PathNode; place: string; province: Province }
 
 /** The characters take turns: each finished lesson hands over to the next one. */
@@ -64,12 +60,10 @@ const nextBuddy = (): FriendId => {
 export default function App() {
   const progress = useProgress()
   const [tab, setTab] = useState<Tab>('map')
-  // The journey: a province's door page, the lesson, the stamp, the trip onward.
+  // The journey: a province's door page, the lesson, its result, back to the doors.
   const [province, setProvince] = useState<Province | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [result, setResult] = useState<Result | null>(null)
-  const [stamp, setStamp] = useState<Province | null>(null)
-  const [aboard, setAboard] = useState<{ from: Province; to: Province } | null>(null)
   const [mapEvent, setMapEvent] = useState<MapEvent | null>(null)
   // The loading screen preloads every picture once; the app is mounted behind it meanwhile.
   const [loaded, setLoaded] = useState(false)
@@ -98,7 +92,7 @@ export default function App() {
   }, [loaded])
 
   // A new version of the app reloads the page, so it waits until the learner isn't mid-lesson.
-  const busy = !!(session || result || stamp || aboard)
+  const busy = !!(session || result)
   useEffect(() => (busy ? holdUpdates() : undefined), [busy])
 
   const start = (exercises: Exercise[], nodeId: string | null = null, newWords: number[] = [], journey?: Ride) =>
@@ -116,9 +110,9 @@ export default function App() {
       if (!session) return
       const firstPass = session.nodeId ? !getProgress().nodes[session.nodeId] : false
       const reward = completeNode(session.nodeId, summary)
-      // Passing a province's checkpoint for the first time earns its stamp.
-      const earned = firstPass && session.nodeId?.endsWith('-cp') ? (session.province ?? null) : null
-      setResult({ summary, reward, newWords: session.newWords, buddy: session.buddy, nodeId: session.nodeId, stamp: earned })
+      // Passing a province's checkpoint for the first time finishes the province.
+      const finished = firstPass && session.nodeId?.endsWith('-cp') ? (session.province ?? null) : null
+      setResult({ summary, reward, newWords: session.newWords, buddy: session.buddy, nodeId: session.nodeId, finished })
       setSession(null)
     },
     [session],
@@ -127,27 +121,16 @@ export default function App() {
   const afterResult = () => {
     if (!result) return
     setResult(null)
-    // Without a stamp to collect, the province's page opens on the next door.
-    if (result.stamp) setStamp(result.stamp)
-  }
-
-  const afterStamp = () => {
-    const from = stamp!
-    setStamp(null)
-    const to = nextProvince(from)
-    if (to) setAboard({ from, to })
-    else {
-      setProvince(null)
-      toast('More provinces are coming soon')
-    }
-  }
-
-  const arrive = () => {
-    const trip = aboard!
-    setAboard(null)
+    // A lesson leaves the province's page on its next door. Finishing the province goes back to the map instead: the next
+    // province opens there and the traveller hops over to it.
+    const done = result.finished
+    if (!done) return
+    const to = nextProvince(done)
     setProvince(null)
-    setTab('map')
-    setMapEvent({ hopFrom: trip.from.id, hopTo: trip.to.id })
+    if (to) {
+      setTab('map')
+      setMapEvent({ hopFrom: done.id, hopTo: to.id })
+    } else toast('More provinces are coming soon')
   }
 
   const onTab = (t: Tab) => {
@@ -170,17 +153,12 @@ export default function App() {
         </div>
         {tab === 'review' && (
           <Later>
-            <Review onReview={(pool) => start(buildReview(pool, getProgress()))} onWrite={(c, n) => start(buildWriting(c, n))} />
+            <Review onWrite={(c, n) => start(buildWriting(c, n))} />
           </Later>
         )}
         {tab === 'write' && (
           <Later>
             <Write onWrite={(c, n) => start(buildWriting(c, n))} />
-          </Later>
-        )}
-        {tab === 'passport' && (
-          <Later>
-            <Passport />
           </Later>
         )}
         {tab === 'profile' && (
@@ -231,22 +209,6 @@ export default function App() {
             newWords={result.newWords}
             onContinue={afterResult}
           />
-        </Later>
-      )}
-      {stamp && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <Later>
-            <Passport
-              fresh={stamp}
-              onNext={afterStamp}
-              nextLabel={nextProvince(stamp) ? `Next stop: ${nextProvince(stamp)!.name} 🚂` : 'Back to the map'}
-            />
-          </Later>
-        </div>
-      )}
-      {aboard && (
-        <Later>
-          <AllAboard from={aboard.from} to={aboard.to} traveler={progress.traveler} onDone={arrive} />
         </Later>
       )}
       {!loaded && <Splash onDone={() => setLoaded(true)} />}

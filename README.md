@@ -1,8 +1,8 @@
 # Mandarin Journey · HSK 1
 
 Free HSK 1 Mandarin course for Spanish speakers, built as an installable web app (PWA). The learner travels
-through Panama: each unit is a province on an illustrated map, each lesson a door, and a train carries them
-from one stop to the next. A day and night version of the map, doors and lessons follows the learner's light.
+through Panama: each unit is a province on an illustrated map, each lesson a door, and every learned word
+becomes a spaced-repetition review card. A day and night version of the map, doors and lessons follows the learner's light.
 
 The app lives in [`app/`](app/README.md) (React 19 + TypeScript + Vite). Its README covers the learning model,
 the stack, local development, voice audio and deployment.

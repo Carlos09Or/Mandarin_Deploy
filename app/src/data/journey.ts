@@ -3,11 +3,10 @@ import type { PathNode } from './course'
 import type { FriendId } from './friends'
 
 // The course as a train journey across Panama: each province is one unit. A province's
-// lessons are stops at real places, and its checkpoint is a landmark that earns a stamp.
+// lessons are stops at real places, and its checkpoint is a landmark.
 
 export const asset = (file: string) => `${import.meta.env.BASE_URL}journey/${file}`
 
-export type StampStyle = { shape: 'round' | 'box'; color: string }
 export type Province = {
   id: string
   name: string
@@ -22,8 +21,6 @@ export type Province = {
   header?: { day: string; night?: string }
   /** A tall painting for the whole route: scenery down both sides, the middle left clear for the path. */
   backdrop?: { day: string; night: string }
-  stamp?: StampStyle
-  postcard?: { image: string; zh: string; py: string; en: string }
 }
 
 export const PROVINCES: Province[] = [
@@ -37,8 +34,6 @@ export const PROVINCES: Province[] = [
     story: { title: 'Story · The railroad', sub: 'Panama & China · 3 min' },
     landmark: { name: 'Panama Canal', zh: '运河', py: 'Bānámǎ Yùnhé', image: 'landmark-canal.webp' },
     backdrop: { day: 'route-bg-day.webp', night: 'route-bg-night.webp' },
-    stamp: { shape: 'round', color: '#0a426d' },
-    postcard: { image: 'postcard-panama.webp', zh: '你好！我在巴拿马。', py: 'Nǐ hǎo! Wǒ zài Bānámǎ.', en: "Hello! I'm in Panama." },
   },
   {
     id: 'panama-oeste',
@@ -49,8 +44,6 @@ export const PROVINCES: Province[] = [
     stops: ['Arraijan', 'Vacamonte', 'La Chorrera', 'El Chorro Falls', 'Capira', 'Coronado Beach'],
     landmark: { name: 'Bridge of the Americas', zh: '大桥', py: 'Měizhōu Dàqiáo', image: 'stops/arch-bridge.webp' },
     header: { day: 'ride-landscape.webp' },
-    stamp: { shape: 'box', color: '#206241' },
-    postcard: { image: 'ride-landscape.webp', zh: '你好！我在西巴拿马。', py: 'Nǐ hǎo! Wǒ zài Xī Bānámǎ.', en: "Hello! I'm in Panama Oeste." },
   },
   { id: 'cocle', name: 'Cocle', zh: '科克莱', py: 'Kēkèlái', unit: 3 },
   { id: 'herrera', name: 'Herrera', zh: '埃雷拉', py: 'Āiléilā', unit: 4 },

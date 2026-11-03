@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { PATH } from '../data/course'
 import type { FriendId, OutfitSetting } from '../data/friends'
+import type { CardState, ReviewEntry } from './srs'
 
 // Local-first progress. Everything is saved on the device first; `outbox` holds the
 // events that a future sync (Supabase) will upload, so nothing is lost while offline.
@@ -52,11 +53,22 @@ export type Progress = {
   words: Record<number, WordStat>
   chars: Record<string, { traced: number; clean: number }>
   outbox: LessonEvent[]
+  /** Spaced-repetition state of every word that has been through the review cards (a word without one is still new). */
+  cards: Record<number, CardState>
+  /** Every answer on a card or in a lesson, newest last: the statistics are worked out from it. */
+  reviews: ReviewEntry[]
+  /** Cards in one study session (there is no daily limit: sessions can follow each other), and the share of cards the learner wants to still remember when they come back. */
+  sessionSize: number
+  retention: number
+  /** The day the gems for finishing the review were given, so they are given once a day. */
+  reviewDay: string | null
 }
 
 const KEY = 'mlh.progress.v1'
 export const DAILY_GOAL = 30
-export const GEMS = { lesson: 5, perfect: 5, dailyGoal: 10 }
+export const GEMS = { lesson: 5, perfect: 5, dailyGoal: 10, review: 5 }
+const MAX_REVIEWS = 3000
+const DEFAULT_RETENTION = 0.9
 
 const today = (d = new Date()) => d.toLocaleDateString('en-CA') // YYYY-MM-DD in local time
 
@@ -77,6 +89,11 @@ function fresh(): Progress {
     words: {},
     chars: {},
     outbox: [],
+    cards: {},
+    reviews: [],
+    sessionSize: 15,
+    retention: DEFAULT_RETENTION,
+    reviewDay: null,
   }
 }
 
@@ -134,6 +151,27 @@ export function recordAnswer(n: number, correct: boolean) {
       },
     },
   })
+}
+
+/** Keeps a card's new schedule and adds the answer (1 again … 4 easy) to the log. The schedule itself is worked out in cards.ts. */
+export function saveReview(n: number, next: CardState, grade: number, src: ReviewEntry['src']) {
+  commit({
+    ...state,
+    cards: { ...state.cards, [n]: next },
+    reviews: [...state.reviews.slice(1 - MAX_REVIEWS), { n, at: Date.now(), r: grade, s: state.cards[n]?.state ?? 0, src }],
+  })
+}
+
+/** Gives the day's gems for finishing the review; only the first time each day. Returns the gems given. */
+export function finishReviewDay() {
+  const t = today()
+  if (state.reviewDay === t) return 0
+  commit({ ...state, gems: state.gems + GEMS.review, reviewDay: t })
+  return GEMS.review
+}
+
+export function setStudyOptions(o: { sessionSize?: number; retention?: number }) {
+  commit({ ...state, ...o })
 }
 
 export function recordTrace(char: string, mistakes: number) {
