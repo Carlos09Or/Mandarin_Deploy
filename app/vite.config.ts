@@ -69,6 +69,8 @@ const paintingFirst = (): Plugin => ({
 // BASE_PATH lets the same build run at a domain root (Vercel) or under /repo/ (GitHub Pages).
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
+  // `npm run dev` talks to the Worker that `npm run dev:api` runs.
+  server: { proxy: { '/api': 'http://localhost:8787', '/admin': 'http://localhost:8787' } },
   plugins: [
     react(),
     tailwindcss(),
@@ -111,6 +113,8 @@ export default defineConfig({
         // which always points at the scripts and styles installed with it. A deploy is picked up in the background
         // (src/lib/updates.ts) and takes over the next time the learner leaves the app.
         navigateFallback: 'index.html',
+        // The server's pages (the API and the admin page) are never answered with the app.
+        navigateFallbackDenylist: [/^\/api\//, /^\/admin/],
         runtimeCaching: [
           {
             // Voice clips are kept as they are fetched (the lesson's clips are fetched ahead of it, src/lib/audio.ts), so

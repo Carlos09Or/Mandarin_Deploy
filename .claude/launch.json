@@ -12,6 +12,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "app", "run", "preview", "--", "--port", "4173", "--strictPort", "--host", "127.0.0.1"],
       "port": 4173
+    },
+    {
+      "name": "app-api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "app", "run", "dev:api"],
+      "port": 8787
     }
   ]
 }

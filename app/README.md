@@ -22,8 +22,8 @@ React 19 + TypeScript + Vite, Tailwind CSS 4, Motion for animation, Hanzi Writer
 ts-fsrs for card scheduling, vite-plugin-pwa for install/offline. Stroke data for the 248 HSK 1 characters is bundled in
 `public/hanzi/`, so writing works offline.
 
-Progress is local-first (`src/lib/progress.ts`): it is saved on the device and finished lessons
-are queued in `outbox`, ready to be uploaded once accounts and sync are added.
+Progress is local-first (`src/lib/progress.ts`): it is saved on the device and works offline. Signed-in
+learners also have it synced to their account (see **Accounts** below).
 Each card's schedule (`cards`) and every answer (`reviews`, the last 3000) are kept there too; the review
 statistics are worked out from them in `src/lib/cards.ts`.
 
@@ -62,3 +62,35 @@ clip at 0.7× speed with the pitch preserved.
 push to `main`. In the repository settings, set **Pages → Source** to **GitHub Actions**.
 For another host (Vercel, Cloudflare Pages), use `app` as the root directory and `npm run build`;
 leave `BASE_PATH` unset when the app is served from a domain root.
+
+## Accounts
+
+Sign in with Google; progress syncs between devices. Without an account (or on hosting with no server, like
+GitHub Pages) the app works exactly as before.
+
+- `worker/index.ts` — the Cloudflare Worker: Google sign-in (code flow + PKCE), cookie sessions, one progress document
+  per learner in **D1**, and `/admin` (`worker/admin.ts`). Static files are served straight from the assets; the Worker
+  only runs for `/api/*` and `/admin` (`wrangler.jsonc`).
+- `migrations/` — the D1 schema.
+- `src/lib/account.ts` — sign-in state and background sync. `src/lib/merge.ts` — how two copies of one learner's progress
+  (two devices) are combined: the work of both is kept; a reset wins over older data (`epoch`).
+- `src/components/Account.tsx` — the Profile section.
+
+### Develop
+
+```bash
+cp .dev.vars.example .dev.vars   # DEV_LOGIN=1 lets you sign in as any email, no Google needed
+npm run db:local                 # creates the local D1 tables
+npm run build && npm run dev:api # the app and API on http://localhost:8787
+```
+
+### Set up on Cloudflare (once)
+
+1. `npx wrangler login`, then `npx wrangler d1 create mandarin-journey` and paste the `database_id` it prints into
+   `wrangler.jsonc`.
+2. `npx wrangler d1 migrations apply DB --remote`
+3. Google Cloud Console → APIs & Services → Credentials → OAuth client ID (Web application). Authorized redirect URI:
+   `https://<your-worker-url>/` (with the trailing slash; add `http://localhost:8787/` to try it locally). Copy the client ID and secret.
+4. `npx wrangler secret put GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `ADMIN_EMAILS` (comma-separated emails that may open `/admin`).
+5. In the Cloudflare dashboard (Workers → the project → Settings → Build) set the deploy command to `npx wrangler deploy`
+   (the old `--assets ./dist …` flags are not needed any more: `wrangler.jsonc` has them).

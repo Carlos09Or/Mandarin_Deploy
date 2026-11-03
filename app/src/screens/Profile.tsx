@@ -13,6 +13,7 @@ import {
 } from '../lib/progress'
 import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
 import { CharacterStudio } from '../components/CharacterStudio'
+import { Account } from '../components/Account'
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const SCENERY: { id: Scenery; label: string; hint: string }[] = [
@@ -148,11 +149,9 @@ export function Profile() {
       </section>
 
       <section className="card flex flex-col gap-3 p-5">
-        <h3 className="font-black">Your data</h3>
-        <p className="text-sm text-muted">
-          Your progress is saved on this device. Soon you’ll be able to create an account to sync it and join your
-          teacher’s class.
-        </p>
+        <h3 className="font-black">Your account</h3>
+        <Account />
+        <h3 className="mt-2 font-black">Your data</h3>
         <div className="flex flex-col gap-3 sm:flex-row">
           <button type="button" onClick={download} className="btn btn-ghost flex-1">
             Download my data

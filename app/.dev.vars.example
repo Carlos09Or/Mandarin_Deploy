@@ -1,0 +1,6 @@
+# Copy to .dev.vars (gitignored) for `npm run dev:api`.
+DEV_LOGIN=1
+ADMIN_EMAILS=you@example.com
+# For real Google sign-in locally (redirect URI http://localhost:8787/):
+# GOOGLE_CLIENT_ID=
+# GOOGLE_CLIENT_SECRET=
