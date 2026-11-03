@@ -2,6 +2,7 @@
 // Static files never reach this Worker (wrangler.jsonc `run_worker_first`): only /api/* and /admin do.
 
 import { adminPage } from './admin.ts'
+import { withSecurityHeaders } from './security.ts'
 
 export interface Env {
   DB: D1Database
@@ -331,51 +332,55 @@ async function adminMetrics(env: Env) {
 
 // ---- Routing ----
 
+async function route(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url)
+  const { pathname } = url
+  try {
+    if (!pathname.startsWith('/api/') && !pathname.startsWith('/admin')) return env.ASSETS.fetch(request)
+
+    if (request.method !== 'GET' && request.method !== 'HEAD' && !sameOrigin(request)) return json({ error: 'forbidden' }, 403)
+
+    if (pathname === '/api/me' && request.method === 'GET') {
+      const user = await currentUser(request, env)
+      return json({
+        user: user && publicUser(env, user),
+        google: !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
+        dev: env.DEV_LOGIN === '1',
+      })
+    }
+    if (pathname === '/api/auth/google/start' && request.method === 'POST') return googleStart(request, env)
+    if (pathname === '/api/auth/google/finish' && request.method === 'POST') return googleFinish(request, env)
+    if (pathname === '/api/auth/dev' && request.method === 'POST') return devLogin(request, env)
+    if (pathname === '/api/auth/logout' && request.method === 'POST') return logout(request, env)
+
+    const user = await currentUser(request, env)
+    if (pathname === '/admin' || pathname === '/admin/') {
+      if (!user || !isAdmin(env, user)) return Response.redirect(`${url.origin}/`, 302)
+      return adminPage(user.email)
+    }
+    if (!user) return json({ error: 'unauthorized' }, 401)
+
+    if (pathname === '/api/me' && request.method === 'DELETE') return deleteAccount(request, env, user)
+    if (pathname === '/api/progress' && request.method === 'GET') return getProgress(env, user)
+    if (pathname === '/api/progress' && request.method === 'PUT') return putProgress(request, env, user)
+    if (pathname === '/api/admin/users' && request.method === 'GET') {
+      return isAdmin(env, user) ? adminUsers(env) : json({ error: 'forbidden' }, 403)
+    }
+    if (pathname === '/api/admin/metrics' && request.method === 'GET') {
+      return isAdmin(env, user) ? adminMetrics(env) : json({ error: 'forbidden' }, 403)
+    }
+    if (pathname === '/api/admin/ratings' && request.method === 'GET') {
+      return isAdmin(env, user) ? adminRatings(env) : json({ error: 'forbidden' }, 403)
+    }
+    return json({ error: 'not_found' }, 404)
+  } catch (err) {
+    console.error(err)
+    return json({ error: 'server_error' }, 500)
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url)
-    const { pathname } = url
-    try {
-      if (!pathname.startsWith('/api/') && !pathname.startsWith('/admin')) return env.ASSETS.fetch(request)
-
-      if (request.method !== 'GET' && request.method !== 'HEAD' && !sameOrigin(request)) return json({ error: 'forbidden' }, 403)
-
-      if (pathname === '/api/me' && request.method === 'GET') {
-        const user = await currentUser(request, env)
-        return json({
-          user: user && publicUser(env, user),
-          google: !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
-          dev: env.DEV_LOGIN === '1',
-        })
-      }
-      if (pathname === '/api/auth/google/start' && request.method === 'POST') return googleStart(request, env)
-      if (pathname === '/api/auth/google/finish' && request.method === 'POST') return googleFinish(request, env)
-      if (pathname === '/api/auth/dev' && request.method === 'POST') return devLogin(request, env)
-      if (pathname === '/api/auth/logout' && request.method === 'POST') return logout(request, env)
-
-      const user = await currentUser(request, env)
-      if (pathname === '/admin' || pathname === '/admin/') {
-        if (!user || !isAdmin(env, user)) return Response.redirect(`${url.origin}/`, 302)
-        return adminPage(user.email)
-      }
-      if (!user) return json({ error: 'unauthorized' }, 401)
-
-      if (pathname === '/api/me' && request.method === 'DELETE') return deleteAccount(request, env, user)
-      if (pathname === '/api/progress' && request.method === 'GET') return getProgress(env, user)
-      if (pathname === '/api/progress' && request.method === 'PUT') return putProgress(request, env, user)
-      if (pathname === '/api/admin/users' && request.method === 'GET') {
-        return isAdmin(env, user) ? adminUsers(env) : json({ error: 'forbidden' }, 403)
-      }
-      if (pathname === '/api/admin/metrics' && request.method === 'GET') {
-        return isAdmin(env, user) ? adminMetrics(env) : json({ error: 'forbidden' }, 403)
-      }
-      if (pathname === '/api/admin/ratings' && request.method === 'GET') {
-        return isAdmin(env, user) ? adminRatings(env) : json({ error: 'forbidden' }, 403)
-      }
-      return json({ error: 'not_found' }, 404)
-    } catch (err) {
-      console.error(err)
-      return json({ error: 'server_error' }, 500)
-    }
+    return withSecurityHeaders(await route(request, env))
   },
 } satisfies ExportedHandler<Env>

@@ -1,7 +1,11 @@
+import { createHash } from 'node:crypto'
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { appCsp, baseHeaders } from './worker/security.ts'
 
 /** Longest the app's scripts and styles wait for the splash painting (index.html) before they are asked for anyway. */
 const PAINTING_FIRST_MS = 1500
@@ -66,6 +70,35 @@ const paintingFirst = (): Plugin => ({
   },
 })
 
+/**
+ * Writes dist/_headers, which Cloudflare applies to the static files (they never reach the Worker): the shared security
+ * headers plus a Content-Security-Policy that allows the page's inline scripts by their hash. It reads the built page,
+ * so the hashes follow whatever index.html and painting-first produce.
+ */
+const securityHeaders = (): Plugin => {
+  let hashes: string[] = []
+  let outDir = 'dist'
+  return {
+    name: 'security-headers',
+    apply: 'build',
+    configResolved: (config) => void (outDir = config.build.outDir),
+    transformIndexHtml: {
+      order: 'post',
+      handler(html) {
+        hashes = [...html.matchAll(/<script(?![^>]*\ssrc=)[^>]*>([\s\S]*?)<\/script>/g)].map((m) =>
+          createHash('sha256').update(m[1]).digest('base64'),
+        )
+      },
+    },
+    writeBundle() {
+      if (!hashes.length) throw new Error('security-headers: found no inline scripts to allow')
+      const lines = Object.entries({ ...baseHeaders, 'content-security-policy': appCsp(hashes) }).map(([k, v]) => `  ${k}: ${v}`)
+      mkdirSync(outDir, { recursive: true })
+      writeFileSync(join(outDir, '_headers'), `/*\n${lines.join('\n')}\n`)
+    },
+  }
+}
+
 // BASE_PATH lets the same build run at a domain root (Vercel) or under /repo/ (GitHub Pages).
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
@@ -75,6 +108,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     paintingFirst(),
+    securityHeaders(),
     VitePWA({
       // A new service worker waits until the learner leaves the app; src/lib/updates.ts registers it and swaps it in then.
       registerType: 'prompt',
