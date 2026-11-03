@@ -210,8 +210,6 @@ export function buildNode(node: PathNode, p: Progress): Exercise[] {
   return node.kind === 'lesson' ? lessonExercises(node, p) : reviewExercises(node.words, p, 12, 2)
 }
 
-export const buildReview = (pool: number[], p: Progress) => reviewExercises(pool, p, 10, 1)
-
 /** Writing drill for one character: trace it, then write it with less and less help. */
 export const buildWriting = (char: string, n: number): Exercise[] => [
   { kind: 'trace', char, word: n, guide: 'full' },

@@ -3,13 +3,12 @@ import { DAILY_GOAL, liveStreak, todayXp, useProgress } from '../lib/progress'
 import { asset } from '../data/journey'
 import { IconFlame, IconGem, IconStar } from './icons'
 
-export type Tab = 'map' | 'review' | 'write' | 'passport' | 'profile'
+export type Tab = 'map' | 'review' | 'write' | 'profile'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'map', label: 'Map' },
   { id: 'review', label: 'Review' },
   { id: 'write', label: 'Write' },
-  { id: 'passport', label: 'Passport' },
   { id: 'profile', label: 'Profile' },
 ]
 const TabIcon = ({ id, on }: { id: Tab; on: boolean }) => (

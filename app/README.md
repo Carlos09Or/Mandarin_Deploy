@@ -8,18 +8,24 @@ Free HSK 1 Mandarin course for Spanish speakers, built as an installable web app
   A lesson mixes: new word → meaning → match pairs → listening / pinyin / Spanish → Hanzi,
   two older words for spaced review, and one character to trace with stroke-order checking.
   Wrong answers come back at the end of the lesson. No lives, no paywall.
-- **Repasar** — smart review of the weakest learned words, plus the full 300-word dictionary.
+- **Repasar** — Anki-style review cards: every word from a finished lesson becomes a card, and a card comes back
+  when you are about to forget it (FSRS scheduling, `src/lib/srs.ts`). Study, Stats (retention, card counts,
+  calendar, forecast, hardest cards) and the full 300-word dictionary.
+  There is no daily limit: a study session holds 15 cards (adjustable) and the next one starts right away, and
+  Practice drills the trickiest words in rounds without touching the schedule.
 - **Escribir** — trace each unlocked character, then write it twice from memory.
 - **Perfil** — streak, XP, accuracy, weekly chart, and a JSON export of the learner's data.
 
 ## Stack
 
 React 19 + TypeScript + Vite, Tailwind CSS 4, Motion for animation, Hanzi Writer for strokes,
-vite-plugin-pwa for install/offline. Stroke data for the 248 HSK 1 characters is bundled in
+ts-fsrs for card scheduling, vite-plugin-pwa for install/offline. Stroke data for the 248 HSK 1 characters is bundled in
 `public/hanzi/`, so writing works offline.
 
 Progress is local-first (`src/lib/progress.ts`): it is saved on the device and finished lessons
 are queued in `outbox`, ready to be uploaded once accounts and sync are added.
+Each card's schedule (`cards`) and every answer (`reviews`, the last 3000) are kept there too; the review
+statistics are worked out from them in `src/lib/cards.ts`.
 
 ## Develop
 

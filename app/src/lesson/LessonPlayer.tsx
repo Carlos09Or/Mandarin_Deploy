@@ -3,7 +3,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { plainPinyin, word } from '../data/course'
 import { chime, pinRandomVoice, unpinVoice } from '../lib/audio'
 import { retry, type Exercise } from '../lib/lesson'
-import { isNight, recordAnswer, recordTrace, useProgress } from '../lib/progress'
+import { answerWord } from '../lib/cards'
+import { isNight, recordTrace, useProgress } from '../lib/progress'
 import { AudioButton } from '../components/AudioButton'
 import { IconClose } from '../components/icons'
 import { Buddy } from '../components/Friends'
@@ -151,7 +152,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
       if (!typed.trim()) return
       const w = word(ex.word)
       const correct = readings(w.pinyin).includes(plain(typed))
-      recordAnswer(ex.word, correct)
+      answerWord(ex.word, correct)
       const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
       grade(
         correct,
@@ -162,7 +163,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
     }
     if (ex.kind !== 'choice' || selected === null) return
     const correct = selected === ex.word
-    recordAnswer(ex.word, correct)
+    answerWord(ex.word, correct)
     const w = word(ex.word)
     const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
     grade(
@@ -177,7 +178,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
   const giveUp = () => {
     if (ex.kind !== 'pinyin' || feedback) return
     const w = word(ex.word)
-    recordAnswer(ex.word, false)
+    answerWord(ex.word, false)
     grade(false, { correct: false, title: 'Correct answer:', detail: `${w.hanzi} · ${w.pinyin} · ${w.en}` }, true)
   }
 

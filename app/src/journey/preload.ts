@@ -14,7 +14,7 @@ import { around, currentProvince, doorStops, firstDoor } from './stops'
 //  - NOW: only what the first view of the map is made of. It loads behind the loading screen.
 //  - NEXT: what the learner's next lesson needs, from the tap on the badge to its first word (`warmAhead`). It loads
 //    while the learner looks at the map, on any connection: it is what they will open next.
-//  - LATER: everything the next screens use (doors, friends, train, passport, stroke data), fetched quietly in the
+//  - LATER: everything the next screens use (doors, friends, stroke data), fetched quietly in the
 //    background once the map is up, and only when the connection can afford it (see `canWarm`).
 // Whatever LATER has not fetched yet loads when its screen asks for it. The service worker keeps every picture it
 // has fetched on the device (vite.config.ts); its install only fetches the app itself and the NOW pictures.
@@ -23,7 +23,7 @@ const NOW = [
   // the map and its fog, in a light version first (the sharp one follows, see `whenSharp`)
   'map/lo.webp', 'map-fog-v2-lo.webp',
   'characters/wawa-sombrero.svg', 'characters/harpia-banda.svg', 'characters/sloth-montuno.svg', 'characters/tucan-pollera.svg',
-  'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-passport.webp', 'nav-profile.webp',
+  'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-profile.webp',
 ]
 /** The door pictures for the light the learner is in now (their night twins after dark). */
 const byLight = (file: string) => nightly(file, isNight(getProgress()))
@@ -47,11 +47,8 @@ const LATER = [
   ...FRIEND_IDS.flatMap(flightFiles),
   // other routes
   'ride-landscape.webp',
-  // the train that takes you on to the next province (AllAboard)
-  'train.webp', 'train-wheel.webp', 'train-smoke.webp', 'train-travel-empty.webp',
-  // passport
+  // the landmarks that close each province
   'landmark-canal.webp', 'stops/arch-bridge.webp',
-  'passport-cover.webp', 'passport-page.webp', 'postcard-panama.webp',
 ]
 
 /** Decoded images are kept here for the whole session, so the browser never drops them. */
