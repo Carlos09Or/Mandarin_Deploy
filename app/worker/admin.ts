@@ -109,7 +109,7 @@ export function adminPage(email: string): Response {
     tile('learning', m.recall.reviews ? pct(m.recall.remembered, m.recall.reviews) : '—', 'Remembered on review', m.recall.reviews ? of(m.recall.remembered, m.recall.reviews) + ' reviews of due cards' : 'no reviews yet')
     tile('learning', m.averageWords ?? '—', 'Words in review per learner')
     tile('learning', m.averageActiveDays ?? '—', 'Days practised per learner')
-    tile('learning', m.averageLessonSeconds ? Math.floor(m.averageLessonSeconds / 60) + ':' + String(m.averageLessonSeconds % 60).padStart(2, '0') : '—', 'Average lesson time', 'last 200 lessons per learner')
+    tile('learning', m.averageLessonSeconds ? Math.floor(m.averageLessonSeconds / 60) + ':' + String(m.averageLessonSeconds % 60).padStart(2, '0') : '—', 'Average lesson time')
   })
   fetch('/api/admin/ratings').then((r) => r.json()).then((r) => {
     const sum = document.getElementById('rating-sum')
