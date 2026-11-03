@@ -57,6 +57,9 @@ const returned = (() => {
   return { state, code: q.get('code'), error: q.get('error') }
 })()
 
+/** The learner has just come back from Google: the sign-in is being finished and the welcome screens wait for it. */
+export const returningFromGoogle = returned !== null
+
 let account: Account = {
   available: false,
   loading: true,

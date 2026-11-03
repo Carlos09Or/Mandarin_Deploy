@@ -36,6 +36,10 @@ export type Progress = {
   v: 1
   deviceId: string
   createdAt: string
+  /** What the learner asked to be called. Empty until they have chosen one. */
+  nickname: string
+  /** The welcome screens (name, then guest or account) have been gone through, on this device or on another one of the account. */
+  welcomed: boolean
   xp: number
   /** Reward currency. What it buys is up to each teacher (extra quiz points, etc.). */
   gems: number
@@ -86,6 +90,8 @@ function fresh(): Progress {
     v: 1,
     deviceId: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
+    nickname: '',
+    welcomed: false,
     xp: 0,
     gems: 0,
     outfits: {},
@@ -111,7 +117,12 @@ function fresh(): Progress {
 }
 
 /** Fills in what a save from an older version of the app, or from the server, doesn't have. */
-export const revive = (data: Partial<Progress>): Progress => ({ ...fresh(), ...data })
+export const revive = (data: Partial<Progress>): Progress => ({
+  ...fresh(),
+  ...data,
+  // Learners who started before the welcome screens existed have been welcomed already.
+  welcomed: data.welcomed ?? (data.modifiedAt ?? 0) > 0,
+})
 
 function load(): Progress {
   try {
@@ -262,6 +273,22 @@ export function setRating(node: string, stars: number) {
   commit({ ...state, ratings: { ...state.ratings, [node]: { stars, at: Date.now() } } })
 }
 
+export const NICKNAME_MAX = 20
+
+/** Keeps the name the learner chose (spaces trimmed). An empty name is ignored: there is always one once chosen. */
+export function setNickname(name: string) {
+  const nickname = name.trim().slice(0, NICKNAME_MAX)
+  if (nickname && nickname !== state.nickname) commit({ ...state, nickname })
+}
+
+/** The welcome screens are done: the learner has a name and has chosen to play as a guest or to sign in. */
+export function finishWelcome(name: string) {
+  commit({ ...state, nickname: name.trim().slice(0, NICKNAME_MAX) || state.nickname, welcomed: true })
+}
+
+/** Puts in progress from a backup file, already merged with what is here. Unlike a sync, this is a change made on this device. */
+export const importProgress = (next: Progress) => commit(next)
+
 export function setScenery(scenery: Scenery) {
   commit({ ...state, scenery })
 }
@@ -272,7 +299,14 @@ export function markRevealed(province: string) {
 
 /** Erases everything and starts a new epoch, so a synced account is erased too instead of bringing the old progress back. */
 export function resetProgress() {
-  commit({ ...fresh(), deviceId: state.deviceId, epoch: crypto.randomUUID(), epochAt: Date.now() })
+  commit({
+    ...fresh(),
+    deviceId: state.deviceId,
+    nickname: state.nickname,
+    welcomed: state.welcomed,
+    epoch: crypto.randomUUID(),
+    epochAt: Date.now(),
+  })
 }
 
 /** Empties this device without touching any account (when signing out); it merges into an account like a new device. */

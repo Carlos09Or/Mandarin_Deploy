@@ -69,7 +69,7 @@ export function Shell({ tab, onTab, bleed = false, children }: Props) {
       <nav className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-2 border-r-2 border-line-dark bg-card px-4 py-6 md:flex">
         <div className="mb-6 px-2 leading-tight">
           <p className="font-display text-xl font-bold text-sky-dark">Mandarin Journey</p>
-          <p className="text-xs font-bold text-muted">HSK 1 · free</p>
+          <p className="text-xs font-bold text-muted">{p.nickname ? `Hi, ${p.nickname}` : 'HSK 1 · free'}</p>
         </div>
         {TABS.map((t) => (
           <button
