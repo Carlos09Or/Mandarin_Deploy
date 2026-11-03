@@ -16,6 +16,7 @@ export function adminPage(email: string): Response {
   body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.4 system-ui, sans-serif; }
   main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
   h1 { margin: 0 0 4px; font-size: 24px; }
+  h2 { margin: 32px 0 4px; font-size: 18px; }
   .muted { color: var(--muted); }
   .stats { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
   .stat { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 12px 16px; min-width: 110px; }
@@ -34,6 +35,15 @@ export function adminPage(email: string): Response {
   <h1>Learners</h1>
   <p class="muted">Signed in as <span id="me"></span> · <a href="/">Back to the app</a></p>
   <div class="stats" id="stats"></div>
+  <h2>Do they come back?</h2>
+  <p class="muted">Learners who were active on or after day N since signing up, among those who signed up at least N days ago.</p>
+  <div class="stats" id="retention"></div>
+  <h2>How far do they get?</h2>
+  <div class="stats" id="funnel"></div>
+  <h2>Are they learning?</h2>
+  <div class="stats" id="learning"></div>
+  <p class="muted">Only people with an account are counted, so these are minimums.</p>
+  <h2>Learners</h2>
   <div class="wrap">
     <table>
       <thead><tr><th>Learner</th><th>Joined</th><th>Last seen</th><th class="n">XP</th><th class="n">Streak</th><th class="n">Lessons</th><th class="n">Words</th></tr></thead>
@@ -41,6 +51,14 @@ export function adminPage(email: string): Response {
     </table>
   </div>
   <p class="muted" id="empty" hidden>Nobody has signed in yet.</p>
+  <h2>Lesson ratings</h2>
+  <p class="muted" id="rating-sum"></p>
+  <div class="wrap" id="rating-wrap" hidden>
+    <table>
+      <thead><tr><th>Lesson</th><th class="n">Votes</th><th class="n">Average</th></tr></thead>
+      <tbody id="rating-rows"></tbody>
+    </table>
+  </div>
 </main>
 <script nonce="${nonce}">
   document.getElementById('me').textContent = ${JSON.stringify(email)}
@@ -70,6 +88,38 @@ export function adminPage(email: string): Response {
       cell(tr, day(u.createdAt)); cell(tr, ago(u.lastSeenAt))
       cell(tr, u.xp ?? '—', 'n'); cell(tr, u.streak ?? '—', 'n'); cell(tr, u.lessons ?? '—', 'n'); cell(tr, u.words ?? '—', 'n')
       document.getElementById('rows').appendChild(tr)
+    }
+  })
+  const tile = (parent, value, label, detail) => {
+    const box = document.createElement('div'); box.className = 'stat'
+    const b = document.createElement('b'); b.textContent = value
+    box.append(b, label)
+    if (detail) { const d = document.createElement('div'); d.className = 'muted'; d.style.fontSize = '12px'; d.textContent = detail; box.appendChild(d) }
+    document.getElementById(parent).appendChild(box)
+  }
+  const pct = (a, b) => (b ? Math.round((a / b) * 100) + '%' : '—')
+  const of = (a, b) => a + ' of ' + b
+  fetch('/api/admin/metrics').then((r) => r.json()).then((m) => {
+    for (const r of m.retention) tile('retention', pct(r.returned, r.eligible), 'Back after ' + r.days + (r.days === 1 ? ' day' : ' days'), r.eligible ? of(r.returned, r.eligible) : 'too early to tell')
+    const f = m.funnel
+    tile('funnel', of(f.firstLesson, f.registered), 'Did a first lesson', pct(f.firstLesson, f.registered))
+    tile('funnel', of(f.fiveLessons, f.registered), 'Did 5 or more lessons', pct(f.fiveLessons, f.registered))
+    tile('funnel', of(f.finishedProvince, f.registered), 'Finished a province', pct(f.finishedProvince, f.registered))
+    tile('funnel', m.averageLessons ?? '—', 'Lessons per learner')
+    tile('learning', m.recall.reviews ? pct(m.recall.remembered, m.recall.reviews) : '—', 'Remembered on review', m.recall.reviews ? of(m.recall.remembered, m.recall.reviews) + ' reviews of due cards' : 'no reviews yet')
+    tile('learning', m.averageWords ?? '—', 'Words in review per learner')
+    tile('learning', m.averageActiveDays ?? '—', 'Days practised per learner')
+    tile('learning', m.averageLessonSeconds ? Math.floor(m.averageLessonSeconds / 60) + ':' + String(m.averageLessonSeconds % 60).padStart(2, '0') : '—', 'Average lesson time')
+  })
+  fetch('/api/admin/ratings').then((r) => r.json()).then((r) => {
+    const sum = document.getElementById('rating-sum')
+    if (!r.votes) { sum.textContent = 'No lesson has been rated yet.'; return }
+    sum.textContent = r.average.toFixed(2) + ' ★ average from ' + r.votes + ' ratings · ' + r.spread.map((n, i) => (i + 1) + '★ ' + n).join(' · ')
+    document.getElementById('rating-wrap').hidden = false
+    for (const l of r.lessons) {
+      const tr = document.createElement('tr')
+      cell(tr, l.node); cell(tr, l.votes, 'n'); cell(tr, l.average.toFixed(2) + ' ★', 'n')
+      document.getElementById('rating-rows').appendChild(tr)
     }
   })
 </script>

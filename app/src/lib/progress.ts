@@ -62,6 +62,8 @@ export type Progress = {
   retention: number
   /** The day the gems for finishing the review were given, so they are given once a day. */
   reviewDay: string | null
+  /** The stars (1 to 5) the learner gave a lesson when they finished it; the admin page averages them. */
+  ratings: Record<string, { stars: number; at: number }>
   /** When anything was last changed here (not when a merge brought changes in): it tells the sync what is still to be uploaded. */
   modifiedAt: number
   /** Which "life" of the data this is. Resetting starts a new one; a device with an older one is overruled when it syncs (see merge.ts). */
@@ -101,6 +103,7 @@ function fresh(): Progress {
     sessionSize: 15,
     retention: DEFAULT_RETENTION,
     reviewDay: null,
+    ratings: {},
     modifiedAt: 0,
     epoch: INITIAL_EPOCH,
     epochAt: 0,
@@ -252,6 +255,11 @@ export function setOutfit(id: FriendId, outfit: OutfitSetting) {
 
 export function setTraveler(id: FriendId) {
   commit({ ...state, traveler: id })
+}
+
+/** Keeps the stars given to a lesson; tapping again changes them. */
+export function setRating(node: string, stars: number) {
+  commit({ ...state, ratings: { ...state.ratings, [node]: { stars, at: Date.now() } } })
 }
 
 export function setScenery(scenery: Scenery) {
