@@ -2,19 +2,19 @@ import { AnimatePresence, animate, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { word } from '../data/course'
 import { chime } from '../lib/audio'
-import { isNight, today, useProgress, type Reward } from '../lib/progress'
-import { IconFlame, IconGem } from '../components/icons'
+import { isNight, setRating, today, useProgress, type Reward } from '../lib/progress'
+import { IconFlame, IconGem, IconStar } from '../components/icons'
 import { Mascot } from '../components/Mascot'
 import { Buddy } from '../components/Friends'
 import type { FriendId } from '../data/friends'
 import type { LessonSummary } from './LessonPlayer'
 
-type Props = { summary: LessonSummary; reward: Reward; newWords: number[]; buddy: FriendId; onContinue: () => void }
+type Props = { summary: LessonSummary; reward: Reward; newWords: number[]; buddy: FriendId; nodeId: string | null; onContinue: () => void }
 
 type Step = 'summary' | 'streak' | 'reward'
 
 /** End of a lesson: how it went, the streak (first lesson of the day), then the gems it earned. */
-export function LessonComplete({ summary, reward, newWords, buddy, onContinue }: Props) {
+export function LessonComplete({ summary, reward, newWords, buddy, nodeId, onContinue }: Props) {
   const steps: Step[] = reward.streakUp ? ['summary', 'streak', 'reward'] : ['summary', 'reward']
   const [i, setI] = useState(0)
   const step = steps[i]
@@ -27,7 +27,7 @@ export function LessonComplete({ summary, reward, newWords, buddy, onContinue }:
         <AnimatePresence mode="wait">
           {step === 'summary' ? (
             <motion.div key="summary" exit={{ opacity: 0, x: -40 }} className="flex w-full flex-col items-center gap-8">
-              <SummaryStep summary={summary} xp={reward.xp} newWords={newWords} buddy={buddy} />
+              <SummaryStep summary={summary} xp={reward.xp} newWords={newWords} buddy={buddy} nodeId={nodeId} />
             </motion.div>
           ) : step === 'streak' ? (
             <motion.div
@@ -72,11 +72,13 @@ function SummaryStep({
   xp,
   newWords,
   buddy,
+  nodeId,
 }: {
   summary: LessonSummary
   xp: number
   newWords: number[]
   buddy: FriendId
+  nodeId: string | null
 }) {
   const accuracy = summary.answers ? Math.round(((summary.answers - summary.mistakes) / summary.answers) * 100) : 100
   const mins = Math.floor(summary.durationMs / 60000)
@@ -140,7 +142,36 @@ function SummaryStep({
           </div>
         </div>
       )}
+
+      {nodeId && <RateLesson node={nodeId} />}
     </>
+  )
+}
+
+/** One tap on the stars rates the lesson. Nothing blocks Continue: leaving them alone just skips it. */
+function RateLesson({ node }: { node: string }) {
+  const rated = useProgress().ratings[node]?.stars ?? 0
+  const [hover, setHover] = useState(0)
+  return (
+    <div className="flex flex-col items-center">
+      <p className="text-sm font-extrabold tracking-widest text-muted uppercase">{rated ? 'Thanks!' : 'How was this lesson?'}</p>
+      <div role="radiogroup" aria-label="Rate this lesson" className="flex" onMouseLeave={() => setHover(0)}>
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            role="radio"
+            aria-checked={rated === n}
+            aria-label={`${n} star${n > 1 ? 's' : ''}`}
+            onClick={() => setRating(node, n)}
+            onMouseEnter={() => setHover(n)}
+            className="p-1.5 active:scale-90"
+          >
+            <IconStar className={`h-9 w-9 ${n <= (hover || rated) ? 'text-gold' : 'text-line-dark'}`} />
+          </button>
+        ))}
+      </div>
+    </div>
   )
 }
 

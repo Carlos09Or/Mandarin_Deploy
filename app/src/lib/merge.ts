@@ -70,5 +70,6 @@ export function mergeProgress(local: Progress, remote: Progress): Progress {
     reviews: unionLog(local.reviews, remote.reviews, (e) => `${e.n}:${e.at}:${e.src}`, (e) => e.at, MAX_REVIEWS),
     outbox: unionLog(local.outbox, remote.outbox, (e) => `${e.node}:${e.at}`, (e) => Date.parse(e.at), MAX_OUTBOX),
     reviewDay: later(local.reviewDay, remote.reviewDay),
+    ratings: byKey(local.ratings, remote.ratings, (x, y) => (x.at >= y.at ? x : y)),
   }
 }

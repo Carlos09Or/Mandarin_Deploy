@@ -210,6 +210,7 @@ export default function App() {
             reward={result.reward}
             buddy={result.buddy}
             newWords={result.newWords}
+            nodeId={result.nodeId}
             onContinue={afterResult}
           />
         </Later>

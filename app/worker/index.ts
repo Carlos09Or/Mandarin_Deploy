@@ -253,6 +253,29 @@ async function adminUsers(env: Env) {
   return json({ users: results })
 }
 
+/** The stars learners gave lessons (kept in each learner's progress document), as the overall spread and one line per lesson. */
+async function adminRatings(env: Env) {
+  const rows = (
+    await env.DB.prepare(
+      `SELECT r.key AS node, CAST(json_extract(r.value, '$.stars') AS INTEGER) AS stars
+       FROM progress p, json_each(p.data, '$.ratings') r`,
+    ).all<{ node: string; stars: number }>()
+  ).results.filter((r) => r.stars >= 1 && r.stars <= 5)
+  const spread = [0, 0, 0, 0, 0]
+  const lessons = new Map<string, { votes: number; sum: number }>()
+  for (const { node, stars } of rows) {
+    spread[stars - 1]++
+    const l = lessons.get(node) ?? { votes: 0, sum: 0 }
+    lessons.set(node, { votes: l.votes + 1, sum: l.sum + stars })
+  }
+  return json({
+    votes: rows.length,
+    average: rows.length ? Math.round((rows.reduce((a, r) => a + r.stars, 0) / rows.length) * 100) / 100 : null,
+    spread,
+    lessons: [...lessons].map(([node, l]) => ({ node, votes: l.votes, average: Math.round((l.sum / l.votes) * 100) / 100 })).sort((a, b) => a.node.localeCompare(b.node, 'en', { numeric: true })),
+  })
+}
+
 // ---- Routing ----
 
 export default {
@@ -289,6 +312,9 @@ export default {
       if (pathname === '/api/progress' && request.method === 'PUT') return putProgress(request, env, user)
       if (pathname === '/api/admin/users' && request.method === 'GET') {
         return isAdmin(env, user) ? adminUsers(env) : json({ error: 'forbidden' }, 403)
+      }
+      if (pathname === '/api/admin/ratings' && request.method === 'GET') {
+        return isAdmin(env, user) ? adminRatings(env) : json({ error: 'forbidden' }, 403)
       }
       return json({ error: 'not_found' }, 404)
     } catch (err) {

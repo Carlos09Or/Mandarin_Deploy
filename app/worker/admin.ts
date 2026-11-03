@@ -16,6 +16,7 @@ export function adminPage(email: string): Response {
   body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.4 system-ui, sans-serif; }
   main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
   h1 { margin: 0 0 4px; font-size: 24px; }
+  h2 { margin: 32px 0 4px; font-size: 18px; }
   .muted { color: var(--muted); }
   .stats { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
   .stat { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 12px 16px; min-width: 110px; }
@@ -41,6 +42,14 @@ export function adminPage(email: string): Response {
     </table>
   </div>
   <p class="muted" id="empty" hidden>Nobody has signed in yet.</p>
+  <h2>Lesson ratings</h2>
+  <p class="muted" id="rating-sum"></p>
+  <div class="wrap" id="rating-wrap" hidden>
+    <table>
+      <thead><tr><th>Lesson</th><th class="n">Votes</th><th class="n">Average</th></tr></thead>
+      <tbody id="rating-rows"></tbody>
+    </table>
+  </div>
 </main>
 <script nonce="${nonce}">
   document.getElementById('me').textContent = ${JSON.stringify(email)}
@@ -70,6 +79,17 @@ export function adminPage(email: string): Response {
       cell(tr, day(u.createdAt)); cell(tr, ago(u.lastSeenAt))
       cell(tr, u.xp ?? '—', 'n'); cell(tr, u.streak ?? '—', 'n'); cell(tr, u.lessons ?? '—', 'n'); cell(tr, u.words ?? '—', 'n')
       document.getElementById('rows').appendChild(tr)
+    }
+  })
+  fetch('/api/admin/ratings').then((r) => r.json()).then((r) => {
+    const sum = document.getElementById('rating-sum')
+    if (!r.votes) { sum.textContent = 'No lesson has been rated yet.'; return }
+    sum.textContent = r.average.toFixed(2) + ' ★ average from ' + r.votes + ' ratings · ' + r.spread.map((n, i) => (i + 1) + '★ ' + n).join(' · ')
+    document.getElementById('rating-wrap').hidden = false
+    for (const l of r.lessons) {
+      const tr = document.createElement('tr')
+      cell(tr, l.node); cell(tr, l.votes, 'n'); cell(tr, l.average.toFixed(2) + ' ★', 'n')
+      document.getElementById('rating-rows').appendChild(tr)
     }
   })
 </script>
