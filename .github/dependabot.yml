@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /app
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # Routine updates arrive as one pull request a week; security fixes still come on their own.
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Pinned on purpose: v6 needs Node 24 and is heavy (see the notes on the review cards).
+      - dependency-name: ts-fsrs
+        update-types: [version-update:semver-major]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
