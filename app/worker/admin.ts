@@ -61,7 +61,7 @@ export function adminPage(email: string): Response {
   </div>
 </main>
 <script nonce="${nonce}">
-  document.getElementById('me').textContent = ${JSON.stringify(email)}
+  document.getElementById('me').textContent = ${JSON.stringify(email).replaceAll('<', '\\u003c')}
   const day = (ms) => (ms ? new Date(ms).toLocaleDateString() : '—')
   const ago = (ms) => {
     const m = Math.round((Date.now() - ms) / 60000)

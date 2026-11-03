@@ -3,6 +3,7 @@
 
 import { adminPage } from './admin.ts'
 import { withSecurityHeaders } from './security.ts'
+import { progressProblem } from './validate.ts'
 
 export interface Env {
   DB: D1Database
@@ -202,7 +203,10 @@ async function putProgress(request: Request, env: Env, user: User) {
     return json({ error: 'bad_json' }, 400)
   }
   const data = body.data
-  if (!data || typeof data !== 'object' || data.v !== 1 || typeof body.base !== 'number') return json({ error: 'bad_progress' }, 400)
+  if (typeof body.base !== 'number') return json({ error: 'bad_progress' }, 400)
+  const problem = progressProblem(data)
+  if (problem) return json({ error: 'bad_progress', field: problem }, 400)
+  if (!data) return json({ error: 'bad_progress' }, 400)
 
   const streak = (data.streak ?? {}) as { count?: unknown; last?: unknown }
   const values = [

@@ -63,6 +63,8 @@ if (me.dev) {
   ok('progress that is not JSON is 400', (await send('{nope')).status === 400)
   ok('progress without v:1 is 400', (await send(JSON.stringify({ base: 0, data: { v: 2 } }))).status === 400)
   ok('progress over the size limit is 413', (await send(JSON.stringify({ base: 0, data: { v: 1, junk: 'x'.repeat(1_600_000) } }))).status === 413)
+  ok('progress with a 9-star rating is 400', (await send(JSON.stringify({ base: 0, data: { v: 1, ratings: { '1-1': { stars: 9, at: 1 } } } }))).status === 400)
+  ok('progress with a lesson that lasted a month is 400', (await send(JSON.stringify({ base: 0, data: { v: 1, outbox: [{ type: 'lesson_completed', node: '1-1', at: 'x', durationMs: 2.6e9 }] } }))).status === 400)
   ok('a valid first save works', (await send(JSON.stringify({ base: 0, data: { v: 1, xp: 5 } }))).status === 200)
   ok('saving on a stale version is 409', (await send(JSON.stringify({ base: 0, data: { v: 1, xp: 6 } }))).status === 409)
   await call('/api/me', { method: 'DELETE', headers: auth })
