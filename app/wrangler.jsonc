@@ -13,7 +13,7 @@
     {
       "binding": "DB",
       "database_name": "mandarin-journey",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "3b67f271-fa7e-4447-91fb-8035fbb51ccb",
       "migrations_dir": "migrations"
     }
   ]
