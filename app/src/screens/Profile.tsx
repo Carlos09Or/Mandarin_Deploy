@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { PATH, WORDS } from '../data/course'
 import {
   DAILY_GOAL,
+  NICKNAME_MAX,
   GEMS,
   learnedWords,
   liveStreak,
   resetProgress,
+  setNickname,
   setScenery,
   today,
   useProgress,
@@ -14,6 +16,7 @@ import {
 import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
 import { CharacterStudio } from '../components/CharacterStudio'
 import { Account } from '../components/Account'
+import { downloadProgress, restoreProgress } from '../lib/backup'
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const SCENERY: { id: Scenery; label: string; hint: string }[] = [
@@ -56,17 +59,30 @@ export function Profile() {
     { value: total ? `${Math.round((right / total) * 100)}%` : '—', label: 'Accuracy', icon: <span className="han text-2xl text-gold-dark">准</span> },
   ]
 
-  const download = () => {
-    const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `mandarin-progress-${today()}.json`
-    a.click()
-    URL.revokeObjectURL(a.href)
-  }
+  const fileInput = useRef<HTMLInputElement>(null)
+  const [restored, setRestored] = useState<'ok' | 'bad' | null>(null)
+  const [name, setName] = useState<string | null>(null)
 
   return (
     <div className="flex flex-col gap-8 pb-10">
+      <section className="flex flex-col gap-2">
+        <h2 className="text-2xl font-black">{p.nickname ? `Hi, ${p.nickname}!` : 'Hi!'}</h2>
+        <label className="flex flex-col gap-1.5 text-sm font-bold text-muted">
+          Your name
+          <input
+            value={name ?? p.nickname}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={() => {
+              if (name !== null) setNickname(name)
+              setName(null)
+            }}
+            maxLength={NICKNAME_MAX}
+            autoComplete="nickname"
+            className="rounded-2xl border-2 border-line-dark bg-card px-4 py-2.5 text-base font-bold text-ink"
+          />
+        </label>
+      </section>
+
       <CharacterStudio />
 
       <section>
@@ -152,10 +168,32 @@ export function Profile() {
         <h3 className="font-black">Your account</h3>
         <Account />
         <h3 className="mt-2 font-black">Your data</h3>
+        <p className="text-sm text-muted">
+          A downloaded file is a backup you can keep anywhere. Restoring one adds it to what is here; nothing is lost.
+        </p>
+        {restored && (
+          <p className={`text-sm font-bold ${restored === 'ok' ? 'text-jade-dark' : 'text-wrong'}`}>
+            {restored === 'ok' ? 'Backup restored.' : 'That file is not a Mandarin Journey backup.'}
+          </p>
+        )}
         <div className="flex flex-col gap-3 sm:flex-row">
-          <button type="button" onClick={download} className="btn btn-ghost flex-1">
+          <button type="button" onClick={downloadProgress} className="btn btn-ghost flex-1">
             Download my data
           </button>
+          <button type="button" onClick={() => fileInput.current?.click()} className="btn btn-ghost flex-1">
+            Restore from a file
+          </button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="application/json,.json"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              e.target.value = ''
+              if (file) void restoreProgress(file).then(setRestored)
+            }}
+          />
           {confirm ? (
             <button
               type="button"

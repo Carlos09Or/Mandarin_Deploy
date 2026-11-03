@@ -24,6 +24,8 @@ export function progressProblem(data: unknown): string | null {
   for (const k of ['modifiedAt', 'epochAt']) if (has(k) && !num(data[k], 0, 1e15)) return k
   for (const k of ['deviceId', 'epoch', 'traveler']) if (has(k) && !str(data[k], 64)) return k
   if (has('createdAt') && !str(data.createdAt, 40)) return 'createdAt'
+  if (has('nickname') && !str(data.nickname, 40)) return 'nickname'
+  if (has('welcomed') && typeof data.welcomed !== 'boolean') return 'welcomed'
   if (has('scenery') && !['auto', 'day', 'night'].includes(data.scenery as string)) return 'scenery'
   if (has('reviewDay') && data.reviewDay !== null && !str(data.reviewDay, 10)) return 'reviewDay'
   if (has('sessionSize') && !int(data.sessionSize, 1, 500)) return 'sessionSize'

@@ -1,5 +1,8 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
+import { SaveNudge } from './components/SaveNudge'
 import { Shell, type Tab } from './components/Shell'
+import { useWelcomeOpen } from './components/useWelcomeOpen'
+import { Welcome } from './components/Welcome'
 import type { PathNode } from './data/course'
 import { FRIEND_IDS, type FriendId } from './data/friends'
 import type { Province } from './data/journey'
@@ -9,6 +12,7 @@ import { nextProvince } from './journey/stops'
 import { warmAhead, whenLoaded } from './journey/preload'
 import { startAccount } from './lib/account'
 import { canWarm } from './lib/network'
+import { keepStorage } from './lib/storage'
 import { holdUpdates, registerUpdates } from './lib/updates'
 import { toast } from './journey/toast'
 import { QUICK_FRIEND_FILES } from './lesson/friends'
@@ -83,7 +87,14 @@ export default function App() {
     void warmAhead().then(registerUpdates)
     // Who is signed in, and the sync, start once the map is open so they never compete with the loading screen.
     void startAccount()
+    // Welcome back: said once per visit, only to someone who has been welcomed before (the welcome screens say hello themselves).
+    const { welcomed, nickname } = getProgress()
+    if (welcomed && nickname) {
+      toast(`Welcome back, ${nickname.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)}!`)
+      keepStorage()
+    }
   }, [loaded])
+  const welcoming = useWelcomeOpen(loaded)
 
   // Then the other screens are fetched while the browser is idle, so they open at once.
 
@@ -215,6 +226,8 @@ export default function App() {
           />
         </Later>
       )}
+      <SaveNudge quiet={tab === 'map' && !province && !busy && !welcoming} />
+      {welcoming && <Welcome />}
       {!loaded && <Splash onDone={() => setLoaded(true)} />}
     </>
   )
