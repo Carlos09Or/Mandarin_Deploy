@@ -1,9 +1,13 @@
 // Checks a running copy of the app from the outside: security headers on pages, assets and API answers, and that
 // the API refuses what it should (no session, wrong origin, oversized or bad bodies, non-admins).
-// Usage: node tools/securitycheck.mjs [url]     (default: the deployed site; use http://localhost:8787 for `npm run dev:api`)
+// Usage: node tools/securitycheck.mjs [url] [--signups-closed]
+//   url: default is the deployed site; use http://localhost:8787 for `npm run dev:api`.
+//   --signups-closed: the target runs with SIGNUPS_OPEN=0; checks that new accounts are refused and existing ones still sign in.
 // With DEV_LOGIN=1 on the target (local only) it also signs in as a normal learner and checks the admin routes and progress limits.
 
-const base = (process.argv[2] ?? 'https://mandarin-deploy.mandarinjourney.workers.dev').replace(/\/$/, '')
+const args = process.argv.slice(2)
+const closed = args.includes('--signups-closed')
+const base = (args.find((a) => !a.startsWith('--')) ?? 'https://mandarin-deploy.mandarinjourney.workers.dev').replace(/\/$/, '')
 const https = base.startsWith('https:')
 let failed = 0
 const ok = (name, pass, detail = '') => {
@@ -48,7 +52,7 @@ if (https) ok('dev login is off', me.dev === false && (await call('/api/auth/dev
 ok('a session cookie that was never issued is not accepted', (await call('/api/progress', { headers: { cookie: 'sid=not-a-real-token' } })).status === 401)
 
 // ---- Signed in as a normal learner (local dev login only) ----
-if (me.dev) {
+if (me.dev && !closed) {
   const email = `learner-${Date.now()}@example.test`
   const login = await call('/api/auth/dev', { method: 'POST', headers: { origin: base, 'content-type': 'application/json' }, body: JSON.stringify({ email }) })
   const cookie = (login.headers.get('set-cookie') ?? '').split(';')[0]
@@ -68,6 +72,49 @@ if (me.dev) {
   ok('a valid first save works', (await send(JSON.stringify({ base: 0, data: { v: 1, xp: 5 } }))).status === 200)
   ok('saving on a stale version is 409', (await send(JSON.stringify({ base: 0, data: { v: 1, xp: 6 } }))).status === 409)
   await call('/api/me', { method: 'DELETE', headers: auth })
+
+  // ---- Sessions are capped: only the newest 10 sign-ins of one learner stay valid ----
+  const same = `sessions-${Date.now()}@example.test`
+  const cookies = []
+  for (let i = 0; i < 12; i++) {
+    const r = await call('/api/auth/dev', { method: 'POST', headers: { origin: base, 'content-type': 'application/json' }, body: JSON.stringify({ email: same }) })
+    cookies.push((r.headers.get('set-cookie') ?? '').split(';')[0])
+  }
+  const status = async (c) => (await call('/api/progress', { headers: { cookie: c } })).status
+  ok('the oldest of 12 sign-ins no longer works', (await status(cookies[0])) === 401)
+  ok('the newest sign-in works', (await status(cookies[11])) !== 401)
+  let valid = 0
+  for (const c of cookies) if ((await status(c)) !== 401) valid++
+  ok('exactly 10 sessions stay valid', valid === 10, `${valid} valid`)
+  await call('/api/me', { method: 'DELETE', headers: { origin: base, cookie: cookies[11] } })
+
+  // ---- Rate limit: a device that saves in a loop is turned away with 429 + Retry-After (needs the limiter binding: deployed, or wrangler dev) ----
+  const spam = (await call('/api/auth/dev', { method: 'POST', headers: { origin: base, 'content-type': 'application/json' }, body: JSON.stringify({ email: `spam-${Date.now()}@example.test` }) })).headers.get('set-cookie').split(';')[0]
+  const spamHeaders = { origin: base, cookie: spam, 'content-type': 'application/json' }
+  const codes = []
+  let retryAfter = null
+  for (let i = 0; i < 40; i++) {
+    const r = await call('/api/progress', { method: 'PUT', headers: spamHeaders, body: JSON.stringify({ base: i === 0 ? 0 : 1, data: { v: 1, xp: i } }) })
+    codes.push(r.status)
+    if (r.status === 429) retryAfter ??= r.headers.get('retry-after')
+  }
+  const limited = codes.filter((c) => c === 429).length
+  ok('40 saves in a row: some are turned away with 429', limited > 0, `statuses: ${[...new Set(codes)].join(',')}`)
+  ok('...but not all of them (the first ones went through)', limited < 40 && codes[0] !== 429)
+  ok('429 carries Retry-After', limited === 0 || retryAfter === '30', String(retryAfter))
+  ok('another device (session) of the same learner is not limited', (await (async () => {
+    const r = await call('/api/auth/dev', { method: 'POST', headers: { origin: base, 'content-type': 'application/json' }, body: JSON.stringify({ email: `spam-other-${Date.now()}@example.test` }) })
+    const c = (r.headers.get('set-cookie') ?? '').split(';')[0]
+    return (await call('/api/progress', { headers: { cookie: c } })).status
+  })()) === 200)
+  await call('/api/me', { method: 'DELETE', headers: { origin: base, cookie: spam } })
+}
+
+// ---- New accounts paused (target started with SIGNUPS_OPEN=0) ----
+if (closed) {
+  const dev = (email) => call('/api/auth/dev', { method: 'POST', headers: { origin: base, 'content-type': 'application/json' }, body: JSON.stringify({ email }) })
+  const fresh = await dev(`new-${Date.now()}@example.test`)
+  ok('a new learner is refused while sign-ups are paused', fresh.status === 403 && (await fresh.json()).error === 'signups_closed', `status ${fresh.status}`)
 }
 
 console.log(failed ? `\n${failed} check(s) failed` : '\nAll checks passed')
