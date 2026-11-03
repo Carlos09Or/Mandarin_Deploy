@@ -35,6 +35,15 @@ export function adminPage(email: string): Response {
   <h1>Learners</h1>
   <p class="muted">Signed in as <span id="me"></span> · <a href="/">Back to the app</a></p>
   <div class="stats" id="stats"></div>
+  <h2>Do they come back?</h2>
+  <p class="muted">Learners who were active on or after day N since signing up, among those who signed up at least N days ago.</p>
+  <div class="stats" id="retention"></div>
+  <h2>How far do they get?</h2>
+  <div class="stats" id="funnel"></div>
+  <h2>Are they learning?</h2>
+  <div class="stats" id="learning"></div>
+  <p class="muted">Only people with an account are counted, so these are minimums.</p>
+  <h2>Learners</h2>
   <div class="wrap">
     <table>
       <thead><tr><th>Learner</th><th>Joined</th><th>Last seen</th><th class="n">XP</th><th class="n">Streak</th><th class="n">Lessons</th><th class="n">Words</th></tr></thead>
@@ -80,6 +89,27 @@ export function adminPage(email: string): Response {
       cell(tr, u.xp ?? '—', 'n'); cell(tr, u.streak ?? '—', 'n'); cell(tr, u.lessons ?? '—', 'n'); cell(tr, u.words ?? '—', 'n')
       document.getElementById('rows').appendChild(tr)
     }
+  })
+  const tile = (parent, value, label, detail) => {
+    const box = document.createElement('div'); box.className = 'stat'
+    const b = document.createElement('b'); b.textContent = value
+    box.append(b, label)
+    if (detail) { const d = document.createElement('div'); d.className = 'muted'; d.style.fontSize = '12px'; d.textContent = detail; box.appendChild(d) }
+    document.getElementById(parent).appendChild(box)
+  }
+  const pct = (a, b) => (b ? Math.round((a / b) * 100) + '%' : '—')
+  const of = (a, b) => a + ' of ' + b
+  fetch('/api/admin/metrics').then((r) => r.json()).then((m) => {
+    for (const r of m.retention) tile('retention', pct(r.returned, r.eligible), 'Back after ' + r.days + (r.days === 1 ? ' day' : ' days'), r.eligible ? of(r.returned, r.eligible) : 'too early to tell')
+    const f = m.funnel
+    tile('funnel', of(f.firstLesson, f.registered), 'Did a first lesson', pct(f.firstLesson, f.registered))
+    tile('funnel', of(f.fiveLessons, f.registered), 'Did 5 or more lessons', pct(f.fiveLessons, f.registered))
+    tile('funnel', of(f.finishedProvince, f.registered), 'Finished a province', pct(f.finishedProvince, f.registered))
+    tile('funnel', m.averageLessons ?? '—', 'Lessons per learner')
+    tile('learning', m.recall.reviews ? pct(m.recall.remembered, m.recall.reviews) : '—', 'Remembered on review', m.recall.reviews ? of(m.recall.remembered, m.recall.reviews) + ' reviews of due cards' : 'no reviews yet')
+    tile('learning', m.averageWords ?? '—', 'Words in review per learner')
+    tile('learning', m.averageActiveDays ?? '—', 'Days practised per learner')
+    tile('learning', m.averageLessonSeconds ? Math.floor(m.averageLessonSeconds / 60) + ':' + String(m.averageLessonSeconds % 60).padStart(2, '0') : '—', 'Average lesson time', 'last 200 lessons per learner')
   })
   fetch('/api/admin/ratings').then((r) => r.json()).then((r) => {
     const sum = document.getElementById('rating-sum')

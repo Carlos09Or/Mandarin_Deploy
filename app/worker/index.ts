@@ -276,6 +276,59 @@ async function adminRatings(env: Env) {
   })
 }
 
+/**
+ * How people use the app and whether it works, worked out from the progress documents learners have already synced:
+ * nothing extra is asked of them. "Came back after N days" counts learners who were active on or after the Nth day since
+ * they signed up, among those who signed up at least N days ago.
+ */
+async function adminMetrics(env: Env) {
+  const perLearner = (
+    await env.DB.prepare(
+      `SELECT u.created_at AS createdAt, COALESCE(p.lessons, 0) AS lessons, COALESCE(p.words, 0) AS words,
+              (SELECT MAX(d.key) FROM json_each(p.data, '$.dailyXp') d WHERE d.value > 0) AS lastDay,
+              (SELECT COUNT(*) FROM json_each(p.data, '$.dailyXp') d WHERE d.value > 0) AS activeDays,
+              EXISTS (SELECT 1 FROM json_each(p.data, '$.nodes') n WHERE n.key LIKE '%-cp') AS finishedProvince
+       FROM users u LEFT JOIN progress p ON p.user_id = u.id`,
+    ).all<{ createdAt: number; lessons: number; words: number; lastDay: string | null; activeDays: number | null; finishedProvince: number | null }>()
+  ).results
+  // Reviews of cards that were due (state 2 = review): the share the learner still remembered (grade 2 hard or better).
+  const recall = await env.DB.prepare(
+    `SELECT COUNT(*) AS reviews, COALESCE(SUM(CASE WHEN json_extract(r.value, '$.r') >= 2 THEN 1 ELSE 0 END), 0) AS remembered
+     FROM progress p, json_each(p.data, '$.reviews') r WHERE json_extract(r.value, '$.s') = 2`,
+  ).first<{ reviews: number; remembered: number }>()
+  const lessonTime = await env.DB.prepare(
+    `SELECT COUNT(*) AS lessons, AVG(json_extract(e.value, '$.durationMs')) AS averageMs
+     FROM progress p, json_each(p.data, '$.outbox') e`,
+  ).first<{ lessons: number; averageMs: number | null }>()
+
+  const now = Date.now()
+  const retention = [1, 7, 30].map((days) => {
+    const cohort = perLearner.filter((l) => now - l.createdAt >= days * 86_400_000)
+    const returned = cohort.filter((l) => {
+      const due = new Date(l.createdAt + days * 86_400_000).toISOString().slice(0, 10)
+      return !!l.lastDay && l.lastDay >= due
+    })
+    return { days, eligible: cohort.length, returned: returned.length }
+  })
+  const n = perLearner.length
+  const sum = (f: (l: (typeof perLearner)[number]) => number) => perLearner.reduce((a, l) => a + f(l), 0)
+  return json({
+    learners: n,
+    retention,
+    funnel: {
+      registered: n,
+      firstLesson: perLearner.filter((l) => l.lessons >= 1).length,
+      fiveLessons: perLearner.filter((l) => l.lessons >= 5).length,
+      finishedProvince: perLearner.filter((l) => l.finishedProvince).length,
+    },
+    recall: { reviews: recall?.reviews ?? 0, remembered: recall?.remembered ?? 0 },
+    averageLessonSeconds: lessonTime?.averageMs ? Math.round(lessonTime.averageMs / 1000) : null,
+    averageActiveDays: n ? Math.round((sum((l) => l.activeDays ?? 0) / n) * 10) / 10 : null,
+    averageLessons: n ? Math.round((sum((l) => l.lessons) / n) * 10) / 10 : null,
+    averageWords: n ? Math.round((sum((l) => l.words) / n) * 10) / 10 : null,
+  })
+}
+
 // ---- Routing ----
 
 export default {
@@ -312,6 +365,9 @@ export default {
       if (pathname === '/api/progress' && request.method === 'PUT') return putProgress(request, env, user)
       if (pathname === '/api/admin/users' && request.method === 'GET') {
         return isAdmin(env, user) ? adminUsers(env) : json({ error: 'forbidden' }, 403)
+      }
+      if (pathname === '/api/admin/metrics' && request.method === 'GET') {
+        return isAdmin(env, user) ? adminMetrics(env) : json({ error: 'forbidden' }, 403)
       }
       if (pathname === '/api/admin/ratings' && request.method === 'GET') {
         return isAdmin(env, user) ? adminRatings(env) : json({ error: 'forbidden' }, 403)
