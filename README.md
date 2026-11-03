@@ -15,7 +15,9 @@ the stack, local development, voice audio and deployment.
   `design/respaldo-descargas/` is a local backup of Downloads and is ignored by git.
 - `tools/` — scripts that prepare artwork, fonts and audio for the app (map and boat cutting, font subsetting,
   audio manifest and text-to-speech notebooks).
-- `.github/workflows/deploy-v2.yml` — builds `app/` and publishes it to GitHub Pages on every push to `main`.
+- `.github/workflows/ci.yml` — on every pull request: build, lint, `npm audit`, the progress-validator tests and a check that
+  the build keeps its security headers. `.github/dependabot.yml` asks for dependency updates weekly. The site itself is
+  deployed by Cloudflare from `main` (see `app/README.md`).
 
 ## Develop
 

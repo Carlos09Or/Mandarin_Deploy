@@ -99,7 +99,7 @@ const securityHeaders = (): Plugin => {
   }
 }
 
-// BASE_PATH lets the same build run at a domain root (Vercel) or under /repo/ (GitHub Pages).
+// BASE_PATH lets the same build run at a domain root (Vercel) or under /repo/ (a sub-path host).
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
   // `npm run dev` talks to the Worker that `npm run dev:api` runs.

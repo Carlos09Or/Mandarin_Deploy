@@ -9,7 +9,7 @@ import { getProgress, replaceProgress, revive, subscribeProgress, wipeDevice, ty
 
 export type AccountUser = { id: string; email: string; name: string; isAdmin: boolean }
 export type Account = {
-  /** The server answered: false on GitHub Pages and in plain `vite`, where there are no accounts. */
+  /** The server answered: false on static hosting and in plain `vite`, where there are no accounts. */
   available: boolean
   /** Still finding out who is signed in. */
   loading: boolean

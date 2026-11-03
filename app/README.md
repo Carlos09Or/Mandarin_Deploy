@@ -58,15 +58,14 @@ clip at 0.7× speed with the pitch preserved.
 
 ## Deploy
 
-`.github/workflows/deploy-v2.yml` builds this folder and publishes it to GitHub Pages on every
-push to `main`. In the repository settings, set **Pages → Source** to **GitHub Actions**.
-For another host (Vercel, Cloudflare Pages), use `app` as the root directory and `npm run build`;
-leave `BASE_PATH` unset when the app is served from a domain root.
+Cloudflare builds and deploys this folder on every push to `main` (root `app`, build `npm run build`). There is no
+GitHub Pages deploy any more. For another host, use `app` as the root directory and `npm run build`; leave `BASE_PATH`
+unset when the app is served from a domain root (set it only to serve under `/repo/`).
 
 ## Accounts
 
-Sign in with Google; progress syncs between devices. Without an account (or on hosting with no server, like
-GitHub Pages) the app works exactly as before.
+Sign in with Google; progress syncs between devices. Without an account (or on hosting with no server) the app works
+exactly as before.
 
 - `worker/index.ts` — the Cloudflare Worker: Google sign-in (code flow + PKCE), cookie sessions, one progress document
   per learner in **D1**, and `/admin` (`worker/admin.ts`). Static files are served straight from the assets; the Worker
