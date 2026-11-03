@@ -9,7 +9,7 @@ import { getProgress, replaceProgress, revive, subscribeProgress, wipeDevice, ty
 
 export type AccountUser = { id: string; email: string; name: string; isAdmin: boolean }
 export type Account = {
-  /** The server answered: false on GitHub Pages and in plain `vite`, where there are no accounts. */
+  /** The server answered: false on static hosting and in plain `vite`, where there are no accounts. */
   available: boolean
   /** Still finding out who is signed in. */
   loading: boolean
@@ -83,6 +83,14 @@ export function useAccount(): Account {
 }
 
 class SignedOut extends Error {}
+/** The server asked this device to slow down (429): progress waits on the device and goes up later. */
+class SlowDown extends Error {
+  seconds: number
+  constructor(seconds: number) {
+    super('rate limited')
+    this.seconds = seconds
+  }
+}
 
 async function api(path: string, init: RequestInit & { json?: unknown } = {}) {
   const { json, ...rest } = init
@@ -94,7 +102,7 @@ async function api(path: string, init: RequestInit & { json?: unknown } = {}) {
   })
   // Without the server (static hosting) the same URL answers with the app's page or an error page, never JSON.
   if (!res.headers.get('content-type')?.includes('application/json')) throw new Error('no accounts here')
-  return { status: res.status, body: (await res.json()) as Record<string, any> }
+  return { status: res.status, retryAfter: Number(res.headers.get('retry-after')) || 0, body: (await res.json()) as Record<string, any> }
 }
 
 const setUser = (user: AccountUser | null) => {
@@ -108,6 +116,10 @@ let current: Promise<void> | null = null
 let again = false
 let timer = 0
 let lastRun = 0
+/** After a 429 nothing is sent until this time; each one in a row doubles the wait (30 s, 1 min, 2 min ... up to 10 min). */
+let blockedUntil = 0
+let slowdowns = 0
+let retryTimer = 0
 
 const link = (userId: string): Link | null => {
   const l = read<Link>(LINK_KEY)
@@ -128,6 +140,7 @@ async function syncOnce(user: AccountUser) {
   for (let attempt = 0; attempt < 4; attempt++) {
     const res = await api('/api/progress')
     if (res.status === 401) throw new SignedOut()
+    if (res.status === 429) throw new SlowDown(res.retryAfter)
     if (res.status !== 200) throw new Error(`progress ${res.status}`)
     const remote = res.body.data ? revive(res.body.data as Partial<Progress>) : null
     const version = res.body.version as number
@@ -144,6 +157,7 @@ async function syncOnce(user: AccountUser) {
     if (mustUpload) {
       const put = await api('/api/progress', { method: 'PUT', json: { data: merged, base: version } })
       if (put.status === 401) throw new SignedOut()
+      if (put.status === 429) throw new SlowDown(put.retryAfter)
       if (put.status === 409) continue // another device saved in between: pull and merge again
       if (put.status !== 200) throw new Error(`progress ${put.status}`)
       savedVersion = put.body.version as number
@@ -163,6 +177,7 @@ async function syncOnce(user: AccountUser) {
 /** Brings this device and the account level. A request made while one is under way is folded into it, and waits for it. */
 export function syncNow(): Promise<void> {
   if (!account.user || !account.available) return Promise.resolve()
+  if (Date.now() < blockedUntil) return Promise.resolve()
   if (current) {
     again = true
     return current
@@ -175,9 +190,16 @@ export function syncNow(): Promise<void> {
         again = false
         await syncOnce(user)
       } while (again)
+      slowdowns = 0
       set({ sync: 'idle', syncedAt: Date.now() })
     } catch (err) {
       if (err instanceof SignedOut) setUser(null)
+      if (err instanceof SlowDown) {
+        const wait = Math.min(Math.max(err.seconds, 30) * 2 ** slowdowns++, 600)
+        blockedUntil = Date.now() + wait * 1000
+        clearTimeout(retryTimer)
+        retryTimer = window.setTimeout(() => void syncNow(), wait * 1000 + 500)
+      }
       set({ sync: err instanceof SignedOut ? 'idle' : 'error' })
     } finally {
       current = null
@@ -220,10 +242,13 @@ export async function startAccount() {
         if (done.status === 200) {
           setUser(done.body.user)
           toast('Signed in')
-        } else set({ problem: 'Google sign-in did not work. Try again.' })
+        } else if (done.body.error === 'signups_closed') set({ problem: 'New accounts are paused for now. Please try again later.' })
+        else set({ problem: 'Google sign-in did not work. Try again.' })
       }
     }
     const me = await api('/api/me')
+    // Slowed down at startup: treated like being offline (the learner stays signed in on this device).
+    if (me.status === 429) throw new Error('busy')
     set({ available: true, google: !!me.body.google, dev: !!me.body.dev })
     setUser(me.body.user)
   } catch (err) {

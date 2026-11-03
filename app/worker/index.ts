@@ -2,6 +2,8 @@
 // Static files never reach this Worker (wrangler.jsonc `run_worker_first`): only /api/* and /admin do.
 
 import { adminPage } from './admin.ts'
+import { withSecurityHeaders } from './security.ts'
+import { progressProblem } from './validate.ts'
 
 export interface Env {
   DB: D1Database
@@ -13,6 +15,13 @@ export interface Env {
   ADMIN_EMAILS?: string
   /** '1' only in .dev.vars: lets `npm run dev` sign in without Google. */
   DEV_LOGIN?: string
+  /** Set to '0' (a plain variable in the Cloudflare dashboard, no deploy) to stop new accounts being created; learners who have one are unaffected. */
+  SIGNUPS_OPEN?: string
+  // Rate limiters (wrangler.jsonc `ratelimits`). Missing ones (older config, tests) simply don't limit.
+  RL_IP?: RateLimit
+  RL_AUTH?: RateLimit
+  RL_USER?: RateLimit
+  RL_WRITE?: RateLimit
 }
 
 type User = { id: string; email: string; name: string }
@@ -20,6 +29,8 @@ type User = { id: string; email: string; name: string }
 const SESSION_COOKIE = 'sid'
 const TX_COOKIE = 'tx'
 const SESSION_DAYS = 60
+/** Sessions kept per learner (one per device, more or less): signing in again past this ends the oldest. */
+const MAX_SESSIONS = 10
 const DAY = 86_400_000
 /** One progress document is a few hundred KB at most (3000 review entries + 300 cards). */
 const MAX_PROGRESS_BYTES = 1_500_000
@@ -57,6 +68,28 @@ const isAdmin = (env: Env, user: User) => adminEmails(env).includes(user.email.t
 /** Writes need a same-origin Origin header: with SameSite=Lax cookies this keeps other sites from acting for a signed-in learner. */
 const sameOrigin = (request: Request) => request.headers.get('origin') === new URL(request.url).origin
 
+/** True when the request may go on. Fails open: a problem with the limiter itself must not lock learners out. */
+async function allowed(limiter: RateLimit | undefined, key: string) {
+  if (!limiter) return true
+  try {
+    return (await limiter.limit({ key })).success
+  } catch {
+    return true
+  }
+}
+const tooMany = () => json({ error: 'rate_limited' }, 429, { 'retry-after': '30' })
+
+/** The admin figures scan every learner's document, which D1 bills by rows read: they are worked out at most this often per Worker instance. */
+const ADMIN_CACHE_MS = 10 * 60_000
+const adminCache = new Map<string, { at: number; body: string }>()
+async function cachedAdmin(key: string, compute: () => Promise<Response>) {
+  const hit = adminCache.get(key)
+  if (hit && Date.now() - hit.at < ADMIN_CACHE_MS) return new Response(hit.body, { headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } })
+  const res = await compute()
+  if (res.ok) adminCache.set(key, { at: Date.now(), body: await res.clone().text() })
+  return res
+}
+
 // ---- Sessions ----
 
 async function currentUser(request: Request, env: Env): Promise<User | null> {
@@ -83,6 +116,7 @@ async function currentUser(request: Request, env: Env): Promise<User | null> {
 async function signIn(request: Request, env: Env, who: { sub: string; email: string; name: string }) {
   const now = Date.now()
   const existing = await env.DB.prepare('SELECT id FROM users WHERE google_sub = ?').bind(who.sub).first<{ id: string }>()
+  if (!existing && env.SIGNUPS_OPEN === '0') return null
   const userId = existing?.id ?? crypto.randomUUID()
   const token = randomToken()
   await env.DB.batch([
@@ -93,6 +127,7 @@ async function signIn(request: Request, env: Env, who: { sub: string; email: str
         ),
     env.DB.prepare('DELETE FROM sessions WHERE expires_at < ?').bind(now),
     env.DB.prepare('INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)').bind(await sha256Hex(token), userId, now + SESSION_DAYS * DAY),
+    env.DB.prepare('DELETE FROM sessions WHERE user_id = ? AND id NOT IN (SELECT id FROM sessions WHERE user_id = ? ORDER BY expires_at DESC LIMIT ?)').bind(userId, userId, MAX_SESSIONS),
   ])
   const user: User = { id: userId, email: who.email, name: who.name }
   return { user, cookie: setCookie(request, SESSION_COOKIE, token, (SESSION_DAYS * DAY) / 1000) }
@@ -156,7 +191,9 @@ async function googleFinish(request: Request, env: Env) {
   if (!issuerOk || claims.aud !== env.GOOGLE_CLIENT_ID || !claims.exp || claims.exp * 1000 < Date.now() || !claims.sub || !claims.email || !claims.email_verified) {
     return json({ error: 'bad_token' }, 400)
   }
-  const { user, cookie } = await signIn(request, env, { sub: claims.sub, email: claims.email, name: claims.name || claims.email.split('@')[0] })
+  const signedIn = await signIn(request, env, { sub: claims.sub, email: claims.email, name: claims.name || claims.email.split('@')[0] })
+  if (!signedIn) return json({ error: 'signups_closed' }, 403)
+  const { user, cookie } = signedIn
   const headers = new Headers({ 'content-type': 'application/json', 'cache-control': 'no-store' })
   headers.append('set-cookie', cookie)
   headers.append('set-cookie', setCookie(request, TX_COOKIE, '', 0, '/api/auth'))
@@ -170,7 +207,9 @@ async function devLogin(request: Request, env: Env) {
   const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : ''
   if (!email.includes('@')) return json({ error: 'bad_email' }, 400)
   const name = typeof body?.name === 'string' && body.name.trim() ? body.name.trim() : email.split('@')[0]
-  const { user, cookie } = await signIn(request, env, { sub: `dev:${email}`, email, name })
+  const signedIn = await signIn(request, env, { sub: `dev:${email}`, email, name })
+  if (!signedIn) return json({ error: 'signups_closed' }, 403)
+  const { user, cookie } = signedIn
   return json({ user: publicUser(env, user) }, 200, { 'set-cookie': cookie })
 }
 
@@ -201,7 +240,10 @@ async function putProgress(request: Request, env: Env, user: User) {
     return json({ error: 'bad_json' }, 400)
   }
   const data = body.data
-  if (!data || typeof data !== 'object' || data.v !== 1 || typeof body.base !== 'number') return json({ error: 'bad_progress' }, 400)
+  if (typeof body.base !== 'number') return json({ error: 'bad_progress' }, 400)
+  const problem = progressProblem(data)
+  if (problem) return json({ error: 'bad_progress', field: problem }, 400)
+  if (!data) return json({ error: 'bad_progress' }, 400)
 
   const streak = (data.streak ?? {}) as { count?: unknown; last?: unknown }
   const values = [
@@ -331,51 +373,66 @@ async function adminMetrics(env: Env) {
 
 // ---- Routing ----
 
+async function route(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url)
+  const { pathname } = url
+  try {
+    if (!pathname.startsWith('/api/') && !pathname.startsWith('/admin')) return env.ASSETS.fetch(request)
+
+    if (request.method !== 'GET' && request.method !== 'HEAD' && !sameOrigin(request)) return json({ error: 'forbidden' }, 403)
+
+    // Limits come before any database work, so what they turn away costs D1 nothing. Per address for everyone, a looser
+    // per-address one for signing in (a class signs in from one address), and per device (session) once signed in.
+    const ip = request.headers.get('cf-connecting-ip') ?? 'local'
+    if (!(await allowed(env.RL_IP, ip))) return tooMany()
+    if ((pathname.startsWith('/api/auth/google/') || pathname === '/api/auth/dev') && !(await allowed(env.RL_AUTH, ip))) return tooMany()
+    const sid = cookies(request)[SESSION_COOKIE]
+    if (sid) {
+      if (!(await allowed(env.RL_USER, sid))) return tooMany()
+      if (pathname === '/api/progress' && request.method === 'PUT' && !(await allowed(env.RL_WRITE, sid))) return tooMany()
+    }
+
+    if (pathname === '/api/me' && request.method === 'GET') {
+      const user = await currentUser(request, env)
+      return json({
+        user: user && publicUser(env, user),
+        google: !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
+        dev: env.DEV_LOGIN === '1',
+      })
+    }
+    if (pathname === '/api/auth/google/start' && request.method === 'POST') return googleStart(request, env)
+    if (pathname === '/api/auth/google/finish' && request.method === 'POST') return googleFinish(request, env)
+    if (pathname === '/api/auth/dev' && request.method === 'POST') return devLogin(request, env)
+    if (pathname === '/api/auth/logout' && request.method === 'POST') return logout(request, env)
+
+    const user = await currentUser(request, env)
+    if (pathname === '/admin' || pathname === '/admin/') {
+      if (!user || !isAdmin(env, user)) return Response.redirect(`${url.origin}/`, 302)
+      return adminPage(user.email)
+    }
+    if (!user) return json({ error: 'unauthorized' }, 401)
+
+    if (pathname === '/api/me' && request.method === 'DELETE') return deleteAccount(request, env, user)
+    if (pathname === '/api/progress' && request.method === 'GET') return getProgress(env, user)
+    if (pathname === '/api/progress' && request.method === 'PUT') return putProgress(request, env, user)
+    if (pathname === '/api/admin/users' && request.method === 'GET') {
+      return isAdmin(env, user) ? adminUsers(env) : json({ error: 'forbidden' }, 403)
+    }
+    if (pathname === '/api/admin/metrics' && request.method === 'GET') {
+      return isAdmin(env, user) ? cachedAdmin('metrics', () => adminMetrics(env)) : json({ error: 'forbidden' }, 403)
+    }
+    if (pathname === '/api/admin/ratings' && request.method === 'GET') {
+      return isAdmin(env, user) ? cachedAdmin('ratings', () => adminRatings(env)) : json({ error: 'forbidden' }, 403)
+    }
+    return json({ error: 'not_found' }, 404)
+  } catch (err) {
+    console.error(err)
+    return json({ error: 'server_error' }, 500)
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url)
-    const { pathname } = url
-    try {
-      if (!pathname.startsWith('/api/') && !pathname.startsWith('/admin')) return env.ASSETS.fetch(request)
-
-      if (request.method !== 'GET' && request.method !== 'HEAD' && !sameOrigin(request)) return json({ error: 'forbidden' }, 403)
-
-      if (pathname === '/api/me' && request.method === 'GET') {
-        const user = await currentUser(request, env)
-        return json({
-          user: user && publicUser(env, user),
-          google: !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
-          dev: env.DEV_LOGIN === '1',
-        })
-      }
-      if (pathname === '/api/auth/google/start' && request.method === 'POST') return googleStart(request, env)
-      if (pathname === '/api/auth/google/finish' && request.method === 'POST') return googleFinish(request, env)
-      if (pathname === '/api/auth/dev' && request.method === 'POST') return devLogin(request, env)
-      if (pathname === '/api/auth/logout' && request.method === 'POST') return logout(request, env)
-
-      const user = await currentUser(request, env)
-      if (pathname === '/admin' || pathname === '/admin/') {
-        if (!user || !isAdmin(env, user)) return Response.redirect(`${url.origin}/`, 302)
-        return adminPage(user.email)
-      }
-      if (!user) return json({ error: 'unauthorized' }, 401)
-
-      if (pathname === '/api/me' && request.method === 'DELETE') return deleteAccount(request, env, user)
-      if (pathname === '/api/progress' && request.method === 'GET') return getProgress(env, user)
-      if (pathname === '/api/progress' && request.method === 'PUT') return putProgress(request, env, user)
-      if (pathname === '/api/admin/users' && request.method === 'GET') {
-        return isAdmin(env, user) ? adminUsers(env) : json({ error: 'forbidden' }, 403)
-      }
-      if (pathname === '/api/admin/metrics' && request.method === 'GET') {
-        return isAdmin(env, user) ? adminMetrics(env) : json({ error: 'forbidden' }, 403)
-      }
-      if (pathname === '/api/admin/ratings' && request.method === 'GET') {
-        return isAdmin(env, user) ? adminRatings(env) : json({ error: 'forbidden' }, 403)
-      }
-      return json({ error: 'not_found' }, 404)
-    } catch (err) {
-      console.error(err)
-      return json({ error: 'server_error' }, 500)
-    }
+    return withSecurityHeaders(await route(request, env))
   },
 } satisfies ExportedHandler<Env>
