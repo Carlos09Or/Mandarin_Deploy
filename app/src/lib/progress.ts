@@ -3,8 +3,8 @@ import { PATH } from '../data/course'
 import type { FriendId, OutfitSetting } from '../data/friends'
 import type { CardState, ReviewEntry } from './srs'
 
-// Local-first progress. Everything is saved on the device first; `outbox` holds the
-// events that a future sync (Supabase) will upload, so nothing is lost while offline.
+// Local-first progress. Everything is saved on the device first and works offline. Signed-in learners also have it
+// synced to their account in the background (account.ts), merging what several devices did (merge.ts).
 
 export type WordStat = { seen: number; correct: number; wrong: number; last: number }
 export type NodeResult = { completions: number; bestAccuracy: number; lastAt: string }
@@ -62,12 +62,19 @@ export type Progress = {
   retention: number
   /** The day the gems for finishing the review were given, so they are given once a day. */
   reviewDay: string | null
+  /** When anything was last changed here (not when a merge brought changes in): it tells the sync what is still to be uploaded. */
+  modifiedAt: number
+  /** Which "life" of the data this is. Resetting starts a new one; a device with an older one is overruled when it syncs (see merge.ts). */
+  epoch: string
+  epochAt: number
 }
 
 const KEY = 'mlh.progress.v1'
 export const DAILY_GOAL = 30
 export const GEMS = { lesson: 5, perfect: 5, dailyGoal: 10, review: 5 }
 const MAX_REVIEWS = 3000
+/** Everything that has never been reset shares this epoch, so devices that never met still merge. */
+const INITIAL_EPOCH = 'initial'
 const DEFAULT_RETENTION = 0.9
 
 const today = (d = new Date()) => d.toLocaleDateString('en-CA') // YYYY-MM-DD in local time
@@ -94,8 +101,14 @@ function fresh(): Progress {
     sessionSize: 15,
     retention: DEFAULT_RETENTION,
     reviewDay: null,
+    modifiedAt: 0,
+    epoch: INITIAL_EPOCH,
+    epochAt: 0,
   }
 }
+
+/** Fills in what a save from an older version of the app, or from the server, doesn't have. */
+export const revive = (data: Partial<Progress>): Progress => ({ ...fresh(), ...data })
 
 function load(): Progress {
   try {
@@ -105,7 +118,7 @@ function load(): Progress {
       // Older saves kept Wāwa's outfit in `look`.
       if (data.look && !data.outfits) data.outfits = { wawa: data.look }
       delete data.look
-      return { ...fresh(), ...data }
+      return revive(data)
     }
   } catch {
     /* private mode or corrupt data: start fresh */
@@ -116,8 +129,8 @@ function load(): Progress {
 let state = load()
 const listeners = new Set<() => void>()
 
-function commit(next: Progress) {
-  state = next
+function commit(next: Progress, stamp = true) {
+  state = stamp ? { ...next, modifiedAt: Date.now() } : next
   try {
     localStorage.setItem(KEY, JSON.stringify(state))
   } catch {
@@ -128,14 +141,17 @@ function commit(next: Progress) {
 
 export function useProgress(): Progress {
   return useSyncExternalStore(
-    (l) => {
-      listeners.add(l)
-      return () => listeners.delete(l)
-    },
+    subscribeProgress,
     () => state,
   )
 }
 export const getProgress = () => state
+export function subscribeProgress(l: () => void) {
+  listeners.add(l)
+  return () => void listeners.delete(l)
+}
+/** Puts in progress that came from a sync. Its modifiedAt is kept: it is not a change made on this device. */
+export const replaceProgress = (next: Progress) => commit(next, false)
 
 export function recordAnswer(n: number, correct: boolean) {
   const prev = state.words[n] ?? { seen: 0, correct: 0, wrong: 0, last: 0 }
@@ -246,8 +262,14 @@ export function markRevealed(province: string) {
   if (!state.revealed.includes(province)) commit({ ...state, revealed: [...state.revealed, province] })
 }
 
+/** Erases everything and starts a new epoch, so a synced account is erased too instead of bringing the old progress back. */
 export function resetProgress() {
-  commit({ ...fresh(), deviceId: state.deviceId })
+  commit({ ...fresh(), deviceId: state.deviceId, epoch: crypto.randomUUID(), epochAt: Date.now() })
+}
+
+/** Empties this device without touching any account (when signing out); it merges into an account like a new device. */
+export function wipeDevice() {
+  commit({ ...fresh(), deviceId: state.deviceId }, false)
 }
 
 // ---- Derived helpers ----

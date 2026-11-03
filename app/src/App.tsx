@@ -7,6 +7,7 @@ import { MapHome, type MapEvent } from './journey/MapHome'
 import { Splash } from './journey/Splash'
 import { nextProvince } from './journey/stops'
 import { warmAhead, whenLoaded } from './journey/preload'
+import { startAccount } from './lib/account'
 import { canWarm } from './lib/network'
 import { holdUpdates, registerUpdates } from './lib/updates'
 import { toast } from './journey/toast'
@@ -80,6 +81,8 @@ export default function App() {
     if (!loaded) return
     void screens.LessonPlayer()
     void warmAhead().then(registerUpdates)
+    // Who is signed in, and the sync, start once the map is open so they never compete with the loading screen.
+    void startAccount()
   }, [loaded])
 
   // Then the other screens are fetched while the browser is idle, so they open at once.
