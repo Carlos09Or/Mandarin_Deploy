@@ -1,6 +1,7 @@
 import HanziWriter from 'hanzi-writer'
 import { useEffect, useRef, useState } from 'react'
 import { word } from '../data/course'
+import { meaningOf, useLang, useT } from '../i18n'
 import { speak } from '../lib/audio'
 import { loadChar } from '../lib/hanzi'
 import type { Guide } from '../lib/lesson'
@@ -13,6 +14,9 @@ const OUTLINE: Record<Guide, string> = { full: '--color-guide-full', faint: '--c
 
 
 export function Trace({ char, n, guide, onDone }: Props) {
+  const lang = useLang()
+  const e = useT().exercise
+  const skip = useT().common.skip
   const box = useRef<HTMLDivElement>(null)
   const writer = useRef<HanziWriter | null>(null)
   const [size] = useState(() => Math.min(320, window.innerWidth - 72))
@@ -94,7 +98,7 @@ export function Trace({ char, n, guide, onDone }: Props) {
 
   const chars = [...w.hanzi]
   return (
-    <Stage title={guide === 'none' ? `Write “${w.en}” from memory.` : `Write “${w.en}”.`}>
+    <Stage title={guide === 'none' ? e.writeMemory(meaningOf(w, lang)) : e.write(meaningOf(w, lang))}>
       {chars.length > 1 && (
         <p className="han -mt-3 text-3xl font-bold">
           {chars.map((c, i) =>
@@ -126,9 +130,9 @@ export function Trace({ char, n, guide, onDone }: Props) {
           <div ref={box} className="relative touch-none" />
           {failed && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center text-muted">
-              <p>Couldn’t load the strokes for {char}.</p>
+              <p>{e.noStrokes(char)}</p>
               <button type="button" className="btn btn-ghost py-2.5 text-sm" onClick={() => onDone(0)}>
-                Skip
+                {skip}
               </button>
             </div>
           )}
@@ -142,7 +146,7 @@ export function Trace({ char, n, guide, onDone }: Props) {
             className="px-3 py-2 text-sm font-extrabold text-sky-dark"
             onClick={animating ? skipDemo : showOrder}
           >
-            {animating ? 'Skip and write' : 'Show stroke order'}
+            {animating ? e.skipAndWrite : e.showOrder}
           </button>
         </div>
       )}

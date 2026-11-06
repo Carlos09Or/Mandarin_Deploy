@@ -1,16 +1,12 @@
 import type { ReactNode } from 'react'
 import { DAILY_GOAL, liveStreak, todayXp, useProgress } from '../lib/progress'
 import { asset } from '../data/journey'
+import { useT } from '../i18n'
 import { IconFlame, IconGem, IconStar } from './icons'
 
 export type Tab = 'map' | 'review' | 'write' | 'profile'
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'map', label: 'Map' },
-  { id: 'review', label: 'Review' },
-  { id: 'write', label: 'Write' },
-  { id: 'profile', label: 'Profile' },
-]
+const TAB_IDS: Tab[] = ['map', 'review', 'write', 'profile']
 const TabIcon = ({ id, on }: { id: Tab; on: boolean }) => (
   <img
     src={asset(`nav-${id}.webp`)}
@@ -24,25 +20,27 @@ type Props = { tab: Tab; onTab: (t: Tab) => void; bleed?: boolean; children: Rea
 
 export function Shell({ tab, onTab, bleed = false, children }: Props) {
   const p = useProgress()
+  const tx = useT().nav
+  const TABS = TAB_IDS.map((id) => ({ id, label: tx[id] }))
   const streak = liveStreak(p)
   const xpToday = todayXp(p)
   const goal = Math.min(1, xpToday / DAILY_GOAL)
 
   const stats = (
     <div className="flex items-center gap-3 text-[15px] font-black sm:gap-4">
-      <span className={`flex items-center gap-1 ${streak ? 'text-brand' : 'text-muted/60'}`} title="Day streak">
+      <span className={`flex items-center gap-1 ${streak ? 'text-brand' : 'text-muted/60'}`} title={tx.streak}>
         <IconFlame className="h-6 w-6" />
         {streak}
       </span>
-      <span className="flex items-center gap-1 text-gold-dark" title="Total XP">
+      <span className="flex items-center gap-1 text-gold-dark" title={tx.xp}>
         <IconStar className="h-6 w-6 text-gold" />
         {p.xp}
       </span>
-      <span className="flex items-center gap-1 text-sky-dark" title="Gems">
+      <span className="flex items-center gap-1 text-sky-dark" title={tx.gems}>
         <IconGem className="h-6 w-6" />
         {p.gems}
       </span>
-      <span className="flex items-center gap-1.5 text-jade-dark" title={`Daily goal: ${xpToday}/${DAILY_GOAL} XP`}>
+      <span className="flex items-center gap-1.5 text-jade-dark" title={tx.goal(xpToday, DAILY_GOAL)}>
         <svg viewBox="0 0 36 36" className="h-7 w-7 -rotate-90">
           <circle cx="18" cy="18" r="14" fill="none" stroke="var(--color-line)" strokeWidth="5" />
           <circle
@@ -69,7 +67,7 @@ export function Shell({ tab, onTab, bleed = false, children }: Props) {
       <nav className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-2 border-r-2 border-line-dark bg-card px-4 py-6 md:flex">
         <div className="mb-6 px-2 leading-tight">
           <p className="font-display text-xl font-bold text-sky-dark">Mandarin Journey</p>
-          <p className="text-xs font-bold text-muted">{p.nickname ? `Hi, ${p.nickname}` : 'HSK 1 · free'}</p>
+          <p className="text-xs font-bold text-muted">{p.nickname ? tx.hi(p.nickname) : tx.tagline}</p>
         </div>
         {TABS.map((t) => (
           <button

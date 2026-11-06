@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { tokenPinyin, word } from '../data/course'
+import { exampleOf, useLang, useT } from '../i18n'
 import { speak } from '../lib/audio'
 import type { Exercise } from '../lib/lesson'
 import { AudioButton } from '../components/AudioButton'
@@ -19,6 +20,8 @@ type Drag = { id: number; x: number; y: number; dx: number; dy: number; w: numbe
 const DRAG_THRESHOLD = 6
 
 export function Sentence({ ex, order, onOrder, revealed }: Props) {
+  const lang = useLang()
+  const e = useT().exercise
   const w = word(ex.word)
   const [drag, setDrag] = useState<Drag | null>(null)
   const [caret, setCaret] = useState<{ x: number; y: number; h: number } | null>(null)
@@ -144,7 +147,7 @@ export function Sentence({ ex, order, onOrder, revealed }: Props) {
   const empty = Math.max(0, ex.tokens.length - order.length)
 
   return (
-    <Stage title={`Build “${w.example.en}”`}>
+    <Stage title={e.build(exampleOf(w, lang))}>
       <div className="-mt-2 flex items-center gap-3">
         <AudioButton text={w.example.hanzi} size="sm" />
         <AudioButton text={w.example.hanzi} size="sm" slow />

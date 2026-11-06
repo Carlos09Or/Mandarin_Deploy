@@ -14,6 +14,7 @@ export function Welcome() {
   const a = useAccount()
   const p = useProgress()
   const t = useT().welcome
+  const problems = useT().account.problems
   const [guest, setGuest] = useState(false)
   // Until they type, the name is the one already kept, or the first name of the Google account that has just signed in.
   const [typed, setTyped] = useState<string | null>(null)
@@ -47,7 +48,7 @@ export function Welcome() {
               {t.guest}
             </button>
             <p className="text-sm text-muted">{t.guestNote}</p>
-            {a.problem && <p className="text-sm font-bold text-wrong">{a.problem}</p>}
+            {a.problem && <p className="text-sm font-bold text-wrong">{problems[a.problem] ?? a.problem}</p>}
           </div>
         ) : (
           <form

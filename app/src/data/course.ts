@@ -35,6 +35,7 @@ export const WORDS: Word[] = raw.words
 export const UNITS: Unit[] = raw.units
 export const CHARS: Record<string, CharInfo> = raw.chars
 export const RADICALS: Record<string, string> = raw.radicals
+export const RADICALS_ES: Record<string, string> = raw.radicalsEs
 
 const byNumber = new Map(WORDS.map((w) => [w.n, w]))
 export const word = (n: number): Word => byNumber.get(n)!

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { word } from '../data/course'
+import { meaningOf, useLang } from '../i18n'
 import sprites from '../data/word-sprites.json'
 import { asset } from '../data/journey'
 import { whenLoaded } from '../journey/preload'
@@ -39,6 +40,7 @@ type Props = {
 }
 
 export function Intro({ n, step, count, lead }: Props) {
+  const lang = useLang()
   const w = word(n)
   const friend: Friend = count > 1 && step === count - 1 ? 'sloth' : QUICK[(lead + step) % QUICK.length]
   const fromLeft = (lead + step) % 2 === 0
@@ -269,7 +271,7 @@ export function Intro({ n, step, count, lead }: Props) {
           transition={{ duration: instant ? 0 : 0.3 }}
         >
           <p className="text-[1.7rem] leading-tight font-extrabold text-sky-dark">{w.pinyin}</p>
-          <p className="text-2xl leading-tight font-extrabold text-brand-dark">{w.en}</p>
+          <p className="text-2xl leading-tight font-extrabold text-brand-dark">{meaningOf(w, lang)}</p>
         </motion.div>
       </div>
     </Stage>

@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { useEffect } from 'react'
 import { plainPinyin, word } from '../data/course'
+import { useT } from '../i18n'
 import { speak } from '../lib/audio'
 import type { Exercise } from '../lib/lesson'
 import { TONE_COLOR, type Tone } from '../lib/tones'
@@ -51,6 +52,7 @@ function Glyph({ tone }: { tone: Tone }) {
 }
 
 export function ToneExercise({ ex, selected, onSelect, revealed }: Props) {
+  const e = useT().exercise
   const w = word(ex.word)
   // Once checked, the staff always shows the right contour.
   const shown = (revealed ? ex.tone : selected) as Tone | null
@@ -77,7 +79,7 @@ export function ToneExercise({ ex, selected, onSelect, revealed }: Props) {
   }
 
   return (
-    <Stage title="Which tone is it?">
+    <Stage title={e.whichTone}>
       <div className="flex items-center justify-center gap-5">
         <AudioButton text={w.hanzi} size="lg" />
         <p className="text-5xl font-extrabold">{plainPinyin(w.pinyin)}</p>
@@ -126,7 +128,7 @@ export function ToneExercise({ ex, selected, onSelect, revealed }: Props) {
             key={t}
             type="button"
             disabled={revealed}
-            aria-label={`Tone ${t}`}
+            aria-label={e.tone(t)}
             onClick={() => onSelect(t)}
             style={state(t) === '' || state(t) === 'opt-selected' ? { color: TONE_COLOR[t] } : undefined}
             className={`opt min-h-20 px-0 ${state(t)}`}

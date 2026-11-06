@@ -40,7 +40,7 @@ function distractors(target: number, prompt: ChoicePrompt): number[] {
   const clash = (n: number) => {
     const w = word(n)
     if (n === target || w.hanzi === t.hanzi) return true
-    if (prompt === 'hanzi-en' || prompt === 'en-hanzi') return w.en === t.en
+    if (prompt === 'hanzi-en' || prompt === 'en-hanzi') return w.en === t.en || (!!w.es && w.es === t.es)
     // Homophones like 他/她 would make listening and pinyin questions unanswerable.
     return plainPinyin(w.pinyin) === plainPinyin(t.pinyin)
   }

@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import { outfitFor, type FriendId, type Outfit } from '../data/friends'
+import { useT } from '../i18n'
 import { useProgress } from '../lib/progress'
 import { Mascot, type Mood } from './Mascot'
 import { BandaShako, Motas, PolleraCollar, SombreroPintao, Tembleques, WavingFlag } from './Patriotic'
@@ -59,9 +60,10 @@ const Drop = ({ x, y }: { x: number; y: number }) => (
 
 /** Yīngyīng, the harpy eagle (national bird): split crest, black chest band, yellow talons. */
 export function Harpia({ size = 140, mood = 'idle', outfit }: Props) {
+  const aria = useT().friends.aria.harpia
   const look = useOutfit('harpia', outfit)
   return (
-    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label="Yīngyīng, the harpy eagle">
+    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label={aria}>
       <Branch y={166} />
       {mood === 'celebrate' && <Sparkles />}
       <g className="friend-body">
@@ -125,10 +127,11 @@ export function Harpia({ size = 140, mood = 'idle', outfit }: Props) {
 
 /** Lǎnlǎn, the sloth: hangs from a branch, swaying slowly, asleep unless something happens. */
 export function Sloth({ size = 140, mood = 'idle', outfit }: Props) {
+  const aria = useT().friends.aria.sloth
   const look = useOutfit('sloth', outfit)
   const awake = mood !== 'idle'
   return (
-    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label="Lǎnlǎn, the sloth">
+    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label={aria}>
       {mood === 'celebrate' && <Sparkles />}
       <g className="sloth-swing">
         <path d="M78 96 Q64 62 72 32 M122 96 Q136 62 128 32" stroke="#a07d58" strokeWidth="16" strokeLinecap="round" fill="none" />
@@ -215,10 +218,11 @@ export function Sloth({ size = 140, mood = 'idle', outfit }: Props) {
 
 /** Zuǐzuǐ, the keel-billed toucan: rainbow bill, yellow bib, blue feet; plays with a berry. */
 export function Tucan({ size = 140, mood = 'idle', outfit }: Props) {
+  const aria = useT().friends.aria.tucan
   const look = useOutfit('tucan', outfit)
   const id = useId().replace(/:/g, '')
   return (
-    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label="Zuǐzuǐ, the toucan">
+    <svg viewBox="0 0 200 200" width={size} height={size} className={`friend friend-${mood}`} aria-label={aria}>
       <defs>
         <clipPath id={`bill-${id}`}>
           <path d="M112 64 Q152 52 186 80 Q182 92 168 94 Q140 98 112 94 Q106 80 112 64Z" />

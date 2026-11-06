@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { FRIENDS, FRIEND_IDS } from '../data/friends'
+import { useT, useWords } from '../i18n'
 import DETAILS from '../data/map-details.json'
 import {
   BADGE_AT, BOAT_SIZE, SEA_BOATS, CLOUDS, EXTRA_HOLE, OPEN_ZONE, ORIGIN, REGIONS, VB, asset, hasContent, provinceById, type Province, type SeaBoat,
@@ -109,6 +110,9 @@ function TileImage({ src }: { src: string }) {
 
 export function MapHome({ active, onOpen, event, onEventDone }: Props) {
   const progress = useProgress()
+  const t = useT().map
+  const tDoors = useT().doors
+  const { place } = useWords()
   const scrollRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -192,7 +196,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
       setTimeout(() => {
         setShown((s) => new Set(s).add(id))
         const p = provinceById(id)
-        toast(`${p.name} unlocked!<span class="j-han">${p.zh}</span>`)
+        toast(t.unlocked(place(p.name), p.zh))
       }, 900)
       const t0 = performance.now()
       const step = (now: number) => {
@@ -298,7 +302,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
     const p = provinceById(id)
     if (!p || busy.current) return
     if (!isUnlocked(p, progress) || !shown.has(id)) {
-      toast(hasContent(p) ? `${p.name} · finish the province before it` : `${p.name} · coming soon`)
+      toast(hasContent(p) ? t.finishFirst(place(p.name)) : t.soon(place(p.name)))
       return
     }
     busy.current = true
@@ -419,13 +423,13 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
                     className={`j-badge ${done ? 'done' : open ? 'open' : 'locked'}`}
                     style={pct(at)}
                     onClick={(e) => tap(r.id, e.currentTarget)}
-                    aria-label={`${p.name}${open ? '' : ' (locked)'}`}
+                    aria-label={`${place(p.name)}${open ? '' : ` (${tDoors.locked})`}`}
                   >
                     {done ? '✓' : r.unit}
                   </button>
                   {open && (
                     <div className="j-label" style={pct([at[0], at[1] + 12])}>
-                      {p.name}
+                      {place(p.name)}
                       <span className="j-han">{p.zh}</span>
                     </div>
                   )}
@@ -458,7 +462,7 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
 
       <div className="j-map-bar">
         <div className={`j-titlebar ${isNight(progress) ? 'night' : ''}`}>
-          <button type="button" className="j-round" onClick={() => setPicking(true)} aria-label="Choose your traveller">
+          <button type="button" className="j-round" onClick={() => setPicking(true)} aria-label={t.pickTitle}>
             <Face id={progress.traveler} />
           </button>
         </div>
@@ -467,9 +471,9 @@ export function MapHome({ active, onOpen, event, onEventDone }: Props) {
       {picking && (
         <>
           <div className="j-sheet-bg" onClick={() => setPicking(false)} />
-          <div className="j-sheet" role="dialog" aria-label="Choose your traveller">
-            <h3>Who's travelling?</h3>
-            <p>Your character marks where you are on the map and drives the train.</p>
+          <div className="j-sheet" role="dialog" aria-label={t.pickTitle}>
+            <h3>{t.pickAsk}</h3>
+            <p>{t.pickText}</p>
             <div className="j-picks">
               {FRIEND_IDS.map((id) => (
                 <button

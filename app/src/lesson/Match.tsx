@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { word } from '../data/course'
+import { meaningOf, useLang, useT } from '../i18n'
 import { chime, speak } from '../lib/audio'
 import { Stage } from './Stage'
 
@@ -18,6 +19,8 @@ const thread = (a: Point, b: Point) => {
 }
 
 export function Match({ words, onDone }: Props) {
+  const lang = useLang()
+  const e = useT().exercise
   const left = useMemo(() => shuffled(words), [words])
   const right = useMemo(() => {
     // Never start with the answers lined up in the same order.
@@ -152,7 +155,7 @@ export function Match({ words, onDone }: Props) {
         ) : (
           <>
             {dot}
-            <span className="text-base leading-tight font-bold">{w.en}</span>
+            <span className="text-base leading-tight font-bold">{meaningOf(w, lang)}</span>
           </>
         )}
       </div>
@@ -161,7 +164,7 @@ export function Match({ words, onDone }: Props) {
 
   const from = active && drag ? pos[`${active.side}${active.n}`] : null
   return (
-    <Stage title="Draw matching lines.">
+    <Stage title={e.drawLines}>
       <div ref={box} className="relative flex justify-between pt-2">
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden>
           {[...matched].map((n) =>

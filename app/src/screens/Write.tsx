@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { OPEN_WORDS, charsOf, word } from '../data/course'
+import { useT } from '../i18n'
 import { learnedWords, useProgress } from '../lib/progress'
 
 type Props = { onWrite: (char: string, n: number) => void }
@@ -9,6 +10,7 @@ const ALL_CHARS: [string, number][] = []
 for (const w of OPEN_WORDS) for (const c of charsOf(w.hanzi)) if (!ALL_CHARS.some(([x]) => x === c)) ALL_CHARS.push([c, w.n])
 
 export function Write({ onWrite }: Props) {
+  const t = useT().write
   const progress = useProgress()
   const learned = new Set(learnedWords(progress))
   const [showAll, setShowAll] = useState(false)
@@ -25,28 +27,28 @@ export function Write({ onWrite }: Props) {
           写
         </div>
         <div>
-          <h2 className="text-xl font-black">Writing</h2>
+          <h2 className="text-xl font-black">{t.title}</h2>
           <p className="text-muted">
-            Trace each character first, then write it twice from memory with the correct stroke order.
+            {t.text}
           </p>
         </div>
       </section>
 
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-bold text-muted">
-          {unlocked.size} characters unlocked · {clean} written without mistakes
+          {t.unlocked(unlocked.size, clean)}
         </p>
         <button
           type="button"
           onClick={() => setShowAll(!showAll)}
           className="rounded-xl px-3 py-1.5 text-sm font-extrabold text-sky-dark hover:bg-sky-soft"
         >
-          {showAll ? 'Only mine' : `See all ${ALL_CHARS.length}`}
+          {showAll ? t.onlyMine : t.seeAll(ALL_CHARS.length)}
         </button>
       </div>
 
       {chars.length === 0 ? (
-        <p className="py-10 text-center text-muted">Finish a lesson to unlock your first characters.</p>
+        <p className="py-10 text-center text-muted">{t.empty}</p>
       ) : (
         <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
           {chars.map(([c, n]) => {

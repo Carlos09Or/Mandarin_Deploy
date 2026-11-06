@@ -1,3 +1,4 @@
+import { useT } from '../i18n'
 import { outfitFor, type Outfit } from '../data/friends'
 import { useProgress } from '../lib/progress'
 import { SombreroPintao } from './Patriotic'
@@ -16,6 +17,7 @@ type Props = { mood?: Mood; look?: Outfit; size?: number; className?: string }
 
 export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Props) {
   const saved = useProgress().outfits.wawa
+  const names = useT().friends.aria
   const style = look ?? outfitFor('wawa', saved)
   const openMouth = mood === 'happy' || mood === 'celebrate' || mood === 'fire'
 
@@ -26,7 +28,7 @@ export function Mascot({ mood = 'idle', look, size = 160, className = '' }: Prop
       height={size}
       className={`wawa wawa-${mood} ${className}`}
       role="img"
-      aria-label="Wāwa, the golden frog"
+      aria-label={names.wawa}
     >
       <ellipse className="wawa-shadow" cx="100" cy="188" rx="52" ry="8" fill="#2b2420" opacity=".12" />
 
