@@ -77,7 +77,7 @@ export function ToneExercise({ ex, selected, onSelect, revealed }: Props) {
   }
 
   return (
-    <Stage eyebrow="Tones" title="Which tone is it?">
+    <Stage title="Which tone is it?">
       <div className="flex items-center justify-center gap-5">
         <AudioButton text={w.hanzi} size="lg" />
         <p className="text-5xl font-extrabold">{plainPinyin(w.pinyin)}</p>

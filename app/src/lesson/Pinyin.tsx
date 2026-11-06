@@ -28,7 +28,7 @@ export function Pinyin({ ex, value, onChange, onGiveUp, revealed }: Props) {
   }, [revealed])
 
   return (
-    <Stage eyebrow="Type it" title="What is the pinyin?">
+    <Stage title="What is the pinyin?">
       <div className="flex min-h-40 flex-1 flex-col items-center justify-center gap-3">
         <BigHanzi hanzi={w.hanzi} />
         <div className="flex items-center gap-2">

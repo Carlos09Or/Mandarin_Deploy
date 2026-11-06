@@ -14,10 +14,10 @@ type Props = {
 }
 
 const TEXT = {
-  'hanzi-en': { eyebrow: 'Recall', title: 'Find the meaning.' },
-  'en-hanzi': { eyebrow: 'Recall', title: 'Find the character.' },
-  'audio-hanzi': { eyebrow: 'Listen', title: 'What do you hear?' },
-  'hanzi-pinyin': { eyebrow: 'Pronunciation', title: 'How is it pronounced?' },
+  'hanzi-en': 'Find the meaning.',
+  'en-hanzi': 'Find the character.',
+  'audio-hanzi': 'What do you hear?',
+  'hanzi-pinyin': 'How is it pronounced?',
 }
 
 export function Choice({ ex, selected, onSelect, revealed }: Props) {
@@ -56,7 +56,7 @@ export function Choice({ ex, selected, onSelect, revealed }: Props) {
   }
 
   return (
-    <Stage eyebrow={TEXT[ex.prompt].eyebrow} title={TEXT[ex.prompt].title}>
+    <Stage title={TEXT[ex.prompt]}>
       <div className="flex min-h-48 flex-1 flex-col items-center justify-center gap-3">
         {ex.prompt === 'audio-hanzi' ? (
           <div className="flex items-end gap-4">

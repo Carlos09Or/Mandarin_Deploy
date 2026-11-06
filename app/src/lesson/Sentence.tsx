@@ -144,7 +144,7 @@ export function Sentence({ ex, order, onOrder, revealed }: Props) {
   const empty = Math.max(0, ex.tokens.length - order.length)
 
   return (
-    <Stage eyebrow="Build a sentence" title={w.example.en}>
+    <Stage title={`Build “${w.example.en}”`}>
       <div className="-mt-2 flex items-center gap-3">
         <AudioButton text={w.example.hanzi} size="sm" />
         <AudioButton text={w.example.hanzi} size="sm" slow />

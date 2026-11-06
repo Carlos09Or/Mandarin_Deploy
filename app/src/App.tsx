@@ -3,7 +3,7 @@ import { SaveNudge } from './components/SaveNudge'
 import { Shell, type Tab } from './components/Shell'
 import { useWelcomeState } from './components/useWelcomeState'
 import { Welcome } from './components/Welcome'
-import type { PathNode } from './data/course'
+import { lastNodeOf, type PathNode } from './data/course'
 import { FRIEND_IDS, type FriendId } from './data/friends'
 import type { Province } from './data/journey'
 import { MapHome, type MapEvent } from './journey/MapHome'
@@ -117,7 +117,7 @@ export default function App() {
   const startRide = (r: Ride) => {
     const p = getProgress()
     // Words only count as new the first time a lesson is completed.
-    const fresh = r.node.kind === 'lesson' && !p.nodes[r.node.id] ? r.node.words : []
+    const fresh = !p.nodes[r.node.id] ? r.node.words : []
     start(buildNode(r.node, p), r.node.id, fresh, r)
   }
 
@@ -126,8 +126,8 @@ export default function App() {
       if (!session) return
       const firstPass = session.nodeId ? !getProgress().nodes[session.nodeId] : false
       const reward = completeNode(session.nodeId, summary)
-      // Passing a province's checkpoint for the first time finishes the province.
-      const finished = firstPass && session.nodeId?.endsWith('-cp') ? (session.province ?? null) : null
+      // Passing a province's last lesson for the first time finishes the province.
+      const finished = firstPass && session.province && session.nodeId === lastNodeOf(session.province.unit)?.id ? session.province : null
       setResult({ summary, reward, newWords: session.newWords, buddy: session.buddy, nodeId: session.nodeId, finished })
       setSession(null)
     },

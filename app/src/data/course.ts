@@ -22,14 +22,12 @@ export type Unit = {
 }
 export type CharInfo = { radical: string | null; components: string[]; clue: string }
 
-export type NodeKind = 'lesson' | 'checkpoint'
+/** A lesson: five new words, one door on its province's page. */
 export type PathNode = {
   id: string
   unitId: number
   /** Position inside the unit, 0-based. */
   index: number
-  kind: NodeKind
-  /** New words for a lesson; every word of the unit for a checkpoint. */
   words: number[]
 }
 
@@ -64,11 +62,9 @@ function nodesFor(unit: Unit): PathNode[] {
       id: `u${unit.id}-l${i / LESSON_SIZE + 1}`,
       unitId: unit.id,
       index: nodes.length,
-      kind: 'lesson',
       words: unit.words.slice(i, i + LESSON_SIZE),
     })
   }
-  nodes.push({ id: `u${unit.id}-cp`, unitId: unit.id, index: nodes.length, kind: 'checkpoint', words: unit.words })
   return nodes
 }
 
@@ -83,6 +79,8 @@ export const OPEN_PATH: PathNode[] = PATH.filter((n) => OPEN_UNITS.includes(n.un
 const openWordNumbers = new Set(UNITS.filter((u) => OPEN_UNITS.includes(u.id)).flatMap((u) => u.words))
 export const OPEN_WORDS: Word[] = WORDS.filter((w) => openWordNumbers.has(w.n))
 export const nodesOfUnit = (unitId: number) => PATH.filter((p) => p.unitId === unitId)
+/** The last lesson of a unit: passing it for the first time finishes the province. */
+export const lastNodeOf = (unitId: number) => nodesOfUnit(unitId).at(-1)
 export const nodeById = (id: string) => PATH.find((p) => p.id === id)
 
 /** Han characters of a word, in order, without repeats. */

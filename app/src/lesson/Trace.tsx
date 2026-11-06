@@ -94,7 +94,7 @@ export function Trace({ char, n, guide, onDone }: Props) {
 
   const chars = [...w.hanzi]
   return (
-    <Stage eyebrow={guide === 'none' ? 'Draw from memory' : 'Trace'} title={`Write “${w.en}”.`}>
+    <Stage title={guide === 'none' ? `Write “${w.en}” from memory.` : `Write “${w.en}”.`}>
       {chars.length > 1 && (
         <p className="han -mt-3 text-3xl font-bold">
           {chars.map((c, i) =>

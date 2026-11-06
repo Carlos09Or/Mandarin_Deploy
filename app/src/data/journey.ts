@@ -3,7 +3,7 @@ import { OPEN_UNITS, type PathNode } from './course'
 import type { FriendId } from './friends'
 
 // The course as a train journey across Panama: each province is one unit. A province's
-// lessons are stops at real places, and its checkpoint is a landmark.
+// lessons are stops at real places.
 
 export const asset = (file: string) => `${import.meta.env.BASE_URL}journey/${file}`
 
@@ -17,7 +17,6 @@ export type Province = {
   stops?: string[]
   /** After the second lesson, a short story stop (not a lesson). */
   story?: { title: string; sub: string }
-  landmark?: { name: string; zh: string; py: string; image: string }
   header?: { day: string; night?: string }
   /** A tall painting for the whole route: scenery down both sides, the middle left clear for the path. */
   backdrop?: { day: string; night: string }
@@ -30,9 +29,8 @@ export const PROVINCES: Province[] = [
     zh: '巴拿马',
     py: 'Bānámǎ',
     unit: 1,
-    stops: ['Tocumen Airport', 'Cinta Costera', 'Casco Viejo', 'Barrio Chino', 'Amador Causeway', 'Panama Viejo'],
+    stops: ['Tocumen Airport', 'Cinta Costera', 'Casco Viejo', 'Barrio Chino', 'Amador Causeway', 'Panama Viejo', 'Cerro Ancon', 'Panama Canal'],
     story: { title: 'Story · The railroad', sub: 'Panama & China · 3 min' },
-    landmark: { name: 'Panama Canal', zh: '运河', py: 'Bānámǎ Yùnhé', image: 'landmark-canal.webp' },
     backdrop: { day: 'route-bg-day.webp', night: 'route-bg-night.webp' },
   },
   {
@@ -42,7 +40,6 @@ export const PROVINCES: Province[] = [
     py: 'Xī Bānámǎ',
     unit: 2,
     stops: ['Arraijan', 'Vacamonte', 'La Chorrera', 'El Chorro Falls', 'Capira', 'Coronado Beach'],
-    landmark: { name: 'Bridge of the Americas', zh: '大桥', py: 'Měizhōu Dàqiáo', image: 'stops/arch-bridge.webp' },
     header: { day: 'ride-landscape.webp' },
   },
   { id: 'cocle', name: 'Cocle', zh: '科克莱', py: 'Kēkèlái', unit: 3 },
@@ -81,8 +78,10 @@ export const STORY_ICON = 'stops/storybook.webp'
  * also the doorway's centre line; `step` is how far down the doorstep is.
  */
 export const DOOR_FRAME = { w: 760, h: 1228, step: 0.824, plaque: { x: 0.5, y: 0.32, d: 0.157 } }
-/** Panama's six lessons each have a door that nods to their place; its checkpoint is the canal lock. */
-const PANAMA_DOORS = ['door-1-airport', 'door-2-seaside', 'door-3-oldtown', 'door-4-chinatown', 'door-5-causeway', 'door-6-ruins']
+/** Panama's eight lessons each have a door that nods to their place; the last one, at the canal, is the canal lock. */
+const PANAMA_DOORS = [
+  'door-1-airport', 'door-2-seaside', 'door-3-oldtown', 'door-4-chinatown', 'door-5-causeway', 'door-6-ruins', 'door-8-generic', 'door-7-canal',
+]
 /** Any lesson without a door of its own opens through this one. */
 const DEFAULT_DOOR = 'door-8-generic'
 export const DOOR_STATES = ['closed', 'half', 'open'] as const
@@ -93,7 +92,7 @@ const DOOR_PATH: Record<string, string> = {
 }
 export type DoorArt = { name: string; path: string }
 export const doorFor = (node: PathNode): DoorArt => {
-  const name = (node.unitId === 1 ? (node.kind === 'checkpoint' ? 'door-7-canal' : PANAMA_DOORS[node.index]) : undefined) ?? DEFAULT_DOOR
+  const name = (node.unitId === 1 ? PANAMA_DOORS[node.index] : undefined) ?? DEFAULT_DOOR
   return { name, path: DOOR_PATH[name] }
 }
 /** After dark every door and path has a picture of its own, `<name>-night.webp` (tools/cut_doors_night.py). */
@@ -128,7 +127,7 @@ export const doorOpening = (door: DoorArt, night = false) =>
   DOOR_STATES.filter((st) => st !== 'closed').map((st) => nightly(`door/${door.name}-${st}.webp`, night))
 /** Every door and path picture, for the preloader (the walker's own poses are added by whoever is travelling). */
 export const DOOR_FILES = [
-  ...[...PANAMA_DOORS, 'door-7-canal', DEFAULT_DOOR].flatMap(doorPictures),
+  ...[...new Set([...PANAMA_DOORS, DEFAULT_DOOR])].flatMap(doorPictures),
   ...[...new Set(Object.values(DOOR_PATH))].map((p) => `door/path-${p}.webp`),
 ]
 

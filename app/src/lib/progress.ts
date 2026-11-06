@@ -324,7 +324,7 @@ export const currentIndex = (p: Progress) => {
 
 /** Words introduced in completed lessons. */
 export const learnedWords = (p: Progress) => [
-  ...new Set(PATH.filter((node) => node.kind === 'lesson' && p.nodes[node.id]).flatMap((node) => node.words)),
+  ...new Set(PATH.filter((node) => p.nodes[node.id]).flatMap((node) => node.words)),
 ]
 
 /** The streak only counts if the learner practiced today or yesterday. */

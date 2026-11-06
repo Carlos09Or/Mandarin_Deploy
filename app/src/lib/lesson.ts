@@ -54,7 +54,35 @@ export function choice(n: number, prompt: ChoicePrompt): Exercise {
 }
 
 type Practice = ChoicePrompt | 'pinyin' | 'tone'
-const ROTATION: Practice[] = ['en-hanzi', 'audio-hanzi', 'pinyin', 'tone', 'hanzi-pinyin']
+/** Every way a lesson can ask about a word; each lesson draws from these in its own random order. */
+const KINDS: Practice[] = ['hanzi-en', 'en-hanzi', 'audio-hanzi', 'hanzi-pinyin', 'pinyin', 'tone']
+/** The easy ones, for checking a word the moment it has been introduced. */
+const RECOGNITION: Practice[] = ['hanzi-en', 'en-hanzi', 'audio-hanzi']
+
+/** `count` kinds in a random order, never the same twice running: each pass through `kinds` is reshuffled. */
+function randomKinds(count: number, kinds: Practice[]): Practice[] {
+  const out: Practice[] = []
+  while (out.length < count) {
+    const round = shuffle(kinds)
+    if (round[0] === out.at(-1)) round.push(round.shift()!)
+    out.push(...round)
+  }
+  return out.slice(0, count)
+}
+
+/** What two exercises must differ in to not feel like the same thing twice. */
+const look = (ex: Exercise) => (ex.kind === 'choice' ? `choice-${ex.prompt}` : ex.kind)
+
+/** Shuffles until no two neighbours look alike, the first one included against `before` (the shuffle that fits best stands). */
+function spread(items: Exercise[], before: Exercise): Exercise[] {
+  const clash = (list: Exercise[]) => list.filter((ex, j) => look(ex) === look(j === 0 ? before : list[j - 1])).length
+  let best = shuffle(items)
+  for (let i = 0; i < 200 && clash(best) > 0; i++) {
+    const next = shuffle(items)
+    if (clash(next) < clash(best)) best = next
+  }
+  return best
+}
 
 /** One practice exercise of the given kind; tones need a one-syllable word, so others fall back to pronunciation. */
 function practiceFor(n: number, kind: Practice): Exercise {
@@ -147,7 +175,7 @@ function clozeFrom(words: number[], known: Set<string>): Exercise | null {
 }
 
 const knownBefore = (node: PathNode | null, p: Progress) =>
-  PATH.filter((x) => x.kind === 'lesson' && (p.nodes[x.id] || x === node)).flatMap((x) => x.words.map((n) => word(n).hanzi))
+  PATH.filter((x) => p.nodes[x.id] || x === node).flatMap((x) => x.words.map((n) => word(n).hanzi))
 
 /** Characters to trace: ones never traced first, simplest-looking words first. */
 function charsToTrace(words: number[], p: Progress, count: number) {
@@ -158,57 +186,35 @@ function charsToTrace(words: number[], p: Progress, count: number) {
     .slice(0, count)
 }
 
+/**
+ * A lesson meets each word (a card, then a quick check of a random easy kind), then mixes the rest in a random order:
+ * a matching round, one question per word with a random kind each, a character to write, and two reviewed words. It
+ * ends by putting the words to work in a sentence, the two kinds in either order. No two lessons run the same way.
+ */
 function lessonExercises(node: PathNode, p: Progress): Exercise[] {
   const fresh = node.words
   const seq: Exercise[] = []
-  for (const n of fresh) {
+  const checks = randomKinds(fresh.length, RECOGNITION)
+  fresh.forEach((n, i) => {
     seq.push({ kind: 'intro', word: n })
-    seq.push(choice(n, 'hanzi-en'))
-  }
-  seq.push({ kind: 'match', words: fresh })
+    seq.push(practiceFor(n, checks[i]))
+  })
 
-  const before = PATH.slice(0, PATH.indexOf(node)).filter((x) => x.kind === 'lesson').flatMap((x) => x.words)
+  const before = PATH.slice(0, PATH.indexOf(node)).flatMap((x) => x.words)
   const review = weakestWords(p, before, 2)
-  seq.push(...practiceSeq(shuffle([...fresh, ...review]), ROTATION))
+  const words = shuffle([...fresh, ...review])
+  const middle: Exercise[] = [{ kind: 'match', words: fresh }, ...practiceSeq(words, randomKinds(words.length, KINDS))]
+  for (const t of charsToTrace(fresh, p, 1)) middle.push({ kind: 'trace', char: t.char, word: t.word, guide: guideFor(p, t.char) })
+  seq.push(...spread(middle, seq.at(-1)!))
 
-  for (const t of charsToTrace(fresh, p, 1)) {
-    seq.push({ kind: 'trace', char: t.char, word: t.word, guide: guideFor(p, t.char) })
-  }
-
-  // The lesson ends by putting its words to work: first one missing word, then a whole sentence.
   const unitPool = UNITS.find((u) => u.id === node.unitId)?.words ?? []
   const known = new Set(knownBefore(node, p))
-  const cloze = clozeFrom(fresh, known)
-  if (cloze) seq.push(cloze)
-  const sentence = sentenceFrom(fresh, known, [...fresh, ...unitPool])
-  if (sentence) seq.push(sentence)
+  const finale = [clozeFrom(fresh, known), sentenceFrom(fresh, known, [...fresh, ...unitPool])].filter((ex) => ex !== null)
+  seq.push(...shuffle(finale))
   return seq
 }
 
-const REVIEW: Practice[] = ['hanzi-en', 'en-hanzi', 'audio-hanzi', 'pinyin', 'tone', 'hanzi-pinyin']
-
-function reviewExercises(pool: number[], p: Progress, size: number, sentences: number): Exercise[] {
-  const picked = weakestWords(p, pool, size)
-  const seq: Exercise[] = practiceSeq(picked, REVIEW)
-  if (picked.length >= 5) seq.splice(Math.min(4, seq.length), 0, { kind: 'match', words: picked.slice(0, 5) })
-  for (const t of charsToTrace(picked, p, 2)) seq.push({ kind: 'trace', char: t.char, word: t.word, guide: guideFor(p, t.char) })
-
-  const known = new Set(knownBefore(null, p))
-  const used = new Set<number>()
-  for (let i = 0; i < sentences; i++) {
-    const rest = shuffle(pool.filter((n) => !used.has(n)))
-    // Alternate: one missing word, then a whole sentence.
-    const s = (i % 2 === 0 ? clozeFrom(rest, known) : null) ?? sentenceFrom(rest, known, pool)
-    if (!s || (s.kind !== 'sentence' && s.kind !== 'cloze')) break
-    used.add(s.word)
-    seq.push(s)
-  }
-  return seq
-}
-
-export function buildNode(node: PathNode, p: Progress): Exercise[] {
-  return node.kind === 'lesson' ? lessonExercises(node, p) : reviewExercises(node.words, p, 12, 2)
-}
+export const buildNode = lessonExercises
 
 /** Writing drill for one character: trace it, then write it with less and less help. */
 export const buildWriting = (char: string, n: number): Exercise[] => [
