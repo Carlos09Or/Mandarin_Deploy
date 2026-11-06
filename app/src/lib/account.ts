@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { textsOf } from '../i18n'
 import { toast } from '../journey/toast'
 import { mergeProgress } from './merge'
 import { getProgress, replaceProgress, revive, subscribeProgress, wipeDevice, type Progress } from './progress'
@@ -239,14 +240,14 @@ export async function startAccount() {
   try {
     if (returned) {
       if (returned.error || !returned.code) {
-        set({ problem: 'Sign-in was cancelled.' })
+        set({ problem: 'cancelled' })
       } else {
         const done = await api('/api/auth/google/finish', { method: 'POST', json: { code: returned.code, state: returned.state } })
         if (done.status === 200) {
           setUser(done.body.user)
-          toast('Signed in')
-        } else if (done.body.error === 'signups_closed') set({ problem: 'New accounts are paused for now. Please try again later.' })
-        else set({ problem: 'Google sign-in did not work. Try again.' })
+          toast(textsOf(getProgress().lang).account.signedIn)
+        } else if (done.body.error === 'signups_closed') set({ problem: 'closed' })
+        else set({ problem: 'failed' })
       }
     }
     const me = await api('/api/me')
@@ -272,14 +273,14 @@ export async function signInWithGoogle() {
     if (res.status !== 200) throw new Error('not set up')
     location.href = res.body.url
   } catch {
-    set({ problem: 'Sign-in is not available right now.' })
+    set({ problem: 'unavailable' })
   }
 }
 
 /** Development only: signs in as any email without Google (the server must have DEV_LOGIN=1). */
 export async function signInForDevelopment(email: string, name?: string) {
   const res = await api('/api/auth/dev', { method: 'POST', json: { email, name } })
-  if (res.status !== 200) return set({ problem: 'Development sign-in failed.' })
+  if (res.status !== 200) return set({ problem: 'dev' })
   setUser(res.body.user)
   void syncNow()
 }

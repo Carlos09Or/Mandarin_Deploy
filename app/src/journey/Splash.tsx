@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { asset } from '../data/journey'
+import { useT } from '../i18n'
 import { getProgress, isNight } from '../lib/progress'
 import { preloadJourney } from './preload'
 import { whenFirstView } from './sharp'
@@ -29,6 +30,7 @@ const hasOpened = () => {
  * load. Then the app opens with everything ready.
  */
 export function Splash({ onDone }: { onDone: () => void }) {
+  const t = useT().splash
   const [night] = useState(() => isNight(getProgress()))
   const [shown, setShown] = useState(0)
   const [painted, setPainted] = useState(false)
@@ -83,7 +85,7 @@ export function Splash({ onDone }: { onDone: () => void }) {
   }, [])
 
   return (
-    <div className={`j-splash ${night ? 'night' : ''} ${leaving ? 'leaving' : ''}`} role="status" aria-label="Loading">
+    <div className={`j-splash ${night ? 'night' : ''} ${leaving ? 'leaving' : ''}`} role="status" aria-label={t.loading}>
       {/* A blurred copy fills any screen shape the painting does not reach. Until the painting arrives, the tiny copy
           inlined in index.html stands in for it. */}
       <div className="j-splash-fill" style={{ backgroundImage: [`url(${art})`, blur && `url(${blur})`].filter(Boolean).join(', ') }} />
@@ -100,7 +102,7 @@ export function Splash({ onDone }: { onDone: () => void }) {
           <div className="j-splash-row">
             <span className="j-splash-label">
               <b className="j-han">{leaving ? '上车！' : '加载中'}</b>
-              <small>{leaving ? 'shàng chē · All aboard!' : 'jiāzài zhōng · Loading'}</small>
+              <small>{leaving ? t.aboard : t.loadingLine}</small>
             </span>
             <span className="j-splash-pct">{pct}%</span>
           </div>

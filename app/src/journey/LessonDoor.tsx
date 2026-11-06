@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import type { PathNode } from '../data/course'
 import type { FriendId } from '../data/friends'
 import { DOOR_FRAME, DOOR_STATES, WALK_POSES, asset, doorFiles, doorFor, doorOpening, lessonTitle, nightly, type Province } from '../data/journey'
+import { useT, useWords } from '../i18n'
 import { prefetchClips } from '../lib/audio'
 import { isNight, useProgress } from '../lib/progress'
 import { whenLoaded } from './preload'
@@ -24,8 +25,6 @@ type Props = {
 /** How long the tap-to-lesson takes: --walk-delay + --walk-time in journey.css, plus a beat for the light. */
 const WALK_MS = 1500
 
-const LOCKED = 'Finish the doors before this one first'
-
 /**
  * A province's page: one door per lesson side by side on a white page (a night sky after dark, with the doors' night
  * pictures), which you swipe between. It opens on the
@@ -35,6 +34,8 @@ const LOCKED = 'Finish the doors before this one first'
  */
 export function LessonDoor({ province, traveler, onBack, onCovered, onWalk, onDone }: Props) {
   const progress = useProgress()
+  const t = useT().doors
+  const { place } = useWords()
   const night = isNight(progress)
   const stops = useMemo(() => doorStops(province), [province])
   const doors = useMemo(() => stops.map((s) => doorFor(s.node)), [stops])
@@ -151,7 +152,7 @@ export function LessonDoor({ province, traveler, onBack, onCovered, onWalk, onDo
   const going = useRef(false)
   const go = () => {
     if (drag.current?.moved || phase !== 'wait' || going.current) return
-    if (locked) return toast(LOCKED)
+    if (locked) return toast(t.finishFirst)
     going.current = true
     void whenLoaded(doorOpening(doors[view], night), 2500).then(() => {
       going.current = false
@@ -164,7 +165,7 @@ export function LessonDoor({ province, traveler, onBack, onCovered, onWalk, onDo
 
   return (
     <div className={`j-door ${night ? 'night' : ''} ${phase !== 'loading' ? 'ready' : ''} ${phase === 'walk' ? 'walking' : ''}`} style={vars}>
-      <button type="button" className="j-door-back" onClick={onBack} aria-label="Back to the map">
+      <button type="button" className="j-door-back" onClick={onBack} aria-label={t.back}>
         ←
       </button>
 
@@ -176,7 +177,7 @@ export function LessonDoor({ province, traveler, onBack, onCovered, onWalk, onDo
             <button
               key={s.node.id}
               type="button"
-              aria-label={`Door ${i + 1}`}
+              aria-label={t.door(i + 1)}
               className={`${next !== -1 && i > next ? 'locked' : next === i ? 'now' : 'done'} ${i === view ? 'view' : ''}`}
               onClick={() => phase !== 'walk' && center(i, true)}
             />
@@ -204,7 +205,7 @@ export function LessonDoor({ province, traveler, onBack, onCovered, onWalk, onDo
             return (
               <div key={s.node.id} className={`j-slide ${i === view ? 'on' : ''} ${closed ? 'locked' : ''}`} aria-hidden={i !== view}>
                 <img className="j-door-path" src={asset(nightly(`door/path-${door.path}.webp`, night))} alt="" draggable={false} />
-                <button type="button" className="j-door-frame" onClick={go} tabIndex={i === view ? 0 : -1} aria-label={`${s.place}: ${closed ? 'locked' : 'start'}`}>
+                <button type="button" className="j-door-frame" onClick={go} tabIndex={i === view ? 0 : -1} aria-label={`${place(s.place)}: ${closed ? t.locked : t.start}`}>
                   {/* Closed, half open and wide open are laid on top of each other; the walk fades them in. */}
                   {DOOR_STATES.filter((st) => st === 'closed' || (phase !== 'loading' && opening.has(i))).map((st) => (
                     <img key={st} className={`j-door-art ${st}`} src={asset(nightly(`door/${door.name}-${st}.webp`, night))} alt="" draggable={false} />

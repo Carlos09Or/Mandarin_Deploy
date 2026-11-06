@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { word } from '../data/course'
+import { meaningOf, useLang, useT } from '../i18n'
 import { speak } from '../lib/audio'
 import type { Exercise } from '../lib/lesson'
 import { AudioButton } from '../components/AudioButton'
@@ -13,14 +14,10 @@ type Props = {
   revealed: boolean
 }
 
-const TEXT = {
-  'hanzi-en': 'Find the meaning.',
-  'en-hanzi': 'Find the character.',
-  'audio-hanzi': 'What do you hear?',
-  'hanzi-pinyin': 'How is it pronounced?',
-}
-
 export function Choice({ ex, selected, onSelect, revealed }: Props) {
+  const lang = useLang()
+  const e = useT().exercise
+  const TEXT = { 'hanzi-en': e.findMeaning, 'en-hanzi': e.findCharacter, 'audio-hanzi': e.whatHear, 'hanzi-pinyin': e.howPronounced }
   const w = word(ex.word)
   const hanziOptions = ex.prompt === 'en-hanzi' || ex.prompt === 'audio-hanzi'
 
@@ -45,7 +42,7 @@ export function Choice({ ex, selected, onSelect, revealed }: Props) {
     const o = word(n)
     if (hanziOptions) return <span className="han text-4xl">{o.hanzi}</span>
     if (ex.prompt === 'hanzi-pinyin') return <span className="text-xl font-bold">{o.pinyin}</span>
-    return <span>{o.en}</span>
+    return <span>{meaningOf(o, lang)}</span>
   }
 
   const stateClass = (n: number) => {
@@ -64,7 +61,7 @@ export function Choice({ ex, selected, onSelect, revealed }: Props) {
             <AudioButton text={w.hanzi} slow />
           </div>
         ) : ex.prompt === 'en-hanzi' ? (
-          <p className="px-4 text-center text-4xl leading-tight font-extrabold">{w.en}</p>
+          <p className="px-4 text-center text-4xl leading-tight font-extrabold">{meaningOf(w, lang)}</p>
         ) : (
           <>
             <BigHanzi hanzi={w.hanzi} />

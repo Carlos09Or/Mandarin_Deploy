@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { tokenPinyin, word } from '../data/course'
+import { exampleOf, useLang, useT } from '../i18n'
 import { speak } from '../lib/audio'
 import type { Exercise } from '../lib/lesson'
 import { AudioButton } from '../components/AudioButton'
@@ -16,6 +17,8 @@ type Props = {
 const ROW = 64
 
 export function Cloze({ ex, selected, onSelect, revealed }: Props) {
+  const lang = useLang()
+  const e = useT().exercise
   const w = word(ex.word)
   const wheel = useRef<HTMLDivElement>(null)
   const [live, setLive] = useState(0)
@@ -54,7 +57,7 @@ export function Cloze({ ex, selected, onSelect, revealed }: Props) {
       : 'border-wrong bg-wrong-soft'
 
   return (
-    <Stage title="Pick the missing word.">
+    <Stage title={e.pickMissing}>
       <div className="flex flex-wrap items-start justify-center gap-x-3 gap-y-5 pt-4">
         {ex.tokens.map((t, i) => {
           const isHole = i === ex.blank
@@ -116,7 +119,7 @@ export function Cloze({ ex, selected, onSelect, revealed }: Props) {
             <div style={{ height: ROW }} />
           </div>
         </div>
-        <p className="px-4 text-center text-lg font-semibold text-muted">{w.example.en}</p>
+        <p className="px-4 text-center text-lg font-semibold text-muted">{exampleOf(w, lang)}</p>
         <AudioButton text={w.example.hanzi} size="sm" />
       </div>
     </Stage>

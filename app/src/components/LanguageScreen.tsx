@@ -1,12 +1,9 @@
 import { useState } from 'react'
 import { asset } from '../data/journey'
-import { TEXTS } from '../i18n'
+import { phoneLanguage, TEXTS } from '../i18n'
 import { setLang } from '../lib/progress'
 
 type Pick = 'es' | 'en'
-
-/** The language the phone is set to, so the right one is already chosen and a tap on Continue is enough. */
-const phoneLanguage = (): Pick => (navigator.language?.toLowerCase().startsWith('es') ? 'es' : 'en')
 
 const OPTIONS: { id: Pick; name: string }[] = [
   { id: 'es', name: 'Español' },
@@ -19,7 +16,7 @@ const OPTIONS: { id: Pick; name: string }[] = [
  * already marked.
  */
 export function LanguageScreen() {
-  const [pick, setPick] = useState<Pick>(phoneLanguage)
+  const [pick, setPick] = useState<Pick>(phoneLanguage) // the phone's language is already marked, so a tap on Continue is enough
 
   return (
     <div className="fixed inset-0 z-[60] overflow-hidden bg-[#6fb2ee]">

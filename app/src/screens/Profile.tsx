@@ -22,22 +22,15 @@ import { Intro } from '../components/Intro'
 import { asset } from '../data/journey'
 import { downloadProgress, restoreProgress } from '../lib/backup'
 
-const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-const SCENERY: { id: Scenery; label: string; hint: string }[] = [
-  { id: 'auto', label: 'Auto', hint: 'Follows your clock: night from 7 pm to 6 am.' },
-  { id: 'day', label: '☀️ Day', hint: 'Always daytime.' },
-  { id: 'night', label: '🌙 Night', hint: 'Always night: city lights and a darker sea.' },
-]
-
-// Ideas only: each teacher will choose which rewards exist in their class.
-const REWARD_IDEAS = [
-  { title: 'An extra point on a quiz', cost: 300 },
-  { title: 'A hint in the oral exam', cost: 200 },
-  { title: 'Choose the next practice topic', cost: 100 },
-]
+const SCENERY_IDS: Scenery[] = ['auto', 'day', 'night']
+const REWARD_COSTS = [300, 200, 100]
 
 export function Profile() {
   const p = useProgress()
+  const T = useT()
+  const t = T.profile
+  const pm = T.profileMore
+  const lang = useLang()
   const [confirm, setConfirm] = useState(false)
   const answers = Object.values(p.words)
   const right = answers.reduce((a, s) => a + s.correct, 0)
@@ -46,29 +39,27 @@ export function Profile() {
   const week = [...Array(7)].map((_, i) => {
     const d = new Date()
     d.setDate(d.getDate() - (6 - i))
-    return { label: DAYS[d.getDay()], xp: p.dailyXp[today(d)] ?? 0, isToday: i === 6 }
+    return { label: T.common.week[d.getDay()], xp: p.dailyXp[today(d)] ?? 0, isToday: i === 6 }
   })
   const max = Math.max(DAILY_GOAL, ...week.map((d) => d.xp))
 
   const stats = [
-    { value: liveStreak(p), label: 'Day streak', icon: <IconFlame className="h-7 w-7 text-brand" /> },
-    { value: p.xp, label: 'Total XP', icon: <IconStar className="h-7 w-7 text-gold" /> },
-    { value: `${learnedWords(p).length}/${OPEN_WORDS.length}`, label: 'Words', icon: <span className="han text-2xl text-sky">词</span> },
+    { value: liveStreak(p), label: T.nav.streak, icon: <IconFlame className="h-7 w-7 text-brand" /> },
+    { value: p.xp, label: T.nav.xp, icon: <IconStar className="h-7 w-7 text-gold" /> },
+    { value: `${learnedWords(p).length}/${OPEN_WORDS.length}`, label: pm.words, icon: <span className="han text-2xl text-sky">词</span> },
     {
       value: `${OPEN_PATH.filter((n) => p.nodes[n.id]).length}/${OPEN_PATH.length}`,
-      label: 'Lessons',
+      label: pm.lessons,
       icon: <span className="han text-2xl text-jade">课</span>,
     },
-    { value: Object.keys(p.chars).length, label: 'Characters written', icon: <span className="han text-2xl text-jade">写</span> },
-    { value: total ? `${Math.round((right / total) * 100)}%` : '—', label: 'Accuracy', icon: <span className="han text-2xl text-gold-dark">准</span> },
+    { value: Object.keys(p.chars).length, label: pm.charsWritten, icon: <span className="han text-2xl text-jade">写</span> },
+    { value: total ? `${Math.round((right / total) * 100)}%` : '—', label: T.common.accuracy, icon: <span className="han text-2xl text-gold-dark">准</span> },
   ]
 
   const fileInput = useRef<HTMLInputElement>(null)
   const [restored, setRestored] = useState<'ok' | 'bad' | null>(null)
   const [name, setName] = useState<string | null>(null)
   const [tour, setTour] = useState(false)
-  const t = useT().profile
-  const lang = useLang()
 
   return (
     <div className="flex flex-col gap-8 pb-10">
@@ -93,7 +84,7 @@ export function Profile() {
       <CharacterStudio />
 
       <section>
-        <h2 className="mb-4 text-2xl font-black">Stats</h2>
+        <h2 className="mb-4 text-2xl font-black">{pm.stats}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {stats.map((s) => (
             <div key={s.label} className="card flex items-center gap-3 p-4">
@@ -112,33 +103,28 @@ export function Profile() {
           <IconGem className="h-14 w-14 shrink-0" />
           <div className="flex-1">
             <p className="text-3xl leading-none font-black text-sky-dark">{p.gems}</p>
-            <p className="mt-1 font-bold text-sky-dark">gems</p>
+            <p className="mt-1 font-bold text-sky-dark">{T.common.gems}</p>
           </div>
-          <span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-sky-dark">Coming soon</span>
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-sky-dark">{pm.comingSoon}</span>
         </div>
         <div className="flex flex-col gap-3 p-5">
-          <h3 className="font-black">Class rewards</h3>
-          <p className="text-sm text-muted">
-            Your teacher will decide what gems can be traded for in their course. Some ideas:
-          </p>
-          {REWARD_IDEAS.map((r) => (
-            <div key={r.title} className="flex items-center gap-3 rounded-2xl border-2 border-line px-4 py-3">
+          <h3 className="font-black">{pm.classRewards}</h3>
+          <p className="text-sm text-muted">{pm.rewardsText}</p>
+          {pm.ideas.map((title, i) => (
+            <div key={title} className="flex items-center gap-3 rounded-2xl border-2 border-line px-4 py-3">
               <IconLock className="h-5 w-5 shrink-0 text-line-dark" />
-              <span className="flex-1 font-bold">{r.title}</span>
+              <span className="flex-1 font-bold">{title}</span>
               <span className="flex items-center gap-1 font-black text-sky-dark">
-                {r.cost} <IconGem className="h-4 w-4" />
+                {REWARD_COSTS[i]} <IconGem className="h-4 w-4" />
               </span>
             </div>
           ))}
-          <p className="text-xs text-muted">
-            You earn {GEMS.lesson} gems per lesson, {GEMS.perfect} more with no mistakes, and {GEMS.dailyGoal} for reaching
-            your daily goal.
-          </p>
+          <p className="text-xs text-muted">{pm.earn(GEMS.lesson, GEMS.perfect, GEMS.dailyGoal)}</p>
         </div>
       </section>
 
       <section className="card p-5">
-        <h3 className="font-black">Last 7 days</h3>
+        <h3 className="font-black">{pm.last7}</h3>
         <div className="mt-4 flex h-36 items-end gap-2">
           {week.map((d, i) => (
             <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
@@ -151,7 +137,7 @@ export function Profile() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-sm text-muted">Daily goal: {DAILY_GOAL} XP (about 3 lessons).</p>
+        <p className="mt-3 text-sm text-muted">{pm.dailyGoal(DAILY_GOAL)}</p>
       </section>
 
       <section className="card flex flex-col gap-3 p-5">
@@ -182,40 +168,38 @@ export function Profile() {
       </section>
 
       <section className="card flex flex-col gap-3 p-5">
-        <h3 className="font-black">Day &amp; night</h3>
+        <h3 className="font-black">{pm.dayNight}</h3>
         <div className="grid grid-cols-3 gap-2">
-          {SCENERY.map((s) => (
+          {SCENERY_IDS.map((id) => (
             <button
-              key={s.id}
+              key={id}
               type="button"
-              onClick={() => setScenery(s.id)}
-              className={`tile py-2.5 text-sm font-extrabold ${p.scenery === s.id ? 'tile-selected' : ''}`}
+              onClick={() => setScenery(id)}
+              className={`tile py-2.5 text-sm font-extrabold ${p.scenery === id ? 'tile-selected' : ''}`}
             >
-              {s.label}
+              {pm.scenery[id].label}
             </button>
           ))}
         </div>
-        <p className="text-sm text-muted">{SCENERY.find((s) => s.id === p.scenery)?.hint}</p>
+        <p className="text-sm text-muted">{pm.scenery[p.scenery === 'day' || p.scenery === 'night' ? p.scenery : 'auto'].hint}</p>
       </section>
 
       <section className="card flex flex-col gap-3 p-5">
-        <h3 className="font-black">Your account</h3>
+        <h3 className="font-black">{pm.account}</h3>
         <Account />
-        <h3 className="mt-2 font-black">Your data</h3>
-        <p className="text-sm text-muted">
-          A downloaded file is a backup you can keep anywhere. Restoring one adds it to what is here; nothing is lost.
-        </p>
+        <h3 className="mt-2 font-black">{pm.data}</h3>
+        <p className="text-sm text-muted">{pm.dataText}</p>
         {restored && (
           <p className={`text-sm font-bold ${restored === 'ok' ? 'text-jade-dark' : 'text-wrong'}`}>
-            {restored === 'ok' ? 'Backup restored.' : 'That file is not a Mandarin Journey backup.'}
+            {restored === 'ok' ? pm.restored : pm.badFile}
           </p>
         )}
         <div className="flex flex-col gap-3 sm:flex-row">
           <button type="button" onClick={downloadProgress} className="btn btn-ghost flex-1">
-            Download my data
+            {pm.download}
           </button>
           <button type="button" onClick={() => fileInput.current?.click()} className="btn btn-ghost flex-1">
-            Restore from a file
+            {pm.restore}
           </button>
           <input
             ref={fileInput}
@@ -237,11 +221,11 @@ export function Profile() {
               }}
               className="btn btn-wrong flex-1"
             >
-              Yes, erase everything
+              {pm.eraseYes}
             </button>
           ) : (
             <button type="button" onClick={() => setConfirm(true)} className="btn btn-ghost flex-1 text-wrong">
-              Reset progress
+              {pm.reset}
             </button>
           )}
         </div>

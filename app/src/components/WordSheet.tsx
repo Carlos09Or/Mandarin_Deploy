@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect } from 'react'
 import { pinRandomVoice, unpinVoice } from '../lib/audio'
-import { CHARS, RADICALS, charsOf, word } from '../data/course'
+import { CHARS, RADICALS, RADICALS_ES, charsOf, word } from '../data/course'
+import { exampleOf, meaningOf, noteOf, useLang, useT } from '../i18n'
 import { AudioButton } from './AudioButton'
 import { IconClose } from './icons'
 
@@ -36,6 +37,8 @@ export function WordSheet({ n, onClose, onWrite }: Props) {
 }
 
 function Body({ n, onClose, onWrite }: { n: number } & Omit<Props, 'n'>) {
+  const lang = useLang()
+  const t = useT()
   const w = word(n)
   // One voice per open card, so the word, the slow button and the example match.
   useEffect(() => {
@@ -46,7 +49,7 @@ function Body({ n, onClose, onWrite }: { n: number } & Omit<Props, 'n'>) {
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between">
         <span className="rounded-full bg-line px-3 py-1 text-xs font-extrabold text-muted">HSK 1 · #{w.n}</span>
-        <button type="button" onClick={onClose} aria-label="Close" className="text-muted">
+        <button type="button" onClick={onClose} aria-label={t.common.close} className="text-muted">
           <IconClose />
         </button>
       </div>
@@ -57,15 +60,15 @@ function Body({ n, onClose, onWrite }: { n: number } & Omit<Props, 'n'>) {
           <AudioButton text={w.hanzi} />
           <AudioButton text={w.hanzi} slow />
         </div>
-        <p className="mt-2 text-2xl font-extrabold">{w.en}</p>
+        <p className="mt-2 text-2xl font-extrabold">{meaningOf(w, lang)}</p>
       </div>
-      <p className="rounded-2xl bg-paper p-4 text-sm leading-relaxed text-ink/80">{w.note}</p>
+      <p className="rounded-2xl bg-paper p-4 text-sm leading-relaxed text-ink/80">{noteOf(w, lang)}</p>
       <div className="flex items-start gap-3 rounded-2xl border-2 border-line p-4">
         <AudioButton text={w.example.hanzi} size="sm" />
         <div>
           <p className="han text-xl">{w.example.hanzi}</p>
           <p className="text-sm font-semibold text-sky-dark">{w.example.pinyin}</p>
-          <p className="text-sm text-muted">{w.example.en}</p>
+          <p className="text-sm text-muted">{exampleOf(w, lang)}</p>
         </div>
       </div>
       <div className="flex flex-col gap-2">
@@ -77,16 +80,16 @@ function Body({ n, onClose, onWrite }: { n: number } & Omit<Props, 'n'>) {
               <p className="min-w-0 flex-1 text-sm text-jade-dark">
                 {info?.radical ? (
                   <>
-                    Radical <span className="han font-bold">{info.radical}</span>
-                    {RADICALS[info.radical] ? ` · ${RADICALS[info.radical]}` : ''}
+                    {t.wordSheet.radical} <span className="han font-bold">{info.radical}</span>
+                    {(lang === 'es' ? RADICALS_ES : RADICALS)[info.radical] ? ` · ${(lang === 'es' ? RADICALS_ES : RADICALS)[info.radical]}` : ''}
                   </>
                 ) : (
-                  'Character'
+                  t.wordSheet.character
                 )}
               </p>
               {onWrite && (
                 <button type="button" className="btn btn-jade px-3 py-2 text-xs" onClick={() => onWrite(c, n)}>
-                  Write
+                  {t.wordSheet.write}
                 </button>
               )}
             </div>

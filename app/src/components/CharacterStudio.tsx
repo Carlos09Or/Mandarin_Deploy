@@ -1,28 +1,23 @@
 import { useState } from 'react'
-import { FRIENDS, FRIEND_IDS, OUTFITS, OUTFIT_LABELS, outfitFor, type FriendId } from '../data/friends'
+import { FRIENDS, FRIEND_IDS, OUTFITS, outfitFor, type FriendId } from '../data/friends'
+import { useT } from '../i18n'
 import { setOutfit, useProgress } from '../lib/progress'
 import { Buddy } from './Friends'
 import type { Mood } from './Mascot'
 
-const MOODS: { id: Mood; label: string; wawaOnly?: boolean }[] = [
-  { id: 'idle', label: 'Calm' },
-  { id: 'wave', label: 'Wave', wawaOnly: true },
-  { id: 'happy', label: 'Correct' },
-  { id: 'sad', label: 'Wrong' },
-  { id: 'celebrate', label: 'Celebrate' },
-  { id: 'fire', label: 'Streak', wawaOnly: true },
+const MOODS: { id: Mood; key: 'calm' | 'wave' | 'correct' | 'wrong' | 'celebrate' | 'streak'; wawaOnly?: boolean }[] = [
+  { id: 'idle', key: 'calm' },
+  { id: 'wave', key: 'wave', wawaOnly: true },
+  { id: 'happy', key: 'correct' },
+  { id: 'sad', key: 'wrong' },
+  { id: 'celebrate', key: 'celebrate' },
+  { id: 'fire', key: 'streak', wawaOnly: true },
 ]
-
-const BLURB: Record<FriendId, string> = {
-  wawa: 'Panama’s golden frog, a symbol of good luck here and in China.',
-  harpia: 'Panama’s national bird, ready for the November parades.',
-  sloth: 'Hangs out in the trees of the Darién and is never in a hurry.',
-  tucan: 'The keel-billed toucan, the most colorful bird in Panama’s forests.',
-}
 
 /** Pick a character, preview every pose, and choose what they wear. */
 export function CharacterStudio() {
   const outfits = useProgress().outfits
+  const t = useT().friends
   const [who, setWho] = useState<FriendId>('wawa')
   const [mood, setMood] = useState<Mood>('idle')
   const [moodKey, setMoodKey] = useState(0)
@@ -57,9 +52,9 @@ export function CharacterStudio() {
           {FRIENDS[who].name} <span className="text-gold-dark">{FRIENDS[who].hanzi}</span>
         </p>
         <p className="text-sm font-bold text-muted">
-          {FRIENDS[who].kind} · <span className="han text-sky-dark">{FRIENDS[who].meaning}</span>
+          {t.kinds[who]} · <span className="han text-sky-dark">{t.meanings[who]}</span>
         </p>
-        <p className="text-center text-sm text-muted">{BLURB[who]}</p>
+        <p className="text-center text-sm text-muted">{t.blurbs[who]}</p>
       </div>
 
       <div className="flex flex-col gap-4 p-5">
@@ -76,7 +71,7 @@ export function CharacterStudio() {
                 mood === m.id ? 'border-sky bg-sky-soft text-sky-dark' : 'border-line text-muted'
               }`}
             >
-              {m.label}
+              {t.moods[m.key]}
             </button>
           ))}
         </div>
@@ -88,8 +83,8 @@ export function CharacterStudio() {
         >
           <Buddy id={who} outfit={today} size={56} />
           <span className="flex-1">
-            <span className="block font-extrabold">Automatic</span>
-            <span className="block text-sm text-muted">New outfit every day · today: {OUTFIT_LABELS[today]}</span>
+            <span className="block font-extrabold">{t.automatic}</span>
+            <span className="block text-sm text-muted">{t.newOutfit(t.outfits[today])}</span>
           </span>
         </button>
         <div className="grid grid-cols-3 gap-2">
@@ -101,7 +96,7 @@ export function CharacterStudio() {
               className={`tile flex flex-col items-center gap-1 px-1 pt-4 pb-2 ${setting === o ? 'tile-selected' : ''}`}
             >
               <Buddy id={who} outfit={o} size={68} />
-              <span className="text-xs font-extrabold">{OUTFIT_LABELS[o]}</span>
+              <span className="text-xs font-extrabold">{t.outfits[o]}</span>
             </button>
           ))}
         </div>

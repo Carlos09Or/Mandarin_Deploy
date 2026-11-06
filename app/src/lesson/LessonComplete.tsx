@@ -1,6 +1,7 @@
 import { AnimatePresence, animate, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { word } from '../data/course'
+import { meaningOf, useLang, useT } from '../i18n'
 import { chime } from '../lib/audio'
 import { isNight, setRating, today, useProgress, type Reward } from '../lib/progress'
 import { IconFlame, IconGem, IconStar } from '../components/icons'
@@ -15,6 +16,8 @@ type Step = 'summary' | 'streak' | 'reward'
 
 /** End of a lesson: how it went, the streak (first lesson of the day), then the gems it earned. */
 export function LessonComplete({ summary, reward, newWords, buddy, nodeId, onContinue }: Props) {
+  const t = useT().complete
+  const common = useT().common
   const steps: Step[] = reward.streakUp ? ['summary', 'streak', 'reward'] : ['summary', 'reward']
   const [i, setI] = useState(0)
   const step = steps[i]
@@ -59,7 +62,7 @@ export function LessonComplete({ summary, reward, newWords, buddy, nodeId, onCon
             onClick={() => (i + 1 < steps.length ? setI(i + 1) : onContinue())}
             className="btn btn-primary w-full sm:w-44"
           >
-            {steps[i + 1] === 'reward' ? 'See reward' : 'Continue'}
+            {steps[i + 1] === 'reward' ? t.seeReward : common.continue}
           </button>
         </div>
       </footer>
@@ -80,12 +83,15 @@ function SummaryStep({
   buddy: FriendId
   nodeId: string | null
 }) {
+  const t = useT().complete
+  const common = useT().common
+  const lang = useLang()
   const accuracy = summary.answers ? Math.round(((summary.answers - summary.mistakes) / summary.answers) * 100) : 100
   const mins = Math.floor(summary.durationMs / 60000)
   const secs = Math.round((summary.durationMs % 60000) / 1000)
   const tiles = [
-    { label: 'Accuracy', value: `${accuracy}%`, color: 'bg-jade', dark: 'text-jade-dark' },
-    { label: 'Time', value: `${mins}:${String(secs).padStart(2, '0')}`, color: 'bg-sky', dark: 'text-sky-dark' },
+    { label: common.accuracy, value: `${accuracy}%`, color: 'bg-jade', dark: 'text-jade-dark' },
+    { label: t.time, value: `${mins}:${String(secs).padStart(2, '0')}`, color: 'bg-sky', dark: 'text-sky-dark' },
     { label: 'XP', value: `+${xp}`, color: 'bg-gold', dark: 'text-gold-dark' },
   ]
 
@@ -109,9 +115,9 @@ function SummaryStep({
       </motion.div>
       <div>
         <h1 className="text-3xl font-black text-gold-dark">
-          {accuracy === 100 ? 'Perfect lesson!' : 'Lesson complete!'}
+          {accuracy === 100 ? t.perfect : t.done}
         </h1>
-        <p className="mt-1 text-muted">{accuracy === 100 ? 'Not a single mistake.' : 'Every review brings you closer to mastering them.'}</p>
+        <p className="mt-1 text-muted">{accuracy === 100 ? t.noMistake : t.closer}</p>
       </div>
 
       <div className="grid w-full max-w-md grid-cols-3 gap-3">
@@ -131,12 +137,12 @@ function SummaryStep({
 
       {newWords.length > 0 && (
         <div className="w-full max-w-md">
-          <p className="mb-3 text-sm font-extrabold tracking-widest text-muted uppercase">New words</p>
+          <p className="mb-3 text-sm font-extrabold tracking-widest text-muted uppercase">{t.newWords}</p>
           <div className="flex flex-wrap justify-center gap-2">
             {newWords.map((n) => (
               <span key={n} className="card flex max-w-32 flex-col items-center rounded-2xl px-3 py-1.5">
                 <span className="han text-xl">{word(n).hanzi}</span>
-                <span className="text-xs leading-tight text-muted">{word(n).en}</span>
+                <span className="text-xs leading-tight text-muted">{meaningOf(word(n), lang)}</span>
               </span>
             ))}
           </div>
@@ -150,12 +156,13 @@ function SummaryStep({
 
 /** One tap on the stars rates the lesson. Nothing blocks Continue: leaving them alone just skips it. */
 function RateLesson({ node }: { node: string }) {
+  const t = useT().complete
   const rated = useProgress().ratings[node]?.stars ?? 0
   const [hover, setHover] = useState(0)
   return (
     <div className="flex flex-col items-center">
-      <p className="text-sm font-extrabold tracking-widest text-muted uppercase">{rated ? 'Thanks!' : 'How was this lesson?'}</p>
-      <div role="radiogroup" aria-label="Rate this lesson" className="flex" onMouseLeave={() => setHover(0)}>
+      <p className="text-sm font-extrabold tracking-widest text-muted uppercase">{rated ? t.thanks : t.howWas}</p>
+      <div role="radiogroup" aria-label={t.rate} className="flex" onMouseLeave={() => setHover(0)}>
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
@@ -175,9 +182,10 @@ function RateLesson({ node }: { node: string }) {
   )
 }
 
-const WEEK = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 function StreakStep({ streak }: { streak: number }) {
+  const t = useT().complete
+  const week = useT().common.week
   const dailyXp = useProgress().dailyXp
   const [shown, setShown] = useState(Math.max(0, streak - 1))
   useEffect(() => {
@@ -191,7 +199,7 @@ function StreakStep({ streak }: { streak: number }) {
   const days = [...Array(7)].map((_, k) => {
     const d = new Date()
     d.setDate(d.getDate() - (6 - k))
-    return { label: WEEK[d.getDay()], done: (dailyXp[today(d)] ?? 0) > 0, isToday: k === 6 }
+    return { label: week[d.getDay()], done: (dailyXp[today(d)] ?? 0) > 0, isToday: k === 6 }
   })
 
   return (
@@ -220,10 +228,10 @@ function StreakStep({ streak }: { streak: number }) {
       </div>
       <div>
         <h1 className="text-3xl font-black text-brand">
-          {streak === 1 ? 'You started a streak!' : `${streak}-day streak!`}
+          {streak === 1 ? t.streakStart : t.streakDays(streak)}
         </h1>
         <p className="mt-1 text-muted">
-          {streak === 1 ? 'Come back tomorrow to keep it growing.' : 'Wāwa is proud of you. Don’t break it tomorrow!'}
+          {streak === 1 ? t.streakKeep : t.streakProud}
         </p>
       </div>
       <div className="flex gap-2">
@@ -248,6 +256,8 @@ function StreakStep({ streak }: { streak: number }) {
 }
 
 function RewardStep({ reward }: { reward: Reward }) {
+  const t = useT().complete
+  const common = useT().common
   const total = useProgress().gems
   const [shown, setShown] = useState(0)
 
@@ -294,9 +304,9 @@ function RewardStep({ reward }: { reward: Reward }) {
       </div>
 
       <div>
-        <p className="text-sm font-extrabold tracking-widest text-sky-dark uppercase">Reward</p>
+        <p className="text-sm font-extrabold tracking-widest text-sky-dark uppercase">{t.reward}</p>
         <p className="text-5xl font-black text-sky-dark">+{shown}</p>
-        <p className="font-bold text-muted">gems</p>
+        <p className="font-bold text-muted">{common.gems}</p>
       </div>
 
       <div className="w-full max-w-xs overflow-hidden rounded-2xl border-2 border-line bg-card text-left">
@@ -308,7 +318,7 @@ function RewardStep({ reward }: { reward: Reward }) {
             transition={{ delay: 0.5 + i * 0.15 }}
             className="flex items-center justify-between border-b-2 border-line px-4 py-2.5 last:border-b-0"
           >
-            <span className="font-bold">{p.label}</span>
+            <span className="font-bold">{t.parts[p.label] ?? p.label}</span>
             <span className="flex items-center gap-1 font-black text-sky-dark">
               +{p.gems} <IconGem className="h-4 w-4" />
             </span>
@@ -317,8 +327,7 @@ function RewardStep({ reward }: { reward: Reward }) {
       </div>
 
       <p className="max-w-xs text-sm text-muted">
-        You have <b className="text-sky-dark">{total} gems</b>. Soon you’ll be able to trade them for rewards your
-        teacher sets up.
+        {t.youHave(total)}
       </p>
     </>
   )

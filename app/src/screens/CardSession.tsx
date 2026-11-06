@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { word } from '../data/course'
+import { meaningOf, useLang, useT } from '../i18n'
 import { prefetchClips, speak } from '../lib/audio'
 import { LEARN_AHEAD, answerCard, buildQueue, dueCount, dueNow, isLearning, practiceSet } from '../lib/cards'
 import { finishReviewDay, getProgress, isNight, useProgress } from '../lib/progress'
@@ -27,11 +28,11 @@ const pickFront = (n: number | undefined, mode: SessionMode): Front => {
   return r < 0.4 ? 'hanzi' : r < 0.7 ? 'audio' : 'meaning'
 }
 
-const BUTTONS: { grade: Grade; label: string; hint: string; cls: string }[] = [
-  { grade: 1, label: 'Again', hint: 'soon', cls: 'bg-wrong text-white shadow-[0_4px_0_var(--color-wrong-dark)] active:shadow-[0_1px_0_var(--color-wrong-dark)]' },
-  { grade: 2, label: 'Hard', hint: 'later', cls: 'bg-gold text-[#2b2420] shadow-[0_4px_0_var(--color-gold-dark)] active:shadow-[0_1px_0_var(--color-gold-dark)]' },
-  { grade: 3, label: 'Good', hint: 'got it', cls: 'bg-jade text-white shadow-[0_4px_0_var(--color-jade-dark)] active:shadow-[0_1px_0_var(--color-jade-dark)]' },
-  { grade: 4, label: 'Easy', hint: 'got it', cls: 'bg-sky text-white shadow-[0_4px_0_var(--color-sky-dark)] active:shadow-[0_1px_0_var(--color-sky-dark)]' },
+const BUTTONS: { grade: Grade; label: 'again' | 'hard' | 'good' | 'easy'; hint: 'soon' | 'later' | 'gotIt'; cls: string }[] = [
+  { grade: 1, label: 'again', hint: 'soon', cls: 'bg-wrong text-white shadow-[0_4px_0_var(--color-wrong-dark)] active:shadow-[0_1px_0_var(--color-wrong-dark)]' },
+  { grade: 2, label: 'hard', hint: 'later', cls: 'bg-gold text-[#2b2420] shadow-[0_4px_0_var(--color-gold-dark)] active:shadow-[0_1px_0_var(--color-gold-dark)]' },
+  { grade: 3, label: 'good', hint: 'gotIt', cls: 'bg-jade text-white shadow-[0_4px_0_var(--color-jade-dark)] active:shadow-[0_1px_0_var(--color-jade-dark)]' },
+  { grade: 4, label: 'easy', hint: 'gotIt', cls: 'bg-sky text-white shadow-[0_4px_0_var(--color-sky-dark)] active:shadow-[0_1px_0_var(--color-sky-dark)]' },
 ]
 
 /** `pool` limits the session to one deck (a whole unit); a practice round then covers all of its words. */
@@ -44,6 +45,9 @@ const startQueue = (mode: SessionMode, pool?: number[]) => {
 type Props = { mode: SessionMode; pool?: number[]; onRestart: (mode: SessionMode) => void; onExit: () => void }
 
 export function CardSession({ mode, pool, onRestart, onExit }: Props) {
+  const t = useT().cards
+  const common = useT().common
+  const lang = useLang()
   const progress = useProgress()
   const night = isNight(progress)
   const [queue, setQueue] = useState<number[]>(() => startQueue(mode, pool))
@@ -124,7 +128,7 @@ export function CardSession({ mode, pool, onRestart, onExit }: Props) {
   return (
     <div className={`fixed inset-0 z-40 flex flex-col bg-paper ${night ? 'lesson-night' : ''}`}>
       <header className="mx-auto flex w-full max-w-lg items-center gap-4 px-4 pt-[max(env(safe-area-inset-top),16px)] pb-2">
-        <button type="button" aria-label="Leave the review" onClick={onExit} className="text-muted">
+        <button type="button" aria-label={t.leave} onClick={onExit} className="text-muted">
           <IconClose className="h-7 w-7" />
         </button>
         <div className="h-3 flex-1 overflow-hidden rounded-full bg-line">
@@ -151,7 +155,7 @@ export function CardSession({ mode, pool, onRestart, onExit }: Props) {
                 {counter('review', 'text-jade-dark')}
               </>
             ) : (
-              <span className="text-sky-dark">Practice · {queue.length} left</span>
+              <span className="text-sky-dark">{t.practiceLeft(queue.length)}</span>
             )}
           </p>
           <main className="flex flex-1 flex-col overflow-y-auto">
@@ -172,7 +176,7 @@ export function CardSession({ mode, pool, onRestart, onExit }: Props) {
                       <AudioButton text={w!.hanzi} size="md" />
                     </>
                   )}
-                  {front === 'meaning' && <p className="text-4xl leading-tight font-black">{w!.en}</p>}
+                  {front === 'meaning' && <p className="text-4xl leading-tight font-black">{meaningOf(w!, lang)}</p>}
                   {front === 'audio' && !revealed && <AudioButton text={w!.hanzi} size="lg" />}
 
                   {revealed && (
@@ -183,7 +187,7 @@ export function CardSession({ mode, pool, onRestart, onExit }: Props) {
                     >
                       {front !== 'hanzi' && <p className="han text-6xl leading-tight">{w!.hanzi}</p>}
                       <p className="text-2xl font-black text-sky-dark">{w!.pinyin}</p>
-                      {front !== 'meaning' && <p className="text-xl">{w!.en}</p>}
+                      {front !== 'meaning' && <p className="text-xl">{meaningOf(w!, lang)}</p>}
                       {front !== 'hanzi' && <AudioButton text={w!.hanzi} size="md" />}
                     </motion.div>
                   )}
@@ -196,7 +200,7 @@ export function CardSession({ mode, pool, onRestart, onExit }: Props) {
             <div className="mx-auto w-full max-w-lg px-5 py-4">
               {!revealed ? (
                 <button type="button" autoFocus onClick={() => setRevealed(true)} className="btn btn-ghost w-full">
-                  Show answer
+                  {t.show}
                 </button>
               ) : (
                 <div className="grid grid-cols-4 gap-2">
@@ -207,8 +211,8 @@ export function CardSession({ mode, pool, onRestart, onExit }: Props) {
                       onClick={() => answer(b.grade)}
                       className={`flex flex-col items-center gap-0.5 rounded-2xl px-1 py-2.5 text-[15px] font-extrabold select-none active:translate-y-[3px] ${b.cls}`}
                     >
-                      {b.label}
-                      <span className="text-xs font-bold opacity-90">{labels ? labels[b.grade] : b.hint}</span>
+                      {common[b.label]}
+                      <span className="text-xs font-bold opacity-90">{labels ? labels[b.grade] : t[b.hint]}</span>
                     </button>
                   ))}
                 </div>
@@ -223,18 +227,20 @@ export function CardSession({ mode, pool, onRestart, onExit }: Props) {
 
 /** The session is over; another can follow at once. */
 function Done({ mode, pool, total, gems, onRestart, onExit }: { mode: SessionMode; pool?: number[]; total: number; gems: number; onRestart: (m: SessionMode) => void; onExit: () => void }) {
+  const t = useT().cards
+  const common = useT().common
   const progress = useProgress()
   const left = dueCount(dueNow(progress, Date.now(), pool))
   const more = mode === 'study' && left > 0
-  const title = mode === 'practice' ? 'Round done!' : more ? 'Nice work!' : total ? 'All caught up!' : 'Nothing to review'
+  const title = mode === 'practice' ? t.roundDone : more ? t.nice : total ? t.caughtUp : t.nothing
   const text =
     mode === 'practice'
-      ? 'Practice as often as you like: it never changes when your cards come back.'
+      ? t.practiceNote
       : more
-        ? `${left} more ${left === 1 ? 'card is' : 'cards are'} waiting. Keep going or take a break.`
+        ? t.waiting(left)
         : total
-          ? 'Every card comes back right when you are about to forget it. Want to practice some more?'
-          : 'Come back when your cards are due.'
+          ? t.forget
+          : t.comeBack
   return (
     <>
       <main className="flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto px-6 text-center">
@@ -260,11 +266,11 @@ function Done({ mode, pool, total, gems, onRestart, onExit }: { mode: SessionMod
         <div className="mx-auto flex w-full max-w-lg flex-col gap-3 px-4 py-4">
           {(total > 0 || mode === 'practice' || more) && (
             <button type="button" autoFocus onClick={() => onRestart(more ? 'study' : 'practice')} className="btn btn-primary w-full">
-              {more ? `Study ${Math.min(left, progress.sessionSize)} more` : 'Practice again'}
+              {more ? t.studyMore(Math.min(left, progress.sessionSize)) : t.practiceAgain}
             </button>
           )}
           <button type="button" onClick={onExit} className="btn btn-ghost w-full">
-            Continue
+            {common.continue}
           </button>
         </div>
       </footer>

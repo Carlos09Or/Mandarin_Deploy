@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { plainPinyin, word } from '../data/course'
+import { exampleOf, meaningOf, placeName, useLang, useT } from '../i18n'
 import { chime, pinRandomVoice, unpinVoice } from '../lib/audio'
 import { retry, type Exercise } from '../lib/lesson'
 import { answerWord } from '../lib/cards'
@@ -28,12 +29,8 @@ type Props = {
   onFinish: (s: LessonSummary) => void
 }
 
-const PRAISE = [
-  ['很好！', 'hěn hǎo', 'Very good!'],
-  ['太棒了！', 'tài bàng le', 'Excellent!'],
-  ['对了！', 'duì le', 'Correct!'],
-  ['非常好！', 'fēicháng hǎo', 'Perfect!'],
-]
+/** The Chinese of each word of praise; what it means is in the texts (`lesson.praise`), in the same order. */
+const PRAISE = ['很好！', '太棒了！', '对了！', '非常好！']
 
 type Feedback = { correct: boolean; title: string; detail?: string; sub?: string }
 
@@ -42,6 +39,13 @@ const plain = (s: string) => plainPinyin(s.replace(/v/gi, 'u'))
 const readings = (pinyin: string) => pinyin.split('/').map(plain)
 
 export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Props) {
+  const lang = useLang()
+  const t = useT().lesson
+  /** A word of praise in Chinese and in the learner's language. */
+  const praise = useCallback(() => {
+    const i = Math.floor(Math.random() * PRAISE.length)
+    return `${PRAISE[i]} ${t.praise[i]}`
+  }, [t])
   const [queue, setQueue] = useState(exercises)
   const [pos, setPos] = useState(0)
   const [done, setDone] = useState(0)
@@ -112,10 +116,9 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
       if (!order.length) return
       const correct = order.map((i) => ex.bank[i]).join('') === ex.tokens.join('')
       const ewx = word(ex.word).example
-      const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
       grade(
         correct,
-        { correct, title: correct ? `${p[0]} ${p[2]}` : 'Correct sentence:', detail: ewx.hanzi, sub: `${ewx.pinyin} · ${ewx.en}` },
+        { correct, title: correct ? praise() : t.correctSentence, detail: ewx.hanzi, sub: `${ewx.pinyin} · ${exampleOf(word(ex.word), lang)}` },
         true,
       )
       return
@@ -124,10 +127,9 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
       if (selected === null) return
       const correct = ex.options[selected] === ex.tokens[ex.blank]
       const ewx = word(ex.word).example
-      const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
       grade(
         correct,
-        { correct, title: correct ? `${p[0]} ${p[2]}` : 'Correct sentence:', detail: ewx.hanzi, sub: `${ewx.pinyin} · ${ewx.en}` },
+        { correct, title: correct ? praise() : t.correctSentence, detail: ewx.hanzi, sub: `${ewx.pinyin} · ${exampleOf(word(ex.word), lang)}` },
         true,
       )
       return
@@ -136,13 +138,12 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
       if (selected === null) return
       const correct = selected === ex.tone
       const w = word(ex.word)
-      const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
       grade(
         correct,
         {
           correct,
-          title: correct ? `${p[0]} ${p[2]}` : `Correct answer: tone ${ex.tone}`,
-          detail: `${w.hanzi} · ${w.pinyin} · ${w.en}`,
+          title: correct ? praise() : t.correctTone(ex.tone),
+          detail: `${w.hanzi} · ${w.pinyin} · ${meaningOf(w, lang)}`,
         },
         true,
       )
@@ -153,10 +154,9 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
       const w = word(ex.word)
       const correct = readings(w.pinyin).includes(plain(typed))
       answerWord(ex.word, correct)
-      const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
       grade(
         correct,
-        { correct, title: correct ? `${p[0]} ${p[2]}` : 'Correct answer:', detail: `${w.hanzi} · ${w.pinyin} · ${w.en}` },
+        { correct, title: correct ? praise() : t.correctAnswer, detail: `${w.hanzi} · ${w.pinyin} · ${meaningOf(w, lang)}` },
         true,
       )
       return
@@ -165,21 +165,20 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
     const correct = selected === ex.word
     answerWord(ex.word, correct)
     const w = word(ex.word)
-    const p = PRAISE[Math.floor(Math.random() * PRAISE.length)]
     grade(
       correct,
       correct
-        ? { correct, title: `${p[0]} ${p[2]}`, detail: `${w.hanzi} · ${w.pinyin} · ${w.en}` }
-        : { correct, title: 'Correct answer:', detail: `${w.hanzi} · ${w.pinyin} · ${w.en}` },
+        ? { correct, title: praise(), detail: `${w.hanzi} · ${w.pinyin} · ${meaningOf(w, lang)}` }
+        : { correct, title: t.correctAnswer, detail: `${w.hanzi} · ${w.pinyin} · ${meaningOf(w, lang)}` },
       true,
     )
-  }, [ex, selected, order, typed, grade])
+  }, [ex, selected, order, typed, grade, lang, t, praise])
 
   const giveUp = () => {
     if (ex.kind !== 'pinyin' || feedback) return
     const w = word(ex.word)
     answerWord(ex.word, false)
-    grade(false, { correct: false, title: 'Correct answer:', detail: `${w.hanzi} · ${w.pinyin} · ${w.en}` }, true)
+    grade(false, { correct: false, title: t.correctAnswer, detail: `${w.hanzi} · ${w.pinyin} · ${meaningOf(w, lang)}` }, true)
   }
 
   const onPrimary = () => {
@@ -202,7 +201,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
     return () => window.removeEventListener('keydown', onKey)
   }, [confirmExit])
 
-  const primaryLabel = ex.kind !== 'intro' && !feedback ? 'Check' : 'Continue'
+  const primaryLabel = ex.kind !== 'intro' && !feedback ? t.check : t.continue
   const primaryDisabled =
     !feedback &&
     ((ex.kind === 'choice' && selected === null) ||
@@ -221,7 +220,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
   return (
     <div className={`fixed inset-0 z-40 flex flex-col bg-paper ${night ? 'lesson-night' : ''}`}>
       <header className="mx-auto flex w-full max-w-lg items-center gap-4 px-4 pt-[max(env(safe-area-inset-top),16px)] pb-2">
-        <button type="button" aria-label="Quit lesson" onClick={() => setConfirmExit(true)} className="text-muted">
+        <button type="button" aria-label={t.quitLesson} onClick={() => setConfirmExit(true)} className="text-muted">
           <IconClose className="h-7 w-7" />
         </button>
         <div className="h-3 flex-1 overflow-hidden rounded-full bg-line">
@@ -267,7 +266,7 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
                 <Match
                   words={ex.words}
                   onDone={(m) =>
-                    grade(m === 0, { correct: true, title: m === 0 ? 'All on the first try!' : 'All pairs matched!' })
+                    grade(m === 0, { correct: true, title: m === 0 ? t.matchedFirst : t.matched })
                   }
                 />
               )}
@@ -281,8 +280,8 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
                     recordTrace(ex.char, m)
                     grade(m < 3, {
                       correct: true,
-                      title: m === 0 ? 'Perfect strokes!' : m < 3 ? 'Well written!' : 'Done. Practice it in Write.',
-                      detail: `${ex.char} · ${m} ${m === 1 ? 'mistake' : 'mistakes'}`,
+                      title: m === 0 ? t.strokesPerfect : m < 3 ? t.strokesWell : t.strokesPractice,
+                      detail: `${ex.char} · ${t.mistakes(m)}`,
                     })
                   }}
                 />
@@ -339,8 +338,8 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
             <motion.p className="han text-6xl font-black text-brand" initial={{ scale: 0.6 }} animate={{ scale: 1 }}>
               到了！
             </motion.p>
-            <p className="mt-2 text-xl font-black">{station}</p>
-            <p className="font-bold text-muted">dào le · you arrived</p>
+            <p className="mt-2 text-xl font-black">{station && placeName(lang, station)}</p>
+            <p className="font-bold text-muted">{t.arrived}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -362,14 +361,14 @@ export function LessonPlayer({ exercises, buddy, station, onExit, onFinish }: Pr
               className="safe-bottom w-full max-w-md rounded-t-3xl bg-card p-6 text-center sm:rounded-3xl"
             >
               <p className="han text-5xl">等等！</p>
-              <p className="mt-3 text-xl font-extrabold">Are you sure you want to quit?</p>
-              <p className="mt-1 text-muted">You’ll lose your progress in this lesson.</p>
+              <p className="mt-3 text-xl font-extrabold">{t.sure}</p>
+              <p className="mt-1 text-muted">{t.loseProgress}</p>
               <div className="mt-6 flex flex-col gap-3">
                 <button type="button" className="btn btn-primary" onClick={() => setConfirmExit(false)}>
-                  Keep learning
+                  {t.keepLearning}
                 </button>
                 <button type="button" className="btn text-wrong" onClick={onExit}>
-                  Quit
+                  {t.quit}
                 </button>
               </div>
             </motion.div>

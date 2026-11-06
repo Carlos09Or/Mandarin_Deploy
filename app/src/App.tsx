@@ -12,7 +12,7 @@ import { MapHome, type MapEvent } from './journey/MapHome'
 import { Splash } from './journey/Splash'
 import { nextProvince } from './journey/stops'
 import { warmAhead, whenLoaded } from './journey/preload'
-import { textsOf, useLang } from './i18n'
+import { textsOf, useLang, useT } from './i18n'
 import { startAccount } from './lib/account'
 import { canWarm } from './lib/network'
 import { keepStorage } from './lib/storage'
@@ -100,6 +100,7 @@ export default function App() {
   const welcome = useWelcomeState()
   // The page says which language its words are in (screen readers, hyphenation, translation offers).
   const lang = useLang()
+  const t = useT()
   useEffect(() => void (document.documentElement.lang = lang), [lang])
   // The map stays still, and its "unlocked" toast waits, until the learner is through the welcome screens and the tour.
   const welcoming = welcome !== 'closed'
@@ -152,7 +153,7 @@ export default function App() {
     if (to) {
       setTab('map')
       setMapEvent({ hopFrom: done.id, hopTo: to.id })
-    } else toast('More provinces are coming soon')
+    } else toast(t.map.moreSoon)
   }
 
   const onTab = (t: Tab) => {

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { word } from '../data/course'
+import { meaningOf, useLang, useT } from '../i18n'
 import { speak } from '../lib/audio'
 import type { Exercise } from '../lib/lesson'
 import { AudioButton } from '../components/AudioButton'
@@ -15,6 +16,8 @@ type Props = {
 }
 
 export function Pinyin({ ex, value, onChange, onGiveUp, revealed }: Props) {
+  const lang = useLang()
+  const e = useT().exercise
   const w = word(ex.word)
   const input = useRef<HTMLInputElement>(null)
 
@@ -28,11 +31,11 @@ export function Pinyin({ ex, value, onChange, onGiveUp, revealed }: Props) {
   }, [revealed])
 
   return (
-    <Stage title="What is the pinyin?">
+    <Stage title={e.whatPinyin}>
       <div className="flex min-h-40 flex-1 flex-col items-center justify-center gap-3">
         <BigHanzi hanzi={w.hanzi} />
         <div className="flex items-center gap-2">
-          <p className="text-xl font-extrabold text-muted">{w.en}</p>
+          <p className="text-xl font-extrabold text-muted">{meaningOf(w, lang)}</p>
           <AudioButton text={w.hanzi} size="sm" />
         </div>
       </div>
@@ -47,14 +50,14 @@ export function Pinyin({ ex, value, onChange, onGiveUp, revealed }: Props) {
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
-          aria-label="Pinyin"
+          aria-label={e.pinyin}
           className="w-full rounded-2xl border-2 border-line bg-card px-5 py-4 text-3xl font-extrabold caret-jade outline-none focus:border-jade"
         />
         <div className="flex items-center justify-between px-1 text-sm font-bold text-muted">
-          <span>Tone marks are optional.</span>
+          <span>{e.tonesOptional}</span>
           {!revealed && (
             <button type="button" onClick={onGiveUp} className="font-extrabold text-sky-dark">
-              I don’t know
+              {e.dontKnow}
             </button>
           )}
         </div>
