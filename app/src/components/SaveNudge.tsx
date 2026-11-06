@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useT } from '../i18n'
 import { useAccount } from '../lib/account'
 import { PATH } from '../data/course'
 import { liveStreak, useProgress } from '../lib/progress'
@@ -30,6 +31,7 @@ const markSeen = (m: Moment) => {
 export function SaveNudge({ quiet }: { quiet: boolean }) {
   const a = useAccount()
   const p = useProgress()
+  const t = useT().nudge
   const [closed, setClosed] = useState<Moment | null>(null)
 
   const streak = liveStreak(p)
@@ -46,15 +48,15 @@ export function SaveNudge({ quiet }: { quiet: boolean }) {
 
   return (
     <div className="fixed inset-x-0 bottom-[calc(80px+env(safe-area-inset-bottom))] z-40 mx-auto w-full max-w-md px-4 md:bottom-6">
-      <div className="card flex flex-col gap-3 p-5 shadow-lg" role="dialog" aria-label="Save your progress">
-        <p className="font-black">{moment === 'streak' ? `${streak} days in a row!` : 'First lesson done!'}</p>
+      <div className="card flex flex-col gap-3 p-5 shadow-lg" role="dialog" aria-label={t.label}>
+        <p className="font-black">{moment === 'streak' ? t.streak(streak) : t.lesson}</p>
         <p className="text-sm text-muted">
-          Right now your progress is only on this device. Keep it in an account so a lost phone or cleared browser can’t take it away.
-          {needsHomeScreen() && ' On iPhone, you can also tap Share, then “Add to Home Screen”.'}
+          {t.text}
+          {needsHomeScreen() && t.iphone}
         </p>
         <GoogleButton onBefore={() => markSeen(moment)} />
         <button type="button" onClick={close} className="text-sm font-bold text-muted">
-          Not now
+          {t.notNow}
         </button>
       </div>
     </div>

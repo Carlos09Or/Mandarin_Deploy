@@ -2,16 +2,18 @@ import { returningFromGoogle, useAccount } from '../lib/account'
 import { useProgress } from '../lib/progress'
 
 /**
- * What stands over the map before the learner has been through the first screens: the welcome screens ('open'), then the
- * quick tour ('intro'), or a blank page ('waiting') while a sign-in is being finished or a signed-in learner's progress is
+ * What stands over the map before the learner has been through the first screens: the choice of language ('language'), the
+ * welcome screens ('open'), then the quick tour ('intro'), or a blank page ('waiting') while a sign-in is being finished or a signed-in learner's progress is
  * arriving (it may already say they have been through both, so the screens must not flash). It is up from the start, under
  * the loading screen, so the map never shows through between the two.
  */
-export function useWelcomeState(): 'closed' | 'waiting' | 'open' | 'intro' {
+export function useWelcomeState(): 'closed' | 'waiting' | 'language' | 'open' | 'intro' {
   const a = useAccount()
   const p = useProgress()
-  if (p.welcomed && p.introSeen) return 'closed'
+  if (p.lang && p.welcomed && p.introSeen) return 'closed'
   const waiting = (returningFromGoogle && a.loading) || (a.user !== null && (a.loading || a.sync === 'syncing'))
   if (waiting) return 'waiting'
+  // First the language, since everything after it is said in it; then the welcome; then the tour.
+  if (!p.lang) return 'language'
   return p.welcomed ? 'intro' : 'open'
 }

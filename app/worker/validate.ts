@@ -27,6 +27,7 @@ export function progressProblem(data: unknown): string | null {
   if (has('nickname') && !str(data.nickname, 40)) return 'nickname'
   if (has('welcomed') && typeof data.welcomed !== 'boolean') return 'welcomed'
   if (has('introSeen') && typeof data.introSeen !== 'boolean') return 'introSeen'
+  if (has('lang') && !['', 'es', 'en'].includes(data.lang as string)) return 'lang'
   if (has('scenery') && !['auto', 'day', 'night'].includes(data.scenery as string)) return 'scenery'
   if (has('reviewDay') && data.reviewDay !== null && !str(data.reviewDay, 10)) return 'reviewDay'
   if (has('sessionSize') && !int(data.sessionSize, 1, 500)) return 'sessionSize'

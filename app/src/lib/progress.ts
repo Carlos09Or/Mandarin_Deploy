@@ -31,6 +31,7 @@ export type Reward = {
 }
 
 export type Scenery = 'auto' | 'day' | 'night'
+export type Lang = '' | 'es' | 'en'
 
 export type Progress = {
   v: 1
@@ -40,6 +41,8 @@ export type Progress = {
   nickname: string
   /** The welcome screens (name, then guest or account) have been gone through, on this device or on another one of the account. */
   welcomed: boolean
+  /** The language of the app's words and explanations, chosen on the very first screen ('' until then). */
+  lang: Lang
   /** The quick tour of the app (components/Intro.tsx) has been seen or skipped, on this device or on another one of the account. */
   introSeen: boolean
   xp: number
@@ -95,6 +98,7 @@ function fresh(): Progress {
     nickname: '',
     welcomed: false,
     introSeen: false,
+    lang: '',
     xp: 0,
     gems: 0,
     outfits: {},
@@ -127,6 +131,8 @@ export const revive = (data: Partial<Progress>): Progress => ({
   welcomed: data.welcomed ?? (data.modifiedAt ?? 0) > 0,
   // So have the ones who started before the tour existed.
   introSeen: data.introSeen ?? (data.modifiedAt ?? 0) > 0,
+  // Those who started before there was a choice have been using the app in English.
+  lang: data.lang ?? ((data.modifiedAt ?? 0) > 0 ? 'en' : ''),
 })
 
 function load(): Progress {
@@ -291,6 +297,11 @@ export function finishWelcome(name: string) {
   commit({ ...state, nickname: name.trim().slice(0, NICKNAME_MAX) || state.nickname, welcomed: true })
 }
 
+/** Keeps the language the learner chose, for the words and explanations of the whole app. */
+export function setLang(lang: 'es' | 'en') {
+  if (state.lang !== lang) commit({ ...state, lang })
+}
+
 /** The quick tour is over (seen to the end or skipped): it is not shown again. */
 export const finishIntro = () => {
   if (!state.introSeen) commit({ ...state, introSeen: true })
@@ -315,6 +326,7 @@ export function resetProgress() {
     nickname: state.nickname,
     welcomed: state.welcomed,
     introSeen: state.introSeen,
+    lang: state.lang,
     epoch: crypto.randomUUID(),
     epochAt: Date.now(),
   })

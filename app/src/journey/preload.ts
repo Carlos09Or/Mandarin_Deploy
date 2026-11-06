@@ -1,4 +1,5 @@
 import { FRIEND_IDS } from '../data/friends'
+import { LANGUAGE_FILES } from '../data/language'
 import vocab from '../data/hsk1.json'
 import { word } from '../data/course'
 import { DOOR_FILES, asset, doorFiles, doorFor, doorOpening, flightFiles, nightly, walkerFiles } from '../data/journey'
@@ -24,6 +25,8 @@ const NOW = [
   'map/lo.webp', 'map-fog-v2-lo.webp',
   'characters/wawa-sombrero.svg', 'characters/harpia-banda.svg', 'characters/sloth-montuno.svg', 'characters/tucan-pollera.svg',
   'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-profile.webp',
+  // a new learner's first screen is the choice of language
+  ...(getProgress().lang ? [] : LANGUAGE_FILES),
 ]
 /** The door pictures for the light the learner is in now (their night twins after dark). */
 const byLight = (file: string) => nightly(file, isNight(getProgress()))

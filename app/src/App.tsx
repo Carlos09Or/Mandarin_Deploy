@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { SaveNudge } from './components/SaveNudge'
 import { Intro } from './components/Intro'
+import { LanguageScreen } from './components/LanguageScreen'
 import { Shell, type Tab } from './components/Shell'
 import { useWelcomeState } from './components/useWelcomeState'
 import { Welcome } from './components/Welcome'
@@ -11,6 +12,7 @@ import { MapHome, type MapEvent } from './journey/MapHome'
 import { Splash } from './journey/Splash'
 import { nextProvince } from './journey/stops'
 import { warmAhead, whenLoaded } from './journey/preload'
+import { textsOf, useLang } from './i18n'
 import { startAccount } from './lib/account'
 import { canWarm } from './lib/network'
 import { keepStorage } from './lib/storage'
@@ -91,11 +93,14 @@ export default function App() {
     // Welcome back: said once per visit, only to someone who has been welcomed before (the welcome screens say hello themselves).
     const { welcomed, nickname } = getProgress()
     if (welcomed && nickname) {
-      toast(`Welcome back, ${nickname.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)}!`)
+      toast(textsOf(getProgress().lang).app.welcomeBack(nickname.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)))
       keepStorage()
     }
   }, [loaded])
   const welcome = useWelcomeState()
+  // The page says which language its words are in (screen readers, hyphenation, translation offers).
+  const lang = useLang()
+  useEffect(() => void (document.documentElement.lang = lang), [lang])
   // The map stays still, and its "unlocked" toast waits, until the learner is through the welcome screens and the tour.
   const welcoming = welcome !== 'closed'
 
@@ -230,6 +235,7 @@ export default function App() {
         </Later>
       )}
       <SaveNudge quiet={tab === 'map' && !province && !busy && !welcoming} />
+      {welcome === 'language' && <LanguageScreen />}
       {welcome === 'open' && <Welcome />}
       {welcome === 'intro' && <Intro onDone={finishIntro} />}
       {welcome === 'waiting' && <div className="fixed inset-0 z-[60] bg-paper" />}

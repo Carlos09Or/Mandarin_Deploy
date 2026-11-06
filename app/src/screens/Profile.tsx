@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { OPEN_PATH, OPEN_WORDS } from '../data/course'
+import { useLang, useT } from '../i18n'
 import {
   DAILY_GOAL,
   NICKNAME_MAX,
@@ -7,6 +8,7 @@ import {
   learnedWords,
   liveStreak,
   resetProgress,
+  setLang,
   setNickname,
   setScenery,
   today,
@@ -17,6 +19,7 @@ import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
 import { CharacterStudio } from '../components/CharacterStudio'
 import { Account } from '../components/Account'
 import { Intro } from '../components/Intro'
+import { asset } from '../data/journey'
 import { downloadProgress, restoreProgress } from '../lib/backup'
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
@@ -64,13 +67,15 @@ export function Profile() {
   const [restored, setRestored] = useState<'ok' | 'bad' | null>(null)
   const [name, setName] = useState<string | null>(null)
   const [tour, setTour] = useState(false)
+  const t = useT().profile
+  const lang = useLang()
 
   return (
     <div className="flex flex-col gap-8 pb-10">
       <section className="flex flex-col gap-2">
-        <h2 className="text-2xl font-black">{p.nickname ? `Hi, ${p.nickname}!` : 'Hi!'}</h2>
+        <h2 className="text-2xl font-black">{t.hi(p.nickname)}</h2>
         <label className="flex flex-col gap-1.5 text-sm font-bold text-muted">
-          Your name
+          {t.yourName}
           <input
             value={name ?? p.nickname}
             onChange={(e) => setName(e.target.value)}
@@ -150,13 +155,31 @@ export function Profile() {
       </section>
 
       <section className="card flex flex-col gap-3 p-5">
-        <h3 className="font-black">How it works</h3>
-        <p className="text-sm text-muted">A quick tour of the map, the doors, the exercises and the review cards.</p>
+        <h3 className="font-black">{t.tourTitle}</h3>
+        <p className="text-sm text-muted">{t.tourText}</p>
         <button type="button" onClick={() => setTour(true)} className="btn btn-ghost">
-          Watch the tour
+          {t.tourButton}
         </button>
       </section>
       {tour && <Intro onDone={() => setTour(false)} />}
+
+      <section className="card flex flex-col gap-3 p-5">
+        <h3 className="font-black">{t.languageTitle}</h3>
+        <div className="grid grid-cols-2 gap-2">
+          {(['es', 'en'] as const).map((l) => (
+            <button
+              key={l}
+              type="button"
+              onClick={() => setLang(l)}
+              className={`tile flex items-center justify-center gap-2 py-2.5 text-sm font-extrabold ${lang === l ? 'tile-selected' : ''}`}
+            >
+              <img src={asset(`language/lang-${l}.webp`)} alt="" className="h-7 w-7" draggable={false} />
+              {l === 'es' ? 'Español' : 'English'}
+            </button>
+          ))}
+        </div>
+        <p className="text-sm text-muted">{t.languageText}</p>
+      </section>
 
       <section className="card flex flex-col gap-3 p-5">
         <h3 className="font-black">Day &amp; night</h3>

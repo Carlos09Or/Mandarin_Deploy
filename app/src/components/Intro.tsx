@@ -2,70 +2,30 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import screens from '../data/intro-screens.json'
 import { asset } from '../data/journey'
+import { useT } from '../i18n'
 import { useProgress } from '../lib/progress'
 
 /** A spot on the screen of the phone in the painting: shares of the screen's width and height. */
 type Spot = { x: number; y: number; w: number; h: number }
 type Slide = {
   image: keyof typeof screens | 'intro-1-welcome'
-  alt: string
-  title: (name: string) => string
-  text: string
-  /** The tab of the app this slide is about, named with the icon the app shows at the bottom. */
-  tab?: { icon: string; label: string }
+  /** The icon the app shows at the bottom for the tab this slide is about (its name is in the texts). */
+  tabIcon?: string
   /** What to look at on the phone's screen, circled in red just outside it (`thin` for a tight space). */
   mark?: Spot & { round?: boolean; thin?: boolean }
 }
 
 // The quick tour: each slide is a painting of the four friends around a phone that shows a real screen of the app, with the
 // part to look at circled in red and the tab it belongs to named above the picture. Nothing is drawn over the characters.
+// The words of each slide are in i18n/en.ts and i18n/es.ts, in this same order.
 const SLIDES: Slide[] = [
-  {
-    image: 'intro-1-welcome',
-    alt: 'The four friends smiling together at sunrise, with the little train on the bridge behind them',
-    title: (name) => (name ? `Hi, ${name}!` : 'Hi there!'),
-    text: 'We are Wāwa, Yīngyīng, Lǎnlǎn and Zuǐzuǐ, your travel buddies. Let’s learn Mandarin together, one stop at a time.',
-  },
-  {
-    image: 'intro-2-map',
-    alt: 'The friends on the station platform, looking at a phone that shows the map',
-    title: () => 'Travel through Panama',
-    text: 'The Map is your home. Tap a province to open its doors.',
-    tab: { icon: 'nav-map.webp', label: 'Map' },
-    mark: { x: 0.4, y: 0.36, w: 0.2, h: 0.1, round: true },
-  },
-  {
-    image: 'intro-3-doors',
-    alt: 'Wāwa pointing at a phone that shows the doors of a province, next to a red door',
-    title: () => 'Open a door, learn 5 words',
-    text: 'Each door is a lesson: five new words, then quick exercises. Swipe between the doors and tap to start.',
-    tab: { icon: 'nav-map.webp', label: 'Lessons' },
-    mark: { x: 0.262, y: 0.163, w: 0.476, h: 0.042, round: true, thin: true },
-  },
-  {
-    image: 'intro-4-write',
-    alt: 'The friends at a table, listening and writing, while Wāwa points at a phone that shows a character to trace',
-    title: () => 'Write with your finger',
-    text: 'In the Write tab, trace each character stroke by stroke, then write it from memory.',
-    tab: { icon: 'nav-write.webp', label: 'Write' },
-    mark: { x: 0.055, y: 0.16, w: 0.89, h: 0.455 },
-  },
-  {
-    image: 'intro-5-review',
-    alt: 'Wāwa cheering beside blue gems and a phone that shows a review card',
-    title: () => 'Review and earn gems',
-    text: 'In the Review tab each word comes back right before you forget it. Tell us how well you remembered.',
-    tab: { icon: 'nav-review.webp', label: 'Review' },
-    mark: { x: 0.03, y: 0.893, w: 0.94, h: 0.1, round: true },
-  },
-  {
-    image: 'intro-6-profile',
-    alt: 'The four friends around a phone that shows the profile with the travel buddies',
-    title: () => 'Make it yours',
-    text: 'In Profile, pick your travel buddy and watch your streak, points and gems grow.',
-    tab: { icon: 'nav-profile.webp', label: 'Profile' },
-    mark: { x: 0.035, y: 0.282, w: 0.93, h: 0.115, round: true },
-  },
+  { image: 'intro-1-welcome' },
+  { image: 'intro-2-map', tabIcon: 'nav-map.webp', mark: { x: 0.4, y: 0.36, w: 0.2, h: 0.1, round: true } },
+  // around the dots only: the lesson's name is above them and the door below
+  { image: 'intro-3-doors', tabIcon: 'nav-map.webp', mark: { x: 0.262, y: 0.163, w: 0.476, h: 0.042, round: true, thin: true } },
+  { image: 'intro-4-write', tabIcon: 'nav-write.webp', mark: { x: 0.055, y: 0.16, w: 0.89, h: 0.455 } },
+  { image: 'intro-5-review', tabIcon: 'nav-review.webp', mark: { x: 0.03, y: 0.893, w: 0.94, h: 0.1, round: true } },
+  { image: 'intro-6-profile', tabIcon: 'nav-profile.webp', mark: { x: 0.035, y: 0.282, w: 0.93, h: 0.115, round: true } },
 ]
 
 /** How far a finger must travel sideways to turn the page. */
@@ -109,6 +69,7 @@ function useFit() {
 /** The quick tour, over everything else. `onDone` runs when it is finished or skipped. */
 export function Intro({ onDone }: { onDone: () => void }) {
   const { nickname } = useProgress()
+  const t = useT().intro
   const [i, setI] = useState(0)
   // 1 when moving on, -1 when going back: the picture slides in from that side.
   const [dir, setDir] = useState(1)
@@ -116,6 +77,7 @@ export function Intro({ onDone }: { onDone: () => void }) {
   const { holder, box } = useFit()
   const last = i === SLIDES.length - 1
   const slide = SLIDES[i]
+  const text = t.slides[i]
   const { s, tx, ty, screen } = framing(slide.image)
 
   // The first picture is the page's own; the rest, and the screens that go on their phones, are fetched while the learner reads it.
@@ -154,16 +116,16 @@ export function Intro({ onDone }: { onDone: () => void }) {
     >
       <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col px-4 pt-[max(env(safe-area-inset-top),12px)] pb-[max(env(safe-area-inset-bottom),16px)]">
         <div className="flex h-10 items-center justify-between">
-          {slide.tab ? (
+          {slide.tabIcon ? (
             <span className="flex items-center gap-1.5 rounded-full border-2 border-line bg-card py-0.5 pr-3.5 pl-1.5 text-sm font-black">
-              <img src={asset(slide.tab.icon)} alt="" className="h-7 w-7" draggable={false} />
-              {slide.tab.label}
+              <img src={asset(slide.tabIcon)} alt="" className="h-7 w-7" draggable={false} />
+              {text.tab}
             </span>
           ) : (
             <span />
           )}
           <button type="button" onClick={onDone} className="rounded-xl px-3 py-2 text-sm font-extrabold text-muted">
-            Skip
+            {t.skip}
           </button>
         </div>
 
@@ -184,7 +146,7 @@ export function Intro({ onDone }: { onDone: () => void }) {
               >
                 <img
                   src={asset(`intro/${slide.image}.webp`)}
-                  alt={slide.alt}
+                  alt={text.alt}
                   draggable={false}
                   className="absolute max-w-none select-none"
                   style={{ width: pct(s), height: pct(s), left: pct(tx), top: pct(ty) }}
@@ -239,8 +201,8 @@ export function Intro({ onDone }: { onDone: () => void }) {
               transition={{ duration: 0.2 }}
               className="flex min-h-[8.5rem] flex-col items-center gap-2"
             >
-              <h1 className="text-[28px] leading-tight font-black">{slide.title(nickname)}</h1>
-              <p className="max-w-sm text-[15px] leading-snug text-muted">{slide.text}</p>
+              <h1 className="text-[28px] leading-tight font-black">{text.title(nickname)}</h1>
+              <p className="max-w-sm text-[15px] leading-snug text-muted">{text.text}</p>
             </motion.div>
           </AnimatePresence>
 
@@ -251,7 +213,7 @@ export function Intro({ onDone }: { onDone: () => void }) {
           </div>
 
           <button type="button" autoFocus onClick={() => go(i + 1)} className="btn btn-primary w-full">
-            {last ? 'Let’s go!' : 'Next'}
+            {last ? t.letsGo : t.next}
           </button>
         </div>
       </div>
