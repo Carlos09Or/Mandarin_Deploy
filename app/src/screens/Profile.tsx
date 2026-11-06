@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { PATH, WORDS } from '../data/course'
+import { OPEN_PATH, OPEN_WORDS } from '../data/course'
 import {
   DAILY_GOAL,
   NICKNAME_MAX,
@@ -49,9 +49,9 @@ export function Profile() {
   const stats = [
     { value: liveStreak(p), label: 'Day streak', icon: <IconFlame className="h-7 w-7 text-brand" /> },
     { value: p.xp, label: 'Total XP', icon: <IconStar className="h-7 w-7 text-gold" /> },
-    { value: `${learnedWords(p).length}/${WORDS.length}`, label: 'Words', icon: <span className="han text-2xl text-sky">词</span> },
+    { value: `${learnedWords(p).length}/${OPEN_WORDS.length}`, label: 'Words', icon: <span className="han text-2xl text-sky">词</span> },
     {
-      value: `${PATH.filter((n) => p.nodes[n.id]).length}/${PATH.length}`,
+      value: `${OPEN_PATH.filter((n) => p.nodes[n.id]).length}/${OPEN_PATH.length}`,
       label: 'Lessons',
       icon: <span className="han text-2xl text-jade">课</span>,
     },

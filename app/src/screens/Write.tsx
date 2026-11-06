@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { WORDS, charsOf, word } from '../data/course'
+import { OPEN_WORDS, charsOf, word } from '../data/course'
 import { learnedWords, useProgress } from '../lib/progress'
 
 type Props = { onWrite: (char: string, n: number) => void }
 
 /** Every character of the course, each paired with the first word that uses it. */
 const ALL_CHARS: [string, number][] = []
-for (const w of WORDS) for (const c of charsOf(w.hanzi)) if (!ALL_CHARS.some(([x]) => x === c)) ALL_CHARS.push([c, w.n])
+for (const w of OPEN_WORDS) for (const c of charsOf(w.hanzi)) if (!ALL_CHARS.some(([x]) => x === c)) ALL_CHARS.push([c, w.n])
 
 export function Write({ onWrite }: Props) {
   const progress = useProgress()
@@ -41,7 +41,7 @@ export function Write({ onWrite }: Props) {
           onClick={() => setShowAll(!showAll)}
           className="rounded-xl px-3 py-1.5 text-sm font-extrabold text-sky-dark hover:bg-sky-soft"
         >
-          {showAll ? 'Only mine' : 'See all 248'}
+          {showAll ? 'Only mine' : `See all ${ALL_CHARS.length}`}
         </button>
       </div>
 
