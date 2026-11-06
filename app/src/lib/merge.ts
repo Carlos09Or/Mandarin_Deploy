@@ -49,6 +49,7 @@ export function mergeProgress(local: Progress, remote: Progress): Progress {
     // The name last chosen counts, but a device that never asked for one (empty) never erases the other's.
     nickname: newer.nickname || (newer === local ? remote : local).nickname,
     welcomed: local.welcomed || remote.welcomed,
+    introSeen: local.introSeen || remote.introSeen,
     // Counters: if two devices were used on the same day offline, the larger of each is kept rather than a sum that
     // would count the shared past twice.
     xp: Math.max(local.xp, remote.xp, sumXp),

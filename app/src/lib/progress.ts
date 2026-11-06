@@ -40,6 +40,8 @@ export type Progress = {
   nickname: string
   /** The welcome screens (name, then guest or account) have been gone through, on this device or on another one of the account. */
   welcomed: boolean
+  /** The quick tour of the app (components/Intro.tsx) has been seen or skipped, on this device or on another one of the account. */
+  introSeen: boolean
   xp: number
   /** Reward currency. What it buys is up to each teacher (extra quiz points, etc.). */
   gems: number
@@ -92,6 +94,7 @@ function fresh(): Progress {
     createdAt: new Date().toISOString(),
     nickname: '',
     welcomed: false,
+    introSeen: false,
     xp: 0,
     gems: 0,
     outfits: {},
@@ -122,6 +125,8 @@ export const revive = (data: Partial<Progress>): Progress => ({
   ...data,
   // Learners who started before the welcome screens existed have been welcomed already.
   welcomed: data.welcomed ?? (data.modifiedAt ?? 0) > 0,
+  // So have the ones who started before the tour existed.
+  introSeen: data.introSeen ?? (data.modifiedAt ?? 0) > 0,
 })
 
 function load(): Progress {
@@ -286,6 +291,11 @@ export function finishWelcome(name: string) {
   commit({ ...state, nickname: name.trim().slice(0, NICKNAME_MAX) || state.nickname, welcomed: true })
 }
 
+/** The quick tour is over (seen to the end or skipped): it is not shown again. */
+export const finishIntro = () => {
+  if (!state.introSeen) commit({ ...state, introSeen: true })
+}
+
 /** Puts in progress from a backup file, already merged with what is here. Unlike a sync, this is a change made on this device. */
 export const importProgress = (next: Progress) => commit(next)
 
@@ -304,6 +314,7 @@ export function resetProgress() {
     deviceId: state.deviceId,
     nickname: state.nickname,
     welcomed: state.welcomed,
+    introSeen: state.introSeen,
     epoch: crypto.randomUUID(),
     epochAt: Date.now(),
   })

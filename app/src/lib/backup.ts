@@ -24,7 +24,7 @@ export async function restoreProgress(file: File): Promise<'ok' | 'bad'> {
     const here = getProgress()
     // The backup joins this device's current life of the data, even if it was reset since the backup was made.
     const backup = revive({ ...data, epoch: here.epoch, epochAt: here.epochAt })
-    importProgress({ ...mergeProgress(here, backup), welcomed: true })
+    importProgress({ ...mergeProgress(here, backup), welcomed: true, introSeen: true })
     return 'ok'
   } catch {
     return 'bad'

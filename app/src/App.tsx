@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { SaveNudge } from './components/SaveNudge'
+import { Intro } from './components/Intro'
 import { Shell, type Tab } from './components/Shell'
 import { useWelcomeState } from './components/useWelcomeState'
 import { Welcome } from './components/Welcome'
@@ -18,7 +19,7 @@ import { toast } from './journey/toast'
 import { QUICK_FRIEND_FILES } from './lesson/friends'
 import type { LessonSummary } from './lesson/LessonPlayer'
 import { buildNode, buildWriting, type Exercise } from './lib/lesson'
-import { completeNode, getProgress, useProgress, type Reward } from './lib/progress'
+import { completeNode, finishIntro, getProgress, useProgress, type Reward } from './lib/progress'
 
 // Everything but the map is loaded as its own file, so the app opens on the map without downloading the
 // lessons, the writing trainer or the review cards first. They are fetched in the background once it is open.
@@ -95,7 +96,7 @@ export default function App() {
     }
   }, [loaded])
   const welcome = useWelcomeState()
-  // The map stays still, and its "unlocked" toast waits, until the learner is through the welcome screens.
+  // The map stays still, and its "unlocked" toast waits, until the learner is through the welcome screens and the tour.
   const welcoming = welcome !== 'closed'
 
   // Then the other screens are fetched while the browser is idle, so they open at once.
@@ -230,6 +231,7 @@ export default function App() {
       )}
       <SaveNudge quiet={tab === 'map' && !province && !busy && !welcoming} />
       {welcome === 'open' && <Welcome />}
+      {welcome === 'intro' && <Intro onDone={finishIntro} />}
       {welcome === 'waiting' && <div className="fixed inset-0 z-[60] bg-paper" />}
       {!loaded && <Splash onDone={() => setLoaded(true)} />}
     </>

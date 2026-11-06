@@ -16,6 +16,7 @@ import {
 import { IconFlame, IconGem, IconLock, IconStar } from '../components/icons'
 import { CharacterStudio } from '../components/CharacterStudio'
 import { Account } from '../components/Account'
+import { Intro } from '../components/Intro'
 import { downloadProgress, restoreProgress } from '../lib/backup'
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
@@ -62,6 +63,7 @@ export function Profile() {
   const fileInput = useRef<HTMLInputElement>(null)
   const [restored, setRestored] = useState<'ok' | 'bad' | null>(null)
   const [name, setName] = useState<string | null>(null)
+  const [tour, setTour] = useState(false)
 
   return (
     <div className="flex flex-col gap-8 pb-10">
@@ -146,6 +148,15 @@ export function Profile() {
         </div>
         <p className="mt-3 text-sm text-muted">Daily goal: {DAILY_GOAL} XP (about 3 lessons).</p>
       </section>
+
+      <section className="card flex flex-col gap-3 p-5">
+        <h3 className="font-black">How it works</h3>
+        <p className="text-sm text-muted">A quick tour of the map, the doors, the exercises and the review cards.</p>
+        <button type="button" onClick={() => setTour(true)} className="btn btn-ghost">
+          Watch the tour
+        </button>
+      </section>
+      {tour && <Intro onDone={() => setTour(false)} />}
 
       <section className="card flex flex-col gap-3 p-5">
         <h3 className="font-black">Day &amp; night</h3>
