@@ -2,19 +2,12 @@ import { nodesOfUnit, word, type PathNode, type Word } from '../data/course'
 import { PROVINCES, hasContent, type Province } from '../data/journey'
 import type { Progress } from '../lib/progress'
 
-/** A stop on a province's line: a lesson at a place, the story, or the landmark checkpoint. */
-export type Stop =
-  | { kind: 'lesson'; node: PathNode; place: string; key: Word }
-  | { kind: 'story'; title: string; sub: string }
-  | { kind: 'goal'; node: PathNode; place: string }
+/** A stop on a province's line: a lesson at a place, or the story. */
+export type Stop = { kind: 'lesson'; node: PathNode; place: string; key: Word } | { kind: 'story'; title: string; sub: string }
 
 export function stopsOf(p: Province): Stop[] {
   const stops: Stop[] = []
   for (const node of nodesOfUnit(p.unit)) {
-    if (node.kind === 'checkpoint') {
-      stops.push({ kind: 'goal', node, place: p.landmark!.name })
-      continue
-    }
     stops.push({ kind: 'lesson', node, place: p.stops![node.index] ?? `Stop ${node.index + 1}`, key: word(node.words[0]) })
     if (node.index === 1 && p.story) stops.push({ kind: 'story', ...p.story })
   }
@@ -39,9 +32,9 @@ export function nextStop(stops: Stop[], progress: Progress) {
   return i === -1 ? stops.length : i
 }
 
-export const provinceDone = (p: Province, progress: Progress) => !!progress.nodes[`u${p.unit}-cp`]
+export const provinceDone = (p: Province, progress: Progress) => nodesOfUnit(p.unit).every((n) => !!progress.nodes[n.id])
 
-/** A province opens once the one before it has passed its checkpoint. */
+/** A province opens once the one before it has all its lessons done. */
 export const isUnlocked = (p: Province, progress: Progress) => {
   const before = PROVINCES.find((q) => q.unit === p.unit - 1)
   return !before || provinceDone(before, progress)

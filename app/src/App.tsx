@@ -1,15 +1,18 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { SaveNudge } from './components/SaveNudge'
+import { Intro } from './components/Intro'
+import { LanguageScreen } from './components/LanguageScreen'
 import { Shell, type Tab } from './components/Shell'
 import { useWelcomeState } from './components/useWelcomeState'
 import { Welcome } from './components/Welcome'
-import type { PathNode } from './data/course'
+import { lastNodeOf, type PathNode } from './data/course'
 import { FRIEND_IDS, type FriendId } from './data/friends'
 import type { Province } from './data/journey'
 import { MapHome, type MapEvent } from './journey/MapHome'
 import { Splash } from './journey/Splash'
 import { nextProvince } from './journey/stops'
 import { warmAhead, whenLoaded } from './journey/preload'
+import { textsOf, useLang } from './i18n'
 import { startAccount } from './lib/account'
 import { canWarm } from './lib/network'
 import { keepStorage } from './lib/storage'
@@ -18,7 +21,7 @@ import { toast } from './journey/toast'
 import { QUICK_FRIEND_FILES } from './lesson/friends'
 import type { LessonSummary } from './lesson/LessonPlayer'
 import { buildNode, buildWriting, type Exercise } from './lib/lesson'
-import { completeNode, getProgress, useProgress, type Reward } from './lib/progress'
+import { completeNode, finishIntro, getProgress, useProgress, type Reward } from './lib/progress'
 
 // Everything but the map is loaded as its own file, so the app opens on the map without downloading the
 // lessons, the writing trainer or the review cards first. They are fetched in the background once it is open.
@@ -90,12 +93,15 @@ export default function App() {
     // Welcome back: said once per visit, only to someone who has been welcomed before (the welcome screens say hello themselves).
     const { welcomed, nickname } = getProgress()
     if (welcomed && nickname) {
-      toast(`Welcome back, ${nickname.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)}!`)
+      toast(textsOf(getProgress().lang).app.welcomeBack(nickname.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)))
       keepStorage()
     }
   }, [loaded])
   const welcome = useWelcomeState()
-  // The map stays still, and its "unlocked" toast waits, until the learner is through the welcome screens.
+  // The page says which language its words are in (screen readers, hyphenation, translation offers).
+  const lang = useLang()
+  useEffect(() => void (document.documentElement.lang = lang), [lang])
+  // The map stays still, and its "unlocked" toast waits, until the learner is through the welcome screens and the tour.
   const welcoming = welcome !== 'closed'
 
   // Then the other screens are fetched while the browser is idle, so they open at once.
@@ -117,7 +123,7 @@ export default function App() {
   const startRide = (r: Ride) => {
     const p = getProgress()
     // Words only count as new the first time a lesson is completed.
-    const fresh = r.node.kind === 'lesson' && !p.nodes[r.node.id] ? r.node.words : []
+    const fresh = !p.nodes[r.node.id] ? r.node.words : []
     start(buildNode(r.node, p), r.node.id, fresh, r)
   }
 
@@ -126,8 +132,8 @@ export default function App() {
       if (!session) return
       const firstPass = session.nodeId ? !getProgress().nodes[session.nodeId] : false
       const reward = completeNode(session.nodeId, summary)
-      // Passing a province's checkpoint for the first time finishes the province.
-      const finished = firstPass && session.nodeId?.endsWith('-cp') ? (session.province ?? null) : null
+      // Passing a province's last lesson for the first time finishes the province.
+      const finished = firstPass && session.province && session.nodeId === lastNodeOf(session.province.unit)?.id ? session.province : null
       setResult({ summary, reward, newWords: session.newWords, buddy: session.buddy, nodeId: session.nodeId, finished })
       setSession(null)
     },
@@ -229,7 +235,9 @@ export default function App() {
         </Later>
       )}
       <SaveNudge quiet={tab === 'map' && !province && !busy && !welcoming} />
+      {welcome === 'language' && <LanguageScreen />}
       {welcome === 'open' && <Welcome />}
+      {welcome === 'intro' && <Intro onDone={finishIntro} />}
       {welcome === 'waiting' && <div className="fixed inset-0 z-[60] bg-paper" />}
       {!loaded && <Splash onDone={() => setLoaded(true)} />}
     </>

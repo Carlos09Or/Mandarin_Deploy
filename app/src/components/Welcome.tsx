@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { asset } from '../data/journey'
+import { useT } from '../i18n'
 import { useAccount } from '../lib/account'
 import { finishWelcome, NICKNAME_MAX, useProgress } from '../lib/progress'
 import { keepStorage } from '../lib/storage'
-import { Buddy } from './Friends'
 import { GoogleButton } from './GoogleButton'
 
 /**
@@ -12,6 +13,7 @@ import { GoogleButton } from './GoogleButton'
 export function Welcome() {
   const a = useAccount()
   const p = useProgress()
+  const t = useT().welcome
   const [guest, setGuest] = useState(false)
   // Until they type, the name is the one already kept, or the first name of the Google account that has just signed in.
   const [typed, setTyped] = useState<string | null>(null)
@@ -29,16 +31,12 @@ export function Welcome() {
   return (
     <div className="fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-paper">
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-6 px-6 py-10 text-center">
-        <Buddy id="wawa" mood="happy" size={150} />
+        <img src={asset('language/lang-wawa.webp')} alt="" draggable={false} className="h-44 w-auto select-none drop-shadow-[0_8px_6px_rgba(60,30,0,0.25)]" />
         <div>
           <p className="font-display text-lg font-bold text-sky-dark">Mandarin Journey</p>
-          <h1 className="mt-1 text-3xl font-black">{choosing ? 'Keep your progress safe?' : 'What should we call you?'}</h1>
+          <h1 className="mt-1 text-3xl font-black">{choosing ? t.saveTitle : t.nameTitle}</h1>
           <p className="mt-2 text-muted">
-            {choosing
-              ? 'Sign in to carry on from any phone or computer, or just play as a guest.'
-              : a.user
-                ? 'A first name or a nickname, whatever you like.'
-                : 'A first name or a nickname, whatever you like. Your progress stays on this device.'}
+            {choosing ? t.saveText : a.user ? t.nameText : t.nameTextGuest}
           </p>
         </div>
 
@@ -46,11 +44,9 @@ export function Welcome() {
           <div className="flex w-full flex-col gap-3">
             <GoogleButton disabled={!a.google} />
             <button type="button" onClick={() => setGuest(true)} className="btn btn-ghost">
-              Play as a guest
+              {t.guest}
             </button>
-            <p className="text-sm text-muted">
-              As a guest your progress is saved on this device only. You can sign in later from Profile and nothing is lost.
-            </p>
+            <p className="text-sm text-muted">{t.guestNote}</p>
             {a.problem && <p className="text-sm font-bold text-wrong">{a.problem}</p>}
           </div>
         ) : (
@@ -68,16 +64,16 @@ export function Welcome() {
               autoFocus
               autoComplete="nickname"
               enterKeyHint="go"
-              placeholder="Your name"
-              aria-label="Your name or nickname"
+              placeholder={t.namePlaceholder}
+              aria-label={t.nameLabel}
               className="w-full rounded-2xl border-2 border-line-dark bg-card px-4 py-3.5 text-center text-xl font-bold"
             />
             <button type="submit" disabled={!clean} className="btn btn-primary w-full">
-              Let’s go
+              {t.go}
             </button>
             {guest && !a.user && (
               <button type="button" onClick={() => setGuest(false)} className="text-sm font-bold text-muted">
-                Back
+                {t.back}
               </button>
             )}
           </form>

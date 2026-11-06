@@ -27,9 +27,11 @@ const overnight = { ...busy, outbox: [{ ...busy.outbox[0], durationMs: 12 * 3_60
 const fullLog = { ...busy, reviews: Array.from({ length: 3000 }, (_, i) => ({ n: i % 500, at: 1793722793357 + i, r: 1 + (i % 4), s: i % 4, src: 'card' })) }
 // An older save that lacks most fields.
 const old = { v: 1, xp: 10, streak: { count: 1, last: '2026-01-02' } }
+// What a browser sends once the welcome screens and the tour have been through (nickname, welcomed, introSeen).
+const modern = { ...busy, nickname: 'Ana', welcomed: true, introSeen: true, lang: 'es' }
 
 test('what real clients send is accepted', () => {
-  for (const [name, doc] of Object.entries({ fresh, busy, overnight, fullLog, old })) assert.equal(progressProblem(doc), null, name)
+  for (const [name, doc] of Object.entries({ fresh, busy, overnight, fullLog, old, modern })) assert.equal(progressProblem(doc), null, name)
 })
 
 test('a field the server does not know passes untouched', () => {
@@ -61,3 +63,8 @@ bad('a day key that is not a date', { ...busy, dailyXp: { today: 5 } }, 'dailyXp
 bad('a node that is not an object', { ...busy, nodes: { '1-1': 5 } }, 'nodes')
 bad('a node key of 1000 characters', { ...busy, nodes: { ['x'.repeat(1000)]: busy.nodes['1-1'] } }, 'nodes')
 bad('collections as arrays', { ...busy, words: [] }, 'words')
+bad('introSeen as text', { ...busy, introSeen: 'yes' }, 'introSeen')
+bad('welcomed as a number', { ...busy, welcomed: 1 }, 'welcomed')
+bad('a nickname of 100 characters', { ...busy, nickname: 'x'.repeat(100) }, 'nickname')
+bad('a language the app does not have', { ...busy, lang: 'fr' }, 'lang')
+bad('a language as a number', { ...busy, lang: 1 }, 'lang')

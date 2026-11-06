@@ -140,7 +140,7 @@ export function Intro({ n, step, count, lead }: Props) {
   const peekRise = '60%'
 
   return (
-    <Stage eyebrow="New word">
+    <Stage>
       <div
         className="-mx-5 flex flex-1 flex-col items-center justify-center gap-3 overflow-x-clip px-5 text-center"
         style={{ ['--w' as string]: 'clamp(224px, 64vw, 270px)' }}

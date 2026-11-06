@@ -54,7 +54,7 @@ export function Cloze({ ex, selected, onSelect, revealed }: Props) {
       : 'border-wrong bg-wrong-soft'
 
   return (
-    <Stage eyebrow="Complete the sentence" title="Pick the missing word.">
+    <Stage title="Pick the missing word.">
       <div className="flex flex-wrap items-start justify-center gap-x-3 gap-y-5 pt-4">
         {ex.tokens.map((t, i) => {
           const isHole = i === ex.blank

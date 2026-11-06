@@ -1,4 +1,5 @@
 import { FRIEND_IDS } from '../data/friends'
+import { LANGUAGE_FILES } from '../data/language'
 import vocab from '../data/hsk1.json'
 import { word } from '../data/course'
 import { DOOR_FILES, asset, doorFiles, doorFor, doorOpening, flightFiles, nightly, walkerFiles } from '../data/journey'
@@ -24,6 +25,8 @@ const NOW = [
   'map/lo.webp', 'map-fog-v2-lo.webp',
   'characters/wawa-sombrero.svg', 'characters/harpia-banda.svg', 'characters/sloth-montuno.svg', 'characters/tucan-pollera.svg',
   'nav-map.webp', 'nav-review.webp', 'nav-write.webp', 'nav-profile.webp',
+  // a new learner's first screen is the choice of language
+  ...(getProgress().lang ? [] : LANGUAGE_FILES),
 ]
 /** The door pictures for the light the learner is in now (their night twins after dark). */
 const byLight = (file: string) => nightly(file, isNight(getProgress()))
@@ -47,8 +50,6 @@ const LATER = [
   ...FRIEND_IDS.flatMap(flightFiles),
   // other routes
   'ride-landscape.webp',
-  // the landmarks that close each province
-  'landmark-canal.webp', 'stops/arch-bridge.webp',
 ]
 
 /** Decoded images are kept here for the whole session, so the browser never drops them. */
@@ -194,13 +195,11 @@ async function warmNext() {
   await step(doorOpening(doors[at], night))
   // the lesson's voice clips, then the friends who bring its new words, the one bringing the first word first (lesson/Intro.tsx)
   await prefetchClips(node.words)
-  if (node.kind === 'lesson') {
-    const first = QUICK[node.words[0] % QUICK.length]
-    await step([...POSES[first].map((p) => file(first, p)), ...WORD_FRIEND_FILES])
-    // and the stroke data of its characters, for the tracing at the end (lesson/Trace.tsx)
-    const chars = [...new Set(node.words.flatMap((n) => [...word(n).hanzi]))]
-    await Promise.all(chars.map((c) => fetch(`${import.meta.env.BASE_URL}hanzi/${c}.json`).catch(() => undefined)))
-  }
+  const first = QUICK[node.words[0] % QUICK.length]
+  await step([...POSES[first].map((p) => file(first, p)), ...WORD_FRIEND_FILES])
+  // and the stroke data of its characters, for the tracing at the end (lesson/Trace.tsx)
+  const chars = [...new Set(node.words.flatMap((n) => [...word(n).hanzi]))]
+  await Promise.all(chars.map((c) => fetch(`${import.meta.env.BASE_URL}hanzi/${c}.json`).catch(() => undefined)))
 }
 
 let ahead: Promise<void> | null = null

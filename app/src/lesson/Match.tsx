@@ -161,7 +161,7 @@ export function Match({ words, onDone }: Props) {
 
   const from = active && drag ? pos[`${active.side}${active.n}`] : null
   return (
-    <Stage eyebrow="Link the pairs" title="Draw matching lines.">
+    <Stage title="Draw matching lines.">
       <div ref={box} className="relative flex justify-between pt-2">
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden>
           {[...matched].map((n) =>

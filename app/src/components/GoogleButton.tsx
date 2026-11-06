@@ -1,3 +1,4 @@
+import { useT } from '../i18n'
 import { signInWithGoogle } from '../lib/account'
 
 export const GoogleG = () => (
@@ -10,6 +11,7 @@ export const GoogleG = () => (
 )
 
 export function GoogleButton({ onBefore, disabled }: { onBefore?: () => void; disabled?: boolean }) {
+  const t = useT()
   return (
     <button
       type="button"
@@ -20,7 +22,7 @@ export function GoogleButton({ onBefore, disabled }: { onBefore?: () => void; di
       }}
       className="btn btn-ghost normal-case"
     >
-      <GoogleG /> Continue with Google
+      <GoogleG /> {t.google}
     </button>
   )
 }

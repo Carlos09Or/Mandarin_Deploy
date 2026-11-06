@@ -44,10 +44,7 @@ export function LessonDoor({ province, traveler, onBack, onCovered, onWalk, onDo
   const [view, setView] = useState(at)
   const stop = stops[view]
   const locked = next !== -1 && view > next
-  const title =
-    stop.kind === 'goal'
-      ? { zh: province.landmark!.zh, py: province.landmark!.py }
-      : lessonTitle(stop.node.index + 1)
+  const title = lessonTitle(stop.node.index + 1)
 
   // 'loading' while the pictures arrive, 'wait' for the tap, 'walk' to the door.
   const [phase, setPhase] = useState<'loading' | 'wait' | 'walk'>('loading')
@@ -202,7 +199,7 @@ export function LessonDoor({ province, traveler, onBack, onCovered, onWalk, onDo
         >
           {stops.map((s, i) => {
             const door = doors[i]
-            const num = s.kind === 'goal' ? '关' : lessonTitle(s.node.index + 1).num
+            const num = lessonTitle(s.node.index + 1).num
             const closed = next !== -1 && i > next
             return (
               <div key={s.node.id} className={`j-slide ${i === view ? 'on' : ''} ${closed ? 'locked' : ''}`} aria-hidden={i !== view}>

@@ -32,7 +32,7 @@ const fetched = new Set<string>()
 /**
  * Fetches the voice clips of these words ahead of time (the service worker keeps them), so a lesson's first plays do not
  * wait on the network. Every voice on a good connection, only the session's voice on a poor one, and no more than
- * `MAX_AHEAD` words (a checkpoint covers a whole unit).
+ * `MAX_AHEAD` words.
  */
 const MAX_AHEAD = 12
 export async function prefetchClips(words: number[]) {
