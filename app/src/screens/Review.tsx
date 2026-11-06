@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { WORDS, accentFor, plainPinyin, word } from '../data/course'
+import { OPEN_WORDS, accentFor, plainPinyin, word } from '../data/course'
 import { deckRows, deckWords, dueCount, dueNow, statsOf, wholeUnits } from '../lib/cards'
 import { learnedWords, setStudyOptions, useProgress } from '../lib/progress'
 import { WordSheet } from '../components/WordSheet'
@@ -335,7 +335,7 @@ function Words({ onOpen }: { onOpen: (n: number) => void }) {
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase()
-    const pool = scope === 'learned' ? WORDS.filter((w) => learnedSet.has(w.n)) : WORDS
+    const pool = scope === 'learned' ? OPEN_WORDS.filter((w) => learnedSet.has(w.n)) : OPEN_WORDS
     if (!q) return pool
     const qp = plainPinyin(q)
     return pool.filter(
@@ -355,7 +355,7 @@ function Words({ onOpen }: { onOpen: (n: number) => void }) {
               onClick={() => setScope(s)}
               className={`flex-1 rounded-xl px-4 py-2 ${scope === s ? 'bg-sky-soft text-sky-dark' : 'text-muted'}`}
             >
-              {s === 'learned' ? `Learned (${learned.length})` : 'All (300)'}
+              {s === 'learned' ? `Learned (${learned.length})` : `All (${OPEN_WORDS.length})`}
             </button>
           ))}
         </div>

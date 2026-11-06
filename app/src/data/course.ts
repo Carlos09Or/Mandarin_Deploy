@@ -73,6 +73,15 @@ function nodesFor(unit: Unit): PathNode[] {
 }
 
 export const PATH: PathNode[] = UNITS.flatMap(nodesFor)
+
+/**
+ * The units that can be played now. The rest of the course stays in the data but is closed: its provinces say "coming soon" and
+ * the dictionary, the writing list and the totals count only what is open. Opening a unit is adding its id here.
+ */
+export const OPEN_UNITS: number[] = [1]
+export const OPEN_PATH: PathNode[] = PATH.filter((n) => OPEN_UNITS.includes(n.unitId))
+const openWordNumbers = new Set(UNITS.filter((u) => OPEN_UNITS.includes(u.id)).flatMap((u) => u.words))
+export const OPEN_WORDS: Word[] = WORDS.filter((w) => openWordNumbers.has(w.n))
 export const nodesOfUnit = (unitId: number) => PATH.filter((p) => p.unitId === unitId)
 export const nodeById = (id: string) => PATH.find((p) => p.id === id)
 

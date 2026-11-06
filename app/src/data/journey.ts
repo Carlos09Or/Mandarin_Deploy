@@ -1,5 +1,5 @@
 import map from './map-provinces.json'
-import type { PathNode } from './course'
+import { OPEN_UNITS, type PathNode } from './course'
 import type { FriendId } from './friends'
 
 // The course as a train journey across Panama: each province is one unit. A province's
@@ -56,7 +56,7 @@ export const PROVINCES: Province[] = [
 ]
 export const provinceById = (id: string) => PROVINCES.find((p) => p.id === id)!
 export const provinceOfUnit = (unit: number) => PROVINCES.find((p) => p.unit === unit)
-export const hasContent = (p: Province) => !!p.stops
+export const hasContent = (p: Province) => !!p.stops && OPEN_UNITS.includes(p.unit)
 
 /** Felt medallion for each stop on a route; stops without one show their key hanzi instead. */
 export const STOP_ICONS: Record<string, string> = {
