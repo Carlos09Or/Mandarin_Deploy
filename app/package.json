@@ -13,24 +13,24 @@
   },
   "dependencies": {
     "hanzi-writer": "^3.7.3",
-    "motion": "^14.6.0",
+    "motion": "^14.10.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "ts-fsrs": "5.4.2"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20261102.1",
-    "@tailwindcss/vite": "^4.3.3",
+    "@cloudflare/workers-types": "^5.20261107.1",
+    "@tailwindcss/vite": "^4.3.5",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.2",
+    "@vitejs/plugin-react": "^6.2.1",
     "hanzi-writer-data": "^2.0.1",
-    "oxlint": "^1.88.0",
+    "oxlint": "^1.92.0",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
-    "vite": "^8.3.4",
+    "vite": "^8.3.6",
     "vite-plugin-pwa": "^2.0.0",
-    "wrangler": "^4.156.2"
+    "wrangler": "^4.158.0"
   }
 }
